@@ -1,0 +1,14 @@
+{
+	"toolList": [
+		{
+			"uuid": "f6c5fe43-1c0d-446b-b01b-274d93e92447",
+			"previewRenderable": "$GAME_DATA/Character/Char_Tools/char_sledgehammer_preview.rend",
+			"previewRotation": [-1, 0, 0, 0, 0, 1, 0, 1, 0],
+			"script": {
+				"file": "$CONTENT_DATA/Scripts/Kstick.lua",
+				"class": "Kstick"
+			},
+			"showInInventory": true
+		}
+	]
+}

@@ -1,3 +1,3 @@
 {
-   "toolSetList" : [ "$CONTENT_DATA/Tools/Database/ToolSets/vanila.toolset" ]
+   "toolSetList" : [ "$CONTENT_DATA/Tools/Database/ToolSets/vanila.toolset", "$CONTENT_DATA/Tools/Database/ToolSets/mod.toolset" ]
 }
