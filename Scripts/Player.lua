@@ -37,6 +37,8 @@ local RespawnFadeTimeout = 5.0
 local RespawnDelay = RespawnFadeDuration * 40
 local RespawnEndDelay = 1.0 * 40
 
+local BaguetteSteps = 9
+
 function Player.server_onCreate( self )
 	self.sv = {}
 	self.sv.saved = self.storage:load()
@@ -151,12 +153,7 @@ function Player.cl_localPlayerUpdate( self, dt )
 
 	local character = self.player:getCharacter()
 
-	if self.cl.respawnTimer > 0 then
-		local o1 = "<p textShadow='false' bg='gui_keybinds_bg_orange' color='#4f4f4f' spacing='9'>"
-		local o2 = "</p>"
-		local seconds = math.ceil(self.cl.respawnTimer/40)
-		sm.gui.setInteractionText("", "Respawn in: " .. o1 .. tostring(seconds) .. o2)
-	elseif character and not self.cl.isConscious then
+	if character and not self.cl.isConscious then
 		local keyBindingText =  sm.gui.getKeyBinding( "Use", true )
 		if self.cl.hasRevivalItem then
 			if self.cl.revivalChewCount < BaguetteSteps then
@@ -164,6 +161,11 @@ function Player.cl_localPlayerUpdate( self, dt )
 			else
 				sm.gui.setInteractionText( "", keyBindingText, "#{INTERACTION_REVIVE}" )
 			end
+		elseif self.cl.respawnTimer > 0 then
+			local o1 = "<p textShadow='false' bg='gui_keybinds_bg_orange' color='#4f4f4f' spacing='9'>"
+			local o2 = "</p>"
+			local seconds = math.ceil(self.cl.respawnTimer/40)
+			sm.gui.setInteractionText("", "Respawn in: " .. o1 .. tostring(seconds) .. o2)
 		else
 			sm.gui.setInteractionText( "", keyBindingText, "#{INTERACTION_RESPAWN}" )
 		end
@@ -176,15 +178,16 @@ function Player.cl_localPlayerUpdate( self, dt )
 end
 
 function Player.client_onInteract( self, character, state )
-	if state == true and self.cl.respawnTimer == 0 then
+	if state == true then
 		if not self.cl.isConscious then
 			if self.cl.hasRevivalItem then
 				if self.cl.revivalChewCount >= BaguetteSteps then
 					self.network:sendToServer( "sv_n_revive" )
+					self.cl.respawnTimer = 0
 				end
 				self.cl.revivalChewCount = self.cl.revivalChewCount + 1
 				self.network:sendToServer( "sv_onEvent", { type = "character", data = "chew" } )
-			else
+			elseif self.cl.respawnTimer == 0 then
 				self.network:sendToServer( "sv_n_tryRespawn" )
 			end
 		end
@@ -310,7 +313,7 @@ function Player.sv_e_staminaSpend( self, stamina )
 	end
 end
 
-function Player.sv_takeDamage( self, damage, source )
+function Player.sv_takeDamage( self, damage, source, attacker )
 	if damage > 0 then
 		damage = damage * GetDifficultySettings().playerTakeDamageMultiplier
 		local character = self.player:getCharacter()
@@ -336,6 +339,12 @@ function Player.sv_takeDamage( self, damage, source )
 					character:setDowned( true )
 
 					self.network:sendToClient(self.player, "cl_setRespawnTimer")
+
+					if attacker then
+						self.network:sendToClients( "cl_msg", "#ff0000" .. self.player.name .. "#ffffff was pwned by #00ffff" .. attacker.name )
+					else
+						self.network:sendToClients( "cl_msg", "#ff0000".. self.player.name .. " #ffffffdied " )
+					end
 				end
 
 				self.storage:save( self.sv.saved )
@@ -524,7 +533,7 @@ function Player:server_onProjectile(hitPos, hitTime, hitVelocity, _, attacker, d
 	BasePlayer.server_onProjectile( self, hitPos, hitTime, hitVelocity, _, attacker, damage, userData, hitNormal, projectileUuid )
 
 	if type( attacker ) == "Player" then
-		self:sv_takeDamage( damage, "shock" )
+		self:sv_takeDamage( damage, "shock", attacker )
 	end
 end
 
@@ -532,6 +541,10 @@ function Player:server_onMelee( hitPos, attacker, damage, power, hitDirection )
 	BasePlayer.server_onMelee( self, hitPos, attacker, damage, power, hitDirection )
 
 	if type( attacker ) == "Player" then
-		self:sv_takeDamage( damage, "impact" )
+		self:sv_takeDamage( damage, "impact", attacker )
 	end
+end
+
+function Player:cl_msg(msg)
+	sm.gui.chatMessage(msg)
 end
