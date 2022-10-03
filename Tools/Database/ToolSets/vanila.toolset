@@ -1,0 +1,11 @@
+{
+	"toolList": [
+		{
+		"uuid": "a6113860-f4d4-42df-b8f9-129efdbaf777",
+		"previewRenderable": "$GAME_DATA/Character/Char_Tools/char_sledgehammer_preview.rend",
+		"previewRotation": [  -1, 0, 0, 0, 0, 1, 0, 1, 0 ],
+		"script": { "file": "$CONTENT_DATA/Scripts/NotATool.lua", "class": "NotATool" },
+		"showInInventory": false
+		}
+	]
+}
