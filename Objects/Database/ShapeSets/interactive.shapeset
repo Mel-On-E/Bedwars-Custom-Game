@@ -80,6 +80,86 @@
           "convertibleToDynamic": false,
           "paintable": false
         }
+      },
+      {
+        "uuid": "108d772f-9851-400f-a014-d847900458a7",
+        "name": "obj_interactive_basespawner",
+        "renderable": "$GAME_DATA/Objects/Renderable/Interactive/obj_interactive_robotdrumhead.rend",
+        "color": "00ffff",
+        "box": {
+          "x": 2,
+          "y": 2,
+          "z": 2
+        },
+        "scripted": {
+          "filename": "$CONTENT_DATA/Scripts/Spawner.lua",
+          "classname": "Spawner",
+          "data": {
+            "spawnInterval": 200,
+            "drops": [
+              { "c5e56da5-bc3f-4519-91c2-b307d36e15aa": 1},
+              { "c5e56da5-bc3f-4519-91c2-b307d36e15aa": 2},
+              { "c5e56da5-bc3f-4519-91c2-b307d36e15aa": 3},
+  
+              { "edd445cc-c298-4ce3-9a58-745c1bee1bc7": 5},
+              { "edd445cc-c298-4ce3-9a58-745c1bee1bc7": 5},
+  
+              { "388adeab-67e5-4901-afe8-c56217754510": 36}
+            ]
+          }
+        },
+        "rotationSet": "PropY",
+        "sticky": "-X+X-Y+Y-Z",
+        "physicsMaterial": "Mechanical",
+        "ratings": {
+          "density": 4,
+          "durability": 10,
+          "friction": 4,
+          "buoyancy": 5
+        },
+        "flammable": false,
+        "restrictions": {
+          "usable": false,
+          "erasable": false,
+          "destructable": false
+        }
+      },
+      {
+        "uuid": "208d772f-9851-400f-a014-d847900458a7",
+        "name": "obj_interactive_middlespawner",
+        "renderable": "$GAME_DATA/Objects/Renderable/Interactive/obj_interactive_robotsynthhead.rend",
+        "color": "00ff00",
+        "box": {
+          "x": 2,
+          "y": 2,
+          "z": 2
+        },
+        "scripted": {
+          "filename": "$CONTENT_DATA/Scripts/Spawner.lua",
+          "classname": "Spawner",
+          "data": {
+            "spawnInterval": 2400,
+            "drops": [
+              { "388adeab-67e5-4901-afe8-c56217754510": 1},
+              { "388adeab-67e5-4901-afe8-c56217754510": 5}
+            ]
+          }
+        },
+        "rotationSet": "PropY",
+        "sticky": "-X+X-Y+Y-Z",
+        "physicsMaterial": "Mechanical",
+        "ratings": {
+          "density": 4,
+          "durability": 10,
+          "friction": 4,
+          "buoyancy": 5
+        },
+        "flammable": false,
+        "restrictions": {
+          "usable": false,
+          "erasable": false,
+          "destructable": false
+        }
       }
     ]
 }
