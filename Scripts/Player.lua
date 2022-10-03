@@ -519,3 +519,19 @@ end
 function Player:client_onFixedUpdate()
 	self.cl.respawnTimer = math.max(self.cl.respawnTimer - 1, 0)
 end
+
+function Player:server_onProjectile(hitPos, hitTime, hitVelocity, _, attacker, damage, userData, hitNormal, projectileUuid)
+	BasePlayer.server_onProjectile( self, hitPos, hitTime, hitVelocity, _, attacker, damage, userData, hitNormal, projectileUuid )
+
+	if type( attacker ) == "Player" then
+		self:sv_takeDamage( damage, "shock" )
+	end
+end
+
+function Player:server_onMelee( hitPos, attacker, damage, power, hitDirection )
+	BasePlayer.server_onMelee( self, hitPos, attacker, damage, power, hitDirection )
+
+	if type( attacker ) == "Player" then
+		self:sv_takeDamage( damage, "impact" )
+	end
+end
