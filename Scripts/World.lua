@@ -1,3 +1,5 @@
+dofile( "$SURVIVAL_DATA/Scripts/game/survival_harvestable.lua" )
+
 World = class( nil )
 World.terrainScript = "$CONTENT_DATA/Scripts/terrain.lua"
 World.cellMinX = -2
@@ -18,7 +20,6 @@ function World:server_onCellCreated( x, y )
 end
 
 function World:server_onFixedUpdate()
-
     --delete loose creations
     if sm.game.getCurrentTick() % clearDebrisInterval == 0 then
         for _, body in ipairs( sm.body.getAllBodies() ) do
@@ -29,6 +30,17 @@ function World:server_onFixedUpdate()
             end
         end
     end
+end
+
+function World.server_onProjectile( self, hitPos, hitTime, hitVelocity, _, attacker, damage, userData, hitNormal, target, projectileUuid )
+	-- Spawn loot from projectiles with loot user data
+	if userData and userData.lootUid then
+		local normal = -hitVelocity:normalize()
+		local zSignOffset = math.min( sign( normal.z ), 0 ) * 0.5
+		local offset = sm.vec3.new( 0, 0, zSignOffset )
+		local lootHarvestable = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
+		lootHarvestable:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity, epic = userData.epic  } )
+	end
 end
 
 function World:server_changeMap(name)
