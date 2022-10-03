@@ -57,7 +57,7 @@ function BedwarsTrader.server_onCreate( self )
 	else
 		sm.log.info("Patching missing vacuum interactable, attempting to find it")
 		self.sv.storage.vacuumInteractable = FindFirstInteractable( "d1840356-ad77-4505-a9a0-10d11a77986f" )
-		assert( self.sv.storage.vacuumInteractable, "Failed to find vacuum interactable" )
+		--assert( self.sv.storage.vacuumInteractable, "Failed to find vacuum interactable" )
 		self.sv.vacuumInteractable = self.sv.storage.vacuumInteractable
 		shouldSave = true
 	end
@@ -67,7 +67,7 @@ function BedwarsTrader.server_onCreate( self )
 	else
 		sm.log.info("Patching missing button interactable, attempting to find it")
 		self.sv.storage.buttonInteractable = FindFirstInteractable( "712a5ebd-0793-49ba-b1ef-681a8fdceba6" )
-		assert( self.sv.storage.buttonInteractable, "Failed to find button interactable" )
+		--assert( self.sv.storage.buttonInteractable, "Failed to find button interactable" )
 		self.sv.buttonInteractable = self.sv.storage.buttonInteractable
 		shouldSave = true
 	end
@@ -79,7 +79,7 @@ function BedwarsTrader.server_onCreate( self )
 		local x, y = getCell( self.shape:getWorldPosition().x, self.shape:getWorldPosition().y )
 		local cameraNodes = sm.cell.getNodesByTag( x, y, "CAMERA" )
 		self.sv.storage.cameraNode = cameraNodes[1]
-		assert( self.sv.storage.cameraNode, "Failed to find camera node")
+		--assert( self.sv.storage.cameraNode, "Failed to find camera node")
 		self.sv.cameraNode = self.sv.storage.cameraNode
 		shouldSave = true 
 	end
@@ -91,15 +91,15 @@ function BedwarsTrader.server_onCreate( self )
 		local x, y = getCell( self.shape:getWorldPosition().x, self.shape:getWorldPosition().y )
 		local dropzoneNodes = sm.cell.getNodesByTag( x, y, "HIDEOUT_DROPZONE" )
 		self.sv.storage.dropzoneNode = dropzoneNodes[1]
-		assert( self.sv.storage.dropzoneNode, "Failed to find dropzone node")
+		--assert( self.sv.storage.dropzoneNode, "Failed to find dropzone node")
 		self.sv.dropzoneNode = self.sv.storage.dropzoneNode
 		shouldSave = true  
 	end
 
-	assert( self.sv.vacuumInteractable )
-	assert( self.sv.buttonInteractable )
-	assert( self.sv.cameraNode )
-	assert( self.sv.dropzoneNode )
+	--assert( self.sv.vacuumInteractable )
+	--assert( self.sv.buttonInteractable )
+	--assert( self.sv.cameraNode )
+	--assert( self.sv.dropzoneNode )
 
 	if shouldSave then
 		self.storage:save( self.sv.storage )
