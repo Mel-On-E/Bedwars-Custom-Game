@@ -425,7 +425,7 @@ function Player.sv_e_onSpawnCharacter( self )
 			self.sv.saved.stats.food = self.sv.saved.stats.maxfood
 			self.sv.saved.stats.water = self.sv.saved.stats.maxwater
 		else
-			self.sv.saved.stats.hp = 30
+			self.sv.saved.stats.hp = 100
 			self.sv.saved.stats.food = 30
 			self.sv.saved.stats.water = 30
 		end
