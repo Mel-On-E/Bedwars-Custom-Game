@@ -1,7 +1,14 @@
 dofile( "$SURVIVAL_DATA/Scripts/game/managers/RespawnManager.lua" )
 dofile( "$SURVIVAL_DATA/Scripts/game/managers/BeaconManager.lua" )
 
+local DEBUG = true
+
 Game = class( nil )
+Game.enableLimitedInventory = not DEBUG
+Game.enableRestrictions = not DEBUG
+Game.enableFuelConsumption = not DEBUG
+Game.enableAmmoConsumption = not DEBUG
+Game.enableUpgrade = true
 
 START_AREA_SPAWN_POINT = sm.vec3.new( 0, 0, 5 )
 local deathDepth = -69
@@ -79,7 +86,15 @@ function Game.sv_loadedRespawnCell( self, world, x, y, player )
 	g_respawnManager:sv_respawnCharacter( player, world )
 end
 
+function Game.sv_enableRestrictions( self, state )
+	sm.game.setEnableRestrictions( state )
+	self.network:sendToClients( "client_showMessage", ( state and "Restricted" or "Unrestricted"  ) )
+end
 
+function Game.sv_setLimitedInventory( self, state )
+	sm.game.setLimitedInventory( state )
+	self.network:sendToClients( "client_showMessage", ( state and "Limited inventory" or "Unlimited inventory"  ) )
+end
 
 
 --CLIENT
@@ -99,4 +114,27 @@ function Game:client_onCreate()
 		g_beaconManager = BeaconManager()
 	end
 	g_beaconManager:cl_onCreate()
+
+	if sm.isHost then
+		sm.game.bindChatCommand( "/limited", {}, "cl_onChatCommand", "Use the limited inventory" )
+		sm.game.bindChatCommand( "/unlimited", {}, "cl_onChatCommand", "Use the unlimited inventory" )
+		sm.game.bindChatCommand( "/encrypt", {}, "cl_onChatCommand", "Restrict interactions in all warehouses" )
+		sm.game.bindChatCommand( "/decrypt", {}, "cl_onChatCommand", "Unrestrict interactions in all warehouses" )
+	end
+end
+
+function Game:cl_onChatCommand(params)
+	if params[1] == "/encrypt" then
+		self.network:sendToServer( "sv_enableRestrictions", true )
+	elseif params[1] == "/decrypt" then
+		self.network:sendToServer( "sv_enableRestrictions", false )
+	elseif params[1] == "/unlimited" then
+		self.network:sendToServer( "sv_setLimitedInventory", false )
+	elseif params[1] == "/limited" then
+		self.network:sendToServer( "sv_setLimitedInventory", true )
+	end
+end
+
+function Game.client_showMessage( self, msg )
+	sm.gui.chatMessage( msg )
 end

@@ -1,0 +1,315 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<MyGUI type="Layout" version="3.2.0">
+    <Widget type="Widget" skin="PanelEmpty" name="BackPanel" position_real="0 0 0.265625 0.636111">
+        <Widget type="Widget" skin="BeaconBottomBG" position_real="0 0.325 1 0.35">
+
+            <Widget type="TextBox" skin="TextBox" position_real="0 0 1 0.25">
+                <Property key="Caption" value="#{BEACON_SELECT_COLOR}" />
+                <Property key="FontName" value="SM_TextLabel" />
+                <Property key="TextAlign" value="Center" />
+            </Widget>
+
+
+            <Widget type="Widget" skin="PanelEmpty" position_real="0.05 0.205 0.9 0.1746729273">
+
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton0" position_real="0 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#eeeeee" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton1" position_real="0.1 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#f5f071" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton2" position_real="0.2 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#cbf66f" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton3" position_real="0.3 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#68ff88" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton4" position_real="0.4 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#7eeded" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton5" position_real="0.5 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#4c6fe3" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton6" position_real="0.6 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#ae79f0" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton7" position_real="0.7 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#ee7bf0" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton8" position_real="0.8 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#f06767" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton9" position_real="0.9 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#eeaf5c" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+            </Widget>
+
+            <Widget type="Widget" skin="PanelEmpty" position_real="0.05 0.390 0.9 0.1746729273">
+
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton10" position_real="0 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#7f7f7f" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton11" position_real="0.1 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#e2db13" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton12" position_real="0.2 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#a0ea00" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton13" position_real="0.3 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#19e753" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton14" position_real="0.4 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#2ce6e6" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton15" position_real="0.5 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#0a3ee2" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton16" position_real="0.6 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#7514ed" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton17" position_real="0.7 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#cf11d2" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton18" position_real="0.8 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#d02525" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton19" position_real="0.9 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#df7f00" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+            </Widget>
+
+            <Widget type="Widget" skin="PanelEmpty" position_real="0.05 0.575 0.9 0.1746729273">
+
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton20" position_real="0 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#4a4a4a" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton21" position_real="0.1 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#817c00" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton22" position_real="0.2 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#577d07" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton23" position_real="0.3 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#0e8031" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton24" position_real="0.4 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#118787" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton25" position_real="0.5 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#0f2e91" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton26" position_real="0.6 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#500aa6" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton27" position_real="0.7 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#720a74" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton28" position_real="0.8 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#7c0000" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton29" position_real="0.9 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#673b00" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+            </Widget>
+
+            <Widget type="Widget" skin="PanelEmpty" position_real="0.05 0.760 0.9 0.1746729273">
+
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton30" position_real="0 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#222222" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton31" position_real="0.1 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#323000" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton32" position_real="0.2 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#375000" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton33" position_real="0.3 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#064023" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton34" position_real="0.4 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#0a4444" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton35" position_real="0.5 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#0a1d5a" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton36" position_real="0.6 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#35086c" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton37" position_real="0.7 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#520653" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton38" position_real="0.8 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#560202" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+                <Widget type="Button" skin="BeaconIconColorBorder" name="ColorButton39" position_real="0.9 0 0.09506826 1">
+                    <Widget type="Widget" skin="BeaconIconColor" position_real="0.142857 0.142857 0.714286 0.714286">
+                        <Property key="Colour" value="#472800" />
+                        <Property key="NeedMouse" value="false" />
+                        <Property key="NeedKey" value="false" />
+                    </Widget>
+                </Widget>
+            </Widget>
+
+        </Widget>
+
+
+
+    </Widget>
+    <CodeGeneratorSettings />
+</MyGUI>
