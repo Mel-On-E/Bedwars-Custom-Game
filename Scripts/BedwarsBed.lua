@@ -1,3 +1,5 @@
+dofile("$CONTENT_DATA/Scripts/TeamManager.lua")
+
 BedwarsBed = class()
 
 local colors = {
@@ -64,8 +66,9 @@ function BedwarsBed:sv_set_color(color, player)
     self.shape:setColor(sm_color)
 end
 
-function BedwarsBed.sv_activateBed( self, character )
+function BedwarsBed.sv_activateBed( self, character, player )
 	g_respawnManager:sv_registerBed( self.shape, character )
+    TeamManager.sv_setTeam(player, "#" .. tostring(self.shape.color):sub(1, 6))
 end
 
 function BedwarsBed.client_onAction( self, controllerAction, state )
@@ -86,7 +89,6 @@ function BedwarsBed.client_onInteract( self, character, state )
 	if state == true then
 		self.network:sendToServer( "sv_activateBed", character )
 		self:cl_seat()
-		sm.gui.displayAlertText( "Lorem Ipsum" )
 	end
 end
 

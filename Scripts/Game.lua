@@ -30,6 +30,12 @@ function Game.server_onCreate( self )
 
 	g_beaconManager = BeaconManager()
 	g_beaconManager:sv_onCreate()
+
+	self.sv.teamManager = sm.storage.load(69)
+	if not self.sv.teamManager then
+		self.sv.teamManager = sm.scriptableObject.createScriptableObject(sm.uuid.new("cb5871ae-c677-4480-94e9-31d16899d093"))
+		sm.storage.save(69, self.sv.teamManager)
+	end
 end
 
 function Game.server_onPlayerJoined( self, player, isNewPlayer )
