@@ -103,14 +103,21 @@ function Game.sv_setLimitedInventory( self, state )
 end
 
 function Game.sv_toggleFly( self, params, player )
+	if TeamManager.sv_getTeamColor(player) then
+		self.network:sendToClient( player, "client_showMessage", "You need to be /spectator to fly" )
+		return
+	end
+
 	local char = player.character
 	local isSwimming = not char:isSwimming()
 	char:setSwimming(isSwimming)
 	char.publicData.waterMovementSpeedFraction = (isSwimming and 5 or 1)
+end
 
-	if isSwimming then
-		self.network:sendToClients( "client_showMessage", player.name .. " enabled fly mode" )
-	end
+function Game:sv_setSpectator(params, player)
+	TeamManager.sv_setTeam(player, nil)
+
+	self.network:sendToClients("client_showMessage", player.name .. " is now a spectator")
 end
 
 
@@ -141,6 +148,7 @@ function Game:client_onCreate()
 	end
 
 	sm.game.bindChatCommand( "/fly", {}, "cl_onChatCommand", "Toggle fly mode" )
+	sm.game.bindChatCommand( "/spectator", {}, "cl_onChatCommand", "Become a spectator" )
 end
 
 function Game:cl_onChatCommand(params)
@@ -154,6 +162,8 @@ function Game:cl_onChatCommand(params)
 		self.network:sendToServer( "sv_setLimitedInventory", true )
 	elseif params[1] == "/fly" then
 		self.network:sendToServer( "sv_toggleFly")
+	elseif params[1] == "/spectator" then
+		self.network:sendToServer( "sv_setSpectator")
 	end
 end
 

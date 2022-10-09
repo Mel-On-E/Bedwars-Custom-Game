@@ -68,7 +68,10 @@ end
 
 function BedwarsBed.sv_activateBed( self, character, player )
 	g_respawnManager:sv_registerBed( self.shape, character )
-    TeamManager.sv_setTeam(player, "#" .. tostring(self.shape.color):sub(1, 6))
+
+    local color = "#" .. tostring(self.shape.color):sub(1, 6)
+    TeamManager.sv_setTeam(player, color)
+    self.network:sendToClients("client_showMessage", color .. player.name .. "#ffffff changed team")
 end
 
 function BedwarsBed.client_onAction( self, controllerAction, state )
@@ -132,4 +135,8 @@ end
 function BedwarsBed:cl_create()
     self.client_glowEffect = sm.effect.createEffect( "PlayerStart - Glow", self.interactable )
 	self.client_glowEffect:start()
+end
+
+function BedwarsBed.client_showMessage( self, msg )
+	sm.gui.chatMessage( msg )
 end
