@@ -107,6 +107,7 @@ function BedwarsBed:client_canInteract()
     sm.gui.setInteractionText( "", keyBindingText, "#{INTERACTION_USE}" )
     local keyBindingText =  sm.gui.getKeyBinding( "Tinker", true )
     sm.gui.setInteractionText( "", keyBindingText, "Color" )
+    return true
 end
 
 function BedwarsBed:cl_onColorButton(name)
