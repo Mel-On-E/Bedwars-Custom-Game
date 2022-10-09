@@ -96,6 +96,18 @@ function Game.sv_setLimitedInventory( self, state )
 	self.network:sendToClients( "client_showMessage", ( state and "Limited inventory" or "Unlimited inventory"  ) )
 end
 
+function Game.sv_toggleFly( self, params, player )
+	local char = player.character
+	local isSwimming = not char:isSwimming()
+	char:setSwimming(isSwimming)
+	char.publicData.waterMovementSpeedFraction = (isSwimming and 5 or 1)
+
+	if isSwimming then
+		self.network:sendToClients( "client_showMessage", player.name .. " enabled fly mode" )
+	end
+end
+
+
 
 --CLIENT
 
@@ -121,6 +133,8 @@ function Game:client_onCreate()
 		sm.game.bindChatCommand( "/encrypt", {}, "cl_onChatCommand", "Restrict interactions in all warehouses" )
 		sm.game.bindChatCommand( "/decrypt", {}, "cl_onChatCommand", "Unrestrict interactions in all warehouses" )
 	end
+
+	sm.game.bindChatCommand( "/fly", {}, "cl_onChatCommand", "Toggle fly mode" )
 end
 
 function Game:cl_onChatCommand(params)
@@ -132,6 +146,8 @@ function Game:cl_onChatCommand(params)
 		self.network:sendToServer( "sv_setLimitedInventory", false )
 	elseif params[1] == "/limited" then
 		self.network:sendToServer( "sv_setLimitedInventory", true )
+	elseif params[1] == "/fly" then
+		self.network:sendToServer( "sv_toggleFly")
 	end
 end
 
