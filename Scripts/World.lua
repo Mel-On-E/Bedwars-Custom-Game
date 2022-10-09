@@ -39,44 +39,59 @@ function World:server_onFixedUpdate()
 
 end
 
---local loot = { uuid = sm.uuid.new("c5e56da5-bc3f-4519-91c2-b307d36e15aa"), quantity = amount }
---SpawnLoot( phrv, loot, phrv.worldPosition)
-
-function World:makeHarvestables( hitPos, offset, userData)
-    local succ, trigger = sm.physics.spherecast(hitPos, hitPos + sm.vec3.new(0,0,0.001), 1, nil, 512)
-    lastQuantity = 0
+--[[
     if succ then
         local harvest = trigger:getHarvestable()
-        if harvest:getPublicData().uuid == sm.uuid.new("c5e56da5-bc3f-4519-91c2-b307d36e15aa") and userData.lootUid == sm.uuid.new("c5e56da5-bc3f-4519-91c2-b307d36e15aa") then
-            lastQuantity = harvest:getPublicData().quantity
-            harvest:destroy()
-            local lootHarvestable = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
-            lootHarvestable:setParams( { uuid = userData.lootUid, quantity = lastQuantity + 1, epic = userData.epic  } )
-        elseif harvest:getPublicData().uuid == sm.uuid.new("edd445cc-c298-4ce3-9a58-745c1bee1bc7") and userData.lootUid == sm.uuid.new("edd445cc-c298-4ce3-9a58-745c1bee1bc7")  then
+        if harvest:getPublicData().uuid == userData.lootUid then
             lastQuantity = harvest:getPublicData().quantity
             harvest:destroy()
             local lootHarvestable = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
             lootHarvestable:setParams( { uuid = userData.lootUid, quantity = lastQuantity + 1, epic = userData.epic  } )
         else
-            local lootHarvestable = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
-            lootHarvestable:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity, epic = userData.epic  } )
+
         end
     else
-        local lootHarvestable = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
-        lootHarvestable:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity, epic = userData.epic  } )
     end
-    --elseif userData.lootUid == sm.uuid.new("edd445cc-c298-4ce3-9a58-745c1bee1bc7") then
+]]
+
+
+--local loot = { uuid = sm.uuid.new("c5e56da5-bc3f-4519-91c2-b307d36e15aa"), quantity = amount }
+--SpawnLoot( phrv, loot, phrv.worldPosition)
+function World:makeHarvestables( trigger, results)
+    for _,hrv in pairs(results) do
+        if not sm.exists(hrv) then return end
+        if _ == 1 then
+            mhrv = hrv
+            offset = sm.vec3.new(0,0,0)
+            hitPos = mhrv:getPosition()
+            userData = mhrv:getPublicData()
+        else
+            mhrv:destroy()
+            mhrv = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
+            mhrv:setParams( { uuid = userData.uuid, quantity = userData.quantity, epic = userData.epic  } )
+        end
+    end
+    sm.areaTrigger.destroy( trigger )
+end
+
+function World:prepareHarvestable(hitPos, offset, userData)
+    local lootHarvestable = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
+    lootHarvestable:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity, epic = userData.epic  } )
+    local trg = sm.areaTrigger.createSphere(3 ,hitPos, sm.quat.identity(), 512)
+    trg:bindOnStay("makeHarvestables")
 end
 
 
 function World.server_onProjectile( self, hitPos, hitTime, hitVelocity, _, attacker, damage, userData, hitNormal, target, projectileUuid )
 	-- Spawn loot from projectiles with loot user data
-    if userData.lootUid == sm.uuid.new("c5e56da5-bc3f-4519-91c2-b307d36e15aa") or userData.lootUid == sm.uuid.new("edd445cc-c298-4ce3-9a58-745c1bee1bc7") then
+    if true or userData.lootUid == sm.uuid.new("c5e56da5-bc3f-4519-91c2-b307d36e15aa") or userData.lootUid == sm.uuid.new("edd445cc-c298-4ce3-9a58-745c1bee1bc7") then
         if userData and userData.lootUid then
             local normal = -hitVelocity:normalize()
             local zSignOffset = math.min( sign( normal.z ), 0 ) * 0.5
             local offset = sm.vec3.new( 0, 0, zSignOffset )
-            pcall(World.makeHarvestables, self, hitPos, offset, userData)
+            --local trg = sm.areaTrigger.createSphere(1 ,hitPos, sm.quat.identity, 512)
+            --trg:bindOnStay("makeHarvestables")
+            self:prepareHarvestable(hitPos, offset, userData)
         end
     else
         if userData and userData.lootUid then
