@@ -1,4 +1,5 @@
 dofile( "$GAME_DATA/Scripts/game/BasePlayer.lua" )
+dofile( "$SURVIVAL_DATA/scripts/game/quest_util.lua" )
 
 Player = class( BasePlayer )
 
@@ -542,6 +543,17 @@ function Player:server_onMelee( hitPos, attacker, damage, power, hitDirection )
 
 	if type( attacker ) == "Player" then
 		self:sv_takeDamage( damage, "impact", attacker )
+	end
+end
+
+function Player.server_onInventoryChanges( self, container, changes )
+	if sm.game.getLimitedInventory() then
+		local obj_bedwars_bed = sm.uuid.new( "6488a8fa-1187-45e8-8dac-47d13bdaa026" )
+		if FindInventoryChange( changes, obj_bedwars_bed ) > 0 then
+			sm.container.beginTransaction()
+			sm.container.spend(self.player:getInventory(), obj_bedwars_bed, 1)
+			sm.container.endTransaction()
+		end
 	end
 end
 
