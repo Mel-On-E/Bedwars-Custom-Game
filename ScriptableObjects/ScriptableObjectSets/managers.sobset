@@ -1,0 +1,10 @@
+{
+	"scriptableObjectList": [
+		{
+			"filename": "$CONTENT_DATA/Scripts/TeamManager.lua",
+			"classname": "TeamManager",
+			"name": "mgr_team",
+			"uuid": "cb5871ae-c677-4480-94e9-31d16899d093"
+		}
+	]
+}
