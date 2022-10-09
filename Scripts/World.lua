@@ -58,20 +58,23 @@ end
 --local loot = { uuid = sm.uuid.new("c5e56da5-bc3f-4519-91c2-b307d36e15aa"), quantity = amount }
 --SpawnLoot( phrv, loot, phrv.worldPosition)
 function World:makeHarvestables( trigger, results)
+    offset = sm.vec3.new(0,0,0)
     for _,hrv in pairs(results) do
         if not sm.exists(hrv) then return end
+        if hrv ~= fhrv then return end
         if _ == 1 then
-            mhrv = hrv
-            offset = sm.vec3.new(0,0,0)
-            hitPos = mhrv:getPosition()
-            userData = mhrv:getPublicData()
-        else
-            mhrv:destroy()
-            mhrv = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
-            mhrv:setParams( { uuid = userData.uuid, quantity = userData.quantity, epic = userData.epic  } )
+            fhrv = hrv
+            userData = fhrv:getPublicData()
+            hitPos = fhrv:getPosition()
         end
+        hrv:destroy()
+        quantity = quantity + hrv:getPublicData().quantity
     end
+    fhrv:destroy()
+    local fhrv = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
+    fhrv:setParams( { uuid = userData.uuid, quantity = quantity, epic = userData.epic  } )
     sm.areaTrigger.destroy( trigger )
+    quantity = 0
 end
 
 function World:prepareHarvestable(hitPos, offset, userData)
