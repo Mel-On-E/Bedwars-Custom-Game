@@ -2,12 +2,6 @@
 dofile( "$SURVIVAL_DATA/Scripts/util.lua" )
 
 BedwarsTrader = class( nil )
-BedwarsTrader.maxParentCount = 1
-BedwarsTrader.maxChildCount = 0
-BedwarsTrader.connectionInput = sm.interactable.connectionType.logic
-BedwarsTrader.connectionOutput = sm.interactable.connectionType.none
-BedwarsTrader.colorNormal = sm.color.new( 0xdeadbeef )
-BedwarsTrader.colorHighlight = sm.color.new( 0xdeadbeef )
 BedwarsTrader.VacuumTickTime = 40 * 2.0
 
 local OpenShutterDistance = 7.0
@@ -214,7 +208,7 @@ end
 function BedwarsTrader.server_onFixedUpdate( self, timeStep )
 
 	local buttonIsActive = false
-	local parent = self.interactable:getSingleParent()
+	local parent
 	if parent then
 		buttonIsActive = parent:isActive()
 	end
