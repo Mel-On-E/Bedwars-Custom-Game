@@ -42,35 +42,24 @@ end
 --local loot = { uuid = sm.uuid.new("c5e56da5-bc3f-4519-91c2-b307d36e15aa"), quantity = amount }
 --SpawnLoot( phrv, loot, phrv.worldPosition)
 
-
-function World:resetStackCheckTime()
-	stackCheckInterval = sm.game.getCurrentTick() + 5
-end
-
 function World:makeHarvestables( hitPos, offset, userData)
     local succ, trigger = sm.physics.spherecast(hitPos, hitPos + sm.vec3.new(0,0,0.001), 1, nil, 512)
     lastQuantity = 0
-    local harvest = trigger:getHarvestable()
-    if sm.exists(harvest) then
-        local succ, trigger = sm.physics.spherecast(hitPos, hitPos + sm.vec3.new(0,0,0.001), 1, nil, 512)
-        lastQuantity = 0
+    if succ then
         local harvest = trigger:getHarvestable()
-        if harvest:getPublicData().uuid == sm.uuid.new("c5e56da5-bc3f-4519-91c2-b307d36e15aa") then
-            if not harvest:getPublicData().marked then
-                harvest:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity, epic = userData.epic, marked = true })
-                lastQuantity = harvest:getPublicData().quantity
-                harvest:destroy()
-            end
+        if harvest:getPublicData().uuid == sm.uuid.new("c5e56da5-bc3f-4519-91c2-b307d36e15aa") and userData.lootUid == sm.uuid.new("c5e56da5-bc3f-4519-91c2-b307d36e15aa") then
+            lastQuantity = harvest:getPublicData().quantity
+            harvest:destroy()
             local lootHarvestable = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
             lootHarvestable:setParams( { uuid = userData.lootUid, quantity = lastQuantity + 1, epic = userData.epic  } )
-        elseif harvest:getPublicData().uuid == sm.uuid.new("edd445cc-c298-4ce3-9a58-745c1bee1bc7") then
-            if not harvest:getPublicData().marked then
-                harvest:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity, epic = userData.epic, marked = true })
-                lastQuantity = harvest:getPublicData().quantity
-                harvest:destroy()
-            end
+        elseif harvest:getPublicData().uuid == sm.uuid.new("edd445cc-c298-4ce3-9a58-745c1bee1bc7") and userData.lootUid == sm.uuid.new("edd445cc-c298-4ce3-9a58-745c1bee1bc7")  then
+            lastQuantity = harvest:getPublicData().quantity
+            harvest:destroy()
             local lootHarvestable = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
             lootHarvestable:setParams( { uuid = userData.lootUid, quantity = lastQuantity + 1, epic = userData.epic  } )
+        else
+            local lootHarvestable = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
+            lootHarvestable:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity, epic = userData.epic  } )
         end
     else
         local lootHarvestable = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
