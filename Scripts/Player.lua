@@ -342,9 +342,9 @@ function Player.sv_takeDamage( self, damage, source, attacker )
 					self.network:sendToClient(self.player, "cl_setRespawnTimer")
 
 					if attacker then
-						self.network:sendToClients( "cl_msg", "#ff0000" .. self.player.name .. "#ffffff was pwned by #00ffff" .. attacker.name )
+						self.network:sendToClients( "cl_msg", (TeamManager.sv_getTeamColor(self.player) or "") .. self.player.name .. "#ffffff was pwned by " .. (TeamManager.sv_getTeamColor(attacker) or "") .. attacker.name )
 					else
-						self.network:sendToClients( "cl_msg", "#ff0000".. self.player.name .. " #ffffffdied " )
+						self.network:sendToClients( "cl_msg", (TeamManager.sv_getTeamColor(self.player) or "") .. self.player.name .. " #ffffffdied" )
 					end
 				end
 
