@@ -2090,10 +2090,7 @@
                 "buoyancy": 1
             },
             "flammable": false,
-            "stackSize": 10,
-            "restrictions": {
-                "erasable": false
-            }
+            "stackSize": 10
         },
         {
             "uuid": "edd445cc-c298-4ce3-9a58-745c1bee1bc7",
@@ -2117,10 +2114,7 @@
                 "buoyancy": 1
             },
             "flammable": false,
-            "stackSize": 10,
-            "restrictions": {
-                "erasable": false
-            }
+            "stackSize": 10
         },
         {
             "uuid": "2ccaa006-008e-4069-8de1-15668050f92e",
@@ -22688,10 +22682,7 @@
                 "buoyancy": 3
             },
             "flammable": true,
-            "stackSize": 10,
-            "restrictions": {
-                "erasable": false
-            }
+            "stackSize": 10
         },
         {
             "uuid": "c9396a42-67c3-4fa3-b682-31428ff9eced",
