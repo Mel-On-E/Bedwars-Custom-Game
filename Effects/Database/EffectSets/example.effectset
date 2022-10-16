@@ -8,5 +8,15 @@
 				"type": "audio"
 			}
 		]
+	},
+	"game finish": {
+		"effectList": [
+
+			{
+				"delay": 0.0,
+				"name": "event:/ui/challenge/complete_collect",
+				"type": "audio"
+			}
+		]
 	}
 }

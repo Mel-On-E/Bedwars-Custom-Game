@@ -59,6 +59,32 @@ function TeamManager.sv_getTeamCount(color)
     return count
 end
 
+function TeamManager.sv_getTeamsCount()
+    local teams = {}
+    for id, team in pairs(g_teamManager.sv.teams) do
+        ::continue::
+        if not team then
+            goto continue
+        end
+
+        for _, countedTeam in ipairs(teams) do
+            if team == countedTeam then
+               goto continue
+            end
+        end
+        teams[#teams+1] = team
+    end
+    return #teams
+end
+
+function TeamManager.sv_getLastTeam()
+    for id, team in pairs(g_teamManager.sv.teams) do
+        if team then
+            return team
+        end
+    end
+end
+
 
 
 

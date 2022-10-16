@@ -365,6 +365,22 @@ function Player.sv_takeDamage( self, damage, source, attacker )
 								self.network:sendToClients("cl_msg", msg)
 							else
 								self.network:sendToClients("cl_msg", team .. "TEAM ELIMINATED!")
+
+								local remainingTeams = TeamManager.sv_getTeamsCount()
+								local stopComplainingAboutGrammar = "teams"
+								if remainingTeams == 1 then
+									stopComplainingAboutGrammar = "team"
+								end
+
+								if remainingTeams > 1 then
+									self.network:sendToClients("cl_msg", tostring(remainingTeams) .. " " .. stopComplainingAboutGrammar .. " remaining!")
+								else
+									local winner = TeamManager.sv_getLastTeam()
+									local msg = winner .. "TEAM WON!"
+									self.network:sendToClients("cl_msg", msg)
+									self.network:sendToClients("cl_alert", msg)
+									sm.event.sendToWorld(self.player.character:getWorld(), "sv_justPlayTheGoddamnSound", {effect = "game finish"})
+								end
 							end
 
 							--please forgive me. I have sinned in jank.
@@ -583,4 +599,8 @@ end
 
 function Player:cl_msg(msg)
 	sm.gui.chatMessage(msg)
+end
+
+function Player:cl_alert(msg)
+    sm.gui.displayAlertText(msg)
 end
