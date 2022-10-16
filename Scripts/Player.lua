@@ -343,16 +343,16 @@ function Player.sv_takeDamage( self, damage, source, attacker )
 
 					local team = TeamManager.sv_getTeamColor(self.player)
 
-					if attacker then
-						self.network:sendToClients( "cl_msg", (team or "") .. self.player.name .. "#ffffff was pwned by " .. (TeamManager.sv_getTeamColor(attacker) or "") .. attacker.name )
-					else
-						self.network:sendToClients( "cl_msg", (team or "") .. self.player.name .. " #ffffffdied" )
-					end
-
 					--I'm too lazy to make useful documentation, but here is a comment anyway
 					if team then
+						if attacker then
+							self.network:sendToClients( "cl_msg", (team or "") .. self.player.name .. "#ffffff was pwned by " .. (TeamManager.sv_getTeamColor(attacker) or "") .. attacker.name )
+						else
+							self.network:sendToClients( "cl_msg", (team or "") .. self.player.name .. " #ffffffdied" )
+						end
 						if not TeamManager.sv_isBedExisting(team) then
 							TeamManager.sv_setTeam(self.player, nil)
+							self.network:sendToClients("cl_msg", self.player.name .. " is now a spectator")
 
 							local remainingPlayers = TeamManager.sv_getTeamCount(team)
 							local stopComplainingAboutGrammar = "players"
