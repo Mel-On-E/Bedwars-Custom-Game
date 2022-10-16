@@ -41,7 +41,6 @@ function BedwarsBed:server_onCreate()
     self.saved = true
     self.storage:save(self.saved)
 
-    self.color = self.shape.color
     self.key = #g_beds+1
     g_beds[self.key] = self.shape
     self.network:sendToClients("cl_create")
