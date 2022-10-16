@@ -188,7 +188,7 @@
          "ratings" : {
             "buoyancy" : 6,
             "density" : 3,
-            "durability" : 3,
+            "durability" : 10,
             "friction" : 4
          },
          "renderable" : "$SURVIVAL_DATA/Objects/Renderable/interactive/obj_interactive_comfybed.rend",
