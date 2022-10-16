@@ -376,7 +376,7 @@ function Player.sv_takeDamage( self, damage, source, attacker )
 									self.network:sendToClients("cl_msg", tostring(remainingTeams) .. " " .. stopComplainingAboutGrammar .. " remaining!")
 								else
 									local winner = TeamManager.sv_getLastTeam()
-									local msg = winner .. "TEAM WON!"
+									local msg = (winner and winner .. "TEAM WON!") or "NOBODY WON"
 									self.network:sendToClients("cl_msg", msg)
 									self.network:sendToClients("cl_alert", msg)
 									sm.event.sendToWorld(self.player.character:getWorld(), "sv_justPlayTheGoddamnSound", {effect = "game finish"})
