@@ -11,6 +11,7 @@ function TeamManager:server_onCreate()
             self.sv = {}
             self.sv.teams = {}
             self.sv.beds = {}
+            self.sv.teamSpawnpoints = {}
         end
     end
 end
@@ -32,8 +33,9 @@ function TeamManager.sv_setTeam(player, color)
 	char.publicData.waterMovementSpeedFraction = (not color and 5) or 1
 end
 
-function TeamManager.sv_setBed(color, exists)
+function TeamManager.sv_setBed(color, exists, shape)
 	g_teamManager.sv.beds[color] = exists or yo_mama
+    g_teamManager.sv.teamSpawnpoints[color] = (sm.exists(shape) and shape.worldPosition) or g_teamManager.sv.teamSpawnpoints[color]
     g_teamManager.storage:save(g_teamManager.sv)
 end
 
@@ -83,6 +85,10 @@ function TeamManager.sv_getLastTeam()
             return team
         end
     end
+end
+
+function TeamManager.sv_getTeamSpawn(color)
+    return g_teamManager.sv.teamSpawnpoints[color]
 end
 
 
