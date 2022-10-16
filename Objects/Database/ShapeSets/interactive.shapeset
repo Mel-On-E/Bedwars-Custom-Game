@@ -236,7 +236,8 @@
             }
          },
          "sticky" : "-Z+Z-Y-X+X",
-         "uuid" : "6488a8fa-1187-45e8-8dac-47d13bdaa026"
+         "uuid" : "6488a8fa-1187-45e8-8dac-47d13bdaa026",
+         "destroyTime": 6.9
       }
    ]
 }

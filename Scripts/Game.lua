@@ -1,4 +1,4 @@
-dofile( "$SURVIVAL_DATA/Scripts/game/managers/RespawnManager.lua" )
+dofile( "$CONTENT_DATA/Scripts/RespawnManager.lua" )
 dofile( "$SURVIVAL_DATA/Scripts/game/managers/BeaconManager.lua" )
 
 local DEBUG = true
@@ -60,6 +60,8 @@ function Game:server_onFixedUpdate()
             char:applyTumblingImpulse(sm.vec3.new(0,0,1) * tumbleMod )
         end
     end
+
+	g_respawnManager:server_onFixedUpdate()
 end
 
 function Game.sv_createPlayerCharacter( self, world, x, y, player, params )
@@ -118,6 +120,25 @@ function Game:sv_setSpectator(params, player)
 	TeamManager.sv_setTeam(player, nil)
 
 	self.network:sendToClients("client_showMessage", player.name .. " is now a spectator")
+end
+
+function Game:sv_bedDestroyed(color)
+	local remainingPlayers = TeamManager.sv_getTeamCount(color)
+	self.network:sendToClients("cl_bedDestroyed", {color = color, players = remainingPlayers})
+	sm.event.sendToWorld(self.sv.saved.world, "sv_justPlayTheGoddamnSound", {effect = "bed gone"})
+end
+
+function Game:cl_bedDestroyed(params)
+	local stopComplainingAboutGrammar = "players"
+	if params.players == 1 then
+		stopComplainingAboutGrammar = "player"
+	end
+
+	sm.gui.chatMessage(params.color .. "Bed destroyed! (" ..
+		"#ffffff" .. params.players .. " " .. stopComplainingAboutGrammar .. " left" .. params.color .. ")"
+	)
+
+	sm.gui.displayAlertText(params.color .. "Bed destroyed!")
 end
 
 

@@ -47,12 +47,32 @@ function BedwarsBed:server_onCreate()
     self.network:sendToClients("cl_create")
 end
 
+function BedwarsBed:server_onFixedUpdate()
+    if sm.exists(self.shape) then
+        local newColor = "#" .. tostring(self.shape.color):sub(1, 6)
+        local oldColor = (self.color and "#" .. tostring(self.color):sub(1, 6)) or nil
+
+        if not self.color then
+            TeamManager.sv_setBed(newColor, true)
+        elseif self.color ~= self.shape.color then
+            TeamManager.sv_setBed(oldColor, false)
+            TeamManager.sv_setBed(newColor, true)
+        end
+
+        self.color = self.shape.color
+    end
+end
+
 function BedwarsBed:server_onDestroy()
     if self.key then
         g_beds[self.key] = nil
     end
 
     g_respawnManager:sv_destroyBed( self.shape )
+
+    local color = "#" .. tostring(self.color):sub(1, 6)
+    TeamManager.sv_setBed(color)
+    sm.event.sendToGame("sv_bedDestroyed", color)
 end
 
 function BedwarsBed:sv_set_color(color, player)
@@ -69,9 +89,13 @@ end
 function BedwarsBed.sv_activateBed( self, character, player )
 	g_respawnManager:sv_registerBed( self.shape, character )
 
-    local color = "#" .. tostring(self.shape.color):sub(1, 6)
-    TeamManager.sv_setTeam(player, color)
-    self.network:sendToClients("client_showMessage", color .. player.name .. "#ffffff changed team")
+    local newColor = "#" .. tostring(self.shape.color):sub(1, 6)
+    local oldColor = TeamManager.sv_getTeamColor(player)
+
+    TeamManager.sv_setTeam(player, newColor)
+    if newColor ~= oldColor then
+        self.network:sendToClients("client_showMessage", newColor .. player.name .. "#ffffff changed team")
+    end
 end
 
 function BedwarsBed.client_onAction( self, controllerAction, state )
@@ -110,9 +134,15 @@ end
 function BedwarsBed:client_canInteract()
     local keyBindingText =  sm.gui.getKeyBinding( "Use", true )
     sm.gui.setInteractionText( "", keyBindingText, "#{INTERACTION_USE}" )
-    local keyBindingText =  sm.gui.getKeyBinding( "Tinker", true )
-    sm.gui.setInteractionText( "", keyBindingText, "Color" )
+    if sm.isHost then
+        local keyBindingText =  sm.gui.getKeyBinding( "Tinker", true )
+        sm.gui.setInteractionText( "", keyBindingText, "Color" )
+    end
     return true
+end
+
+function BedwarsBed:client_canTinker()
+    return sm.isHost
 end
 
 function BedwarsBed:cl_onColorButton(name)

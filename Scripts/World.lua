@@ -88,3 +88,12 @@ function World:server_changeMap(name)
     sm.creation.importFromFile(self.world, string.format("$CONTENT_DATA/Maps/%s.blueprint", name) ,
         MAP_SPAWNPOINT)
 end
+
+function World:sv_justPlayTheGoddamnSound(params)
+    self.network:sendToClients("cl_justPlayTheGoddamnSound", params)
+end
+
+function World:cl_justPlayTheGoddamnSound(params)
+    local pos = params.pos or sm.localPlayer.getPlayer().character.worldPosition
+    sm.effect.playEffect(params.effect, pos)
+end

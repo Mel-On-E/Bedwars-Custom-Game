@@ -10,6 +10,7 @@ function TeamManager:server_onCreate()
         if self.sv == nil then
             self.sv = {}
             self.sv.teams = {}
+            self.sv.beds = {}
         end
     end
 end
@@ -31,12 +32,31 @@ function TeamManager.sv_setTeam(player, color)
 	char.publicData.waterMovementSpeedFraction = (not color and 5) or 1
 end
 
+function TeamManager.sv_setBed(color, exists)
+	g_teamManager.sv.beds[color] = exists or yo_mama
+    g_teamManager.storage:save(g_teamManager.sv)
+end
+
+function TeamManager.sv_isBedExisting(color)
+	return g_teamManager.sv.beds[color]
+end
+
 function TeamManager:sv_updateClientData()
     self.sv.updateClientData = true
 end
 
 function TeamManager.sv_getTeamColor(player)
     return g_teamManager.sv.teams[player.id]
+end
+
+function TeamManager.sv_getTeamCount(color)
+    local count = 0
+    for id, team in pairs(g_teamManager.sv.teams) do
+        if team == color then
+            count = count + 1
+        end
+    end
+    return count
 end
 
 
