@@ -64,7 +64,6 @@ end
 function TeamManager.sv_getTeamsCount()
     local teams = {}
     for id, team in pairs(g_teamManager.sv.teams) do
-        ::continue::
         if not team then
             goto continue
         end
@@ -75,6 +74,7 @@ function TeamManager.sv_getTeamsCount()
             end
         end
         teams[#teams+1] = team
+        ::continue::
     end
     return #teams
 end
