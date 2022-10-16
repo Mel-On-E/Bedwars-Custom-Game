@@ -1,7 +1,7 @@
 dofile( "$CONTENT_DATA/Scripts/RespawnManager.lua" )
 dofile( "$SURVIVAL_DATA/Scripts/game/managers/BeaconManager.lua" )
 
-local DEBUG = true
+local DEBUG = false
 
 Game = class( nil )
 Game.enableLimitedInventory = not DEBUG
