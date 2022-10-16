@@ -69,9 +69,13 @@ end
 function BedwarsBed.sv_activateBed( self, character, player )
 	g_respawnManager:sv_registerBed( self.shape, character )
 
-    local color = "#" .. tostring(self.shape.color):sub(1, 6)
-    TeamManager.sv_setTeam(player, color)
-    self.network:sendToClients("client_showMessage", color .. player.name .. "#ffffff changed team")
+    local newColor = "#" .. tostring(self.shape.color):sub(1, 6)
+    local oldColor = TeamManager.sv_getTeamColor(player)
+
+    TeamManager.sv_setTeam(player, newColor)
+    if newColor ~= oldColor then
+        self.network:sendToClients("client_showMessage", newColor .. player.name .. "#ffffff changed team")
+    end
 end
 
 function BedwarsBed.client_onAction( self, controllerAction, state )
