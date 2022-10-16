@@ -3,7 +3,7 @@ dofile( "$SURVIVAL_DATA/scripts/game/quest_util.lua" )
 
 Player = class( BasePlayer )
 
-local respawnTime = 15*40
+local respawnTime = 10*40
 
 
 local StatsTickRate = 40
