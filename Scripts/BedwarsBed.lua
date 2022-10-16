@@ -49,6 +49,16 @@ end
 
 function BedwarsBed:server_onFixedUpdate()
     if sm.exists(self.shape) then
+        local newColor = "#" .. tostring(self.shape.color):sub(1, 6)
+        local oldColor = (self.color and "#" .. tostring(self.color):sub(1, 6)) or nil
+
+        if not self.color then
+            TeamManager.sv_setBed(newColor, true)
+        elseif self.color ~= self.shape.color then
+            TeamManager.sv_setBed(oldColor, false)
+            TeamManager.sv_setBed(newColor, true)
+        end
+
         self.color = self.shape.color
     end
 end
@@ -61,6 +71,7 @@ function BedwarsBed:server_onDestroy()
     g_respawnManager:sv_destroyBed( self.shape )
 
     local color = "#" .. tostring(self.color):sub(1, 6)
+    TeamManager.sv_setBed(color)
     sm.event.sendToGame("sv_bedDestroyed", color)
 end
 
