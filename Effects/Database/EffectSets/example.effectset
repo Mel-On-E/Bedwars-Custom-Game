@@ -1,1 +1,12 @@
-{}
+{
+    "bed gone": {
+		"effectList": [
+
+			{
+				"delay": 0.0,
+				"name": "event:/char/npc/bots/enemies/farmbot/farmbot_explode",
+				"type": "audio"
+			}
+		]
+	}
+}

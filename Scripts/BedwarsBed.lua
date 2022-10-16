@@ -47,12 +47,21 @@ function BedwarsBed:server_onCreate()
     self.network:sendToClients("cl_create")
 end
 
+function BedwarsBed:server_onFixedUpdate()
+    if sm.exists(self.shape) then
+        self.color = self.shape.color
+    end
+end
+
 function BedwarsBed:server_onDestroy()
     if self.key then
         g_beds[self.key] = nil
     end
 
     g_respawnManager:sv_destroyBed( self.shape )
+
+    local color = "#" .. tostring(self.color):sub(1, 6)
+    sm.event.sendToGame("sv_bedDestroyed", color)
 end
 
 function BedwarsBed:sv_set_color(color, player)

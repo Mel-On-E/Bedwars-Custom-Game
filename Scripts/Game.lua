@@ -120,6 +120,16 @@ function Game:sv_setSpectator(params, player)
 	self.network:sendToClients("client_showMessage", player.name .. " is now a spectator")
 end
 
+function Game:sv_bedDestroyed(color)
+	self.network:sendToClients("cl_bedDestroyed", color)
+	sm.event.sendToWorld(self.sv.saved.world, "sv_justPlayTheGoddamnSound", {effect = "bed gone"})
+end
+
+function Game:cl_bedDestroyed(color)
+	sm.gui.chatMessage(color .. "Bed destroyed!")
+	sm.gui.displayAlertText(color .. "Bed destroyed!")
+end
+
 
 
 --CLIENT
