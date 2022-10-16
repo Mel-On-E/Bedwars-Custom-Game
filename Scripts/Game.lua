@@ -45,6 +45,15 @@ function Game.server_onPlayerJoined( self, player, isNewPlayer )
             sm.world.loadWorld( self.sv.saved.world )
         end
         self.sv.saved.world:loadCell( 0, 0, player, "sv_createPlayerCharacter" )
+
+		local inventory = player:getInventory()
+
+		sm.container.beginTransaction()
+
+		sm.container.setItem( inventory, 0, tool_sledgehammer, 1 )
+		sm.container.setItem( inventory, 1, tool_lift, 1 )
+
+		sm.container.endTransaction()
     end
 end
 
