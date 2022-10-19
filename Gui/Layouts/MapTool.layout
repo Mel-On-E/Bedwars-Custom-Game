@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<MyGUI type="Layout" version="3.2.0">
+    <Widget type="Widget" skin="BackgroundLiftExport" position_real="0 0 0.3515625 0.36574074074074076" name="MainPanel">
+        <Property key="NeedKey" value="false"/>
+        <Property key="NeedMouse" value="true"/>
+        <Property key="InheritsAlpha" value="false"/>
+        <Widget type="Button" skin="DressbotArrowLeft" position_real="0 0.34177215189873417 0.14814814814814814 0.25316455696202533" name="-1"/>
+        <Widget type="Button" skin="DressbotArrowRight" position_real="0.85185185185185186 0.34177215189873417 0.14814814814814814 0.25316455696202533" name="+1"/>
+        <Widget type="Widget" skin="BackgroundPopup" position_real="0.54074074074074074 0.16455696202531644 0.27407407407407408 0.70886075949367089">
+            <Widget type="EditBox" skin="EditBoxEmpty" position_real="0.081081081081081086 0.053571428571428568 0.83783783783783783 0.8928571428571429" name="Description">
+                <Property key="MultiLine" value="true"/>
+                <Property key="WordWrap" value="true"/>
+                <Property key="Static" value="true"/>
+                <Property key="ReadOnly" value="true"/>
+                <Property key="Caption" value="Random text to test if word wrap works"/>
+                <Property key="FontName" value="X_Hud_PlayerName"/>
+            </Widget>
+        </Widget>
+        <Widget type="ImageBox" skin="ImageBox" position_real="0.19259259259259259 0.17721518987341772 0.26666666666666666 0.67088607594936711" name="Image"/>
+        <Widget type="TextBox" skin="TextBox" position_real="0.3037037037037037 0.025316455696202531 0.37777777777777777 0.10126582278481013" name="Title">
+            <Property key="Caption" value="Front facing baby chick world"/>
+            <Property key="TextAlign" value="Center"/>
+            <Property key="FontName" value="X_Hud_PlayerName"/>
+        </Widget>
+    </Widget>
+    <CodeGeneratorSettings/>
+</MyGUI>

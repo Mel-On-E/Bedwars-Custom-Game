@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Yo Mama",
+        "desc": "Deez nuts",
+        "image": "Map1.png",
+        "blueprint": "map1"
+    },
+    {
+        "name": "Rick Astley",
+        "desc": "Never Gonna Give you up",
+        "image": "Map2.png",
+        "blueprint": "map1"
+    }
+]
