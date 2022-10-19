@@ -36,6 +36,7 @@ function MapTool:cl_openGui()
     self.gui:setButtonCallback("-1", "cl_change_map")
 
 	self.gui:setButtonCallback("DeleteMap", "cl_delete_map_button")
+	self.gui:setButtonCallback("LoadMap", "cl_load_map_button")
 	
 
     self:update_page()
@@ -118,6 +119,35 @@ function MapTool:cl_delete_map(name)
 		self.cl.confirmGui:close()
 	end
 	self.cl.confirmGui = nil
+end
+
+function MapTool:cl_load_map_button()
+	local msg = "#999999Do you want to load #00ff00" .. g_maps[self.mapIndex].name .. "#999999?\nThis will END your current game!"
+	self:cl_createConfirmGui("cl_load_map", msg)
+end
+
+function MapTool:cl_load_map(name)
+	if name == "Yes" then
+		self.cl.confirmGui:close()
+		
+		local map = g_maps[self.mapIndex]
+		name = map.blueprint
+		if map.custom then
+			name = "Custom/" .. name
+		end
+		self.network:sendToServer("sv_load_map", name)
+
+		sm.gui.displayAlertText("Map Loading...")
+
+	elseif name == "No" then
+		self.cl.confirmGui:close()
+	end
+	self.cl.confirmGui = nil
+end
+
+function MapTool:sv_load_map(file)
+	local world = self.tool:getOwner():getCharacter():getWorld()
+	sm.event.sendToWorld(world, "server_changeMap", file)
 end
 
 
