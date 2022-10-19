@@ -1,0 +1,22 @@
+{
+   "blockList" : [
+      {
+         "asg" : "$GAME_DATA/Objects/Textures/Blocks/blk_tiles01_asg.tga",
+         "color" : "FFFFFF",
+         "dif" : "$GAME_DATA/Objects/Textures/Blocks/blk_tiles01_dif.tga",
+         "glass" : true,
+         "name" : "blk_map_building",
+         "nor" : "$GAME_DATA/Objects/Textures/Blocks/blk_tiles01_nor.tga",
+         "physicsMaterial" : "Default",
+         "ratings" : {
+            "durability" : 10
+         },
+         "restrictions" : {
+            "destructable" : false,
+            "erasable" : false
+         },
+         "tiling" : 8,
+         "uuid" : "fada88d2-0b6e-4fdd-9fa6-5fd4c6098fd6"
+      }
+   ]
+}
