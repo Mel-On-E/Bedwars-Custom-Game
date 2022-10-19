@@ -152,39 +152,7 @@ end
 
 function Game.sv_exportMap( self, params )
 	local obj = sm.json.parseJsonString( sm.creation.exportToString( params.body ) )
-	
-	--remove helper blocks
-	local blk_map_building = "fada88d2-0b6e-4fdd-9fa6-5fd4c6098fd6"
-	local newObj = { bodies = {} }
-
-	for _, body in pairs(obj.bodies) do
-		local newBody = { childs = {} }
-		newBody.type = body.type
-
-		for __, child in pairs(body.childs) do
-			if child.shapeId ~= blk_map_building then
-				newBody.childs[#newBody.childs+1] = child
-			end
-		end
-
-		if #newBody.childs > 0 then
-			newObj.bodies[#newObj.bodies+1] = newBody
-		end
-	end
-
-
-	newObj.dependencies = obj.dependencies
-	for k, dependency in ipairs(newObj.dependencies) do
-		local newShapeIds = {}
-		for __, shapeId in ipairs(dependency.shapeIds) do
-			if shapeId ~= blk_map_building then
-				newShapeIds[#newShapeIds+1] = shapeId
-			end
-		end
-		dependency.shapeIds = newShapeIds
-	end
-	
-	sm.json.save( newObj, "$CONTENT_DATA/Maps/Custom/"..params.name..".blueprint" )
+	sm.json.save( obj, "$CONTENT_DATA/Maps/Custom/"..params.name..".blueprint" )
 
 	--update custom.json
 	local custom_maps = sm.json.open("$CONTENT_DATA/Maps/custom.json")

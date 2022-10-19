@@ -1,17 +1,9 @@
 
 [
-	
 	{
-		"blueprint" : "sub2dpp",
+		"blueprint" : "tren",
 		"custom" : true,
-		"name" : "sub2dpp",
-		"time" : 1666209415.0
-	},
-	
-	{
-		"blueprint" : "fail",
-		"custom" : true,
-		"name" : "fail",
-		"time" : 1666209591.0
+		"name" : "tren",
+		"time" : 1666214518.0
 	}
 ]
