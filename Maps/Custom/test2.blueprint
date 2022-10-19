@@ -1,0 +1,65 @@
+
+{
+	"bodies" : 
+	[
+		
+		{
+			"childs" : 
+			[
+				
+				{
+					"bounds" : 
+					{
+						"x" : 1.0,
+						"y" : 1.0,
+						"z" : 1.0
+					},
+					"color" : "8C7E6D",
+					"pos" : 
+					{
+						"x" : 0.0,
+						"y" : 0.0,
+						"z" : 0.0
+					},
+					"shapeId" : "c4a2ffa8-c245-41fb-9496-966c6ee4648b",
+					"xaxis" : 1.0,
+					"zaxis" : 3.0
+				},
+				
+				{
+					"bounds" : 
+					{
+						"x" : 48.0,
+						"y" : 48.0,
+						"z" : 1.0
+					},
+					"color" : "BFDFED",
+					"pos" : 
+					{
+						"x" : -24.0,
+						"y" : -24.0,
+						"z" : 1.0
+					},
+					"shapeId" : "8ca49bff-eeef-4b43-abd0-b527a567f1b7",
+					"xaxis" : 1.0,
+					"zaxis" : 3.0
+				}
+			],
+			"type" : 1.0
+		}
+	],
+	"dependencies" : 
+	[
+		
+		{
+			"contentId" : "d752d3fd-11df-4127-9718-a14edcc70978",
+			"name" : "Bedwars Custom Game",
+			"shapeIds" : 
+			[
+				"8ca49bff-eeef-4b43-abd0-b527a567f1b7",
+				"c4a2ffa8-c245-41fb-9496-966c6ee4648b"
+			],
+			"steamFileId" : 2870930089.0
+		}
+	]
+}

@@ -16,7 +16,11 @@ function MapTool:client_onCreate()
 	self.cl = {}
 	self:client_onRefresh()
 
-    self.maps = sm.json.open("$CONTENT_DATA/Maps/maps.json")
+    g_maps = sm.json.open("$CONTENT_DATA/Maps/maps.json")
+	local custom_maps = sm.json.open("$CONTENT_DATA/Maps/custom.json")
+	for k,v in ipairs(custom_maps) do
+		g_maps[#g_maps+1] = v
+	end
     self.mapIndex = 1
 end
 
@@ -33,17 +37,24 @@ function MapTool:cl_openGui()
 end
 
 function MapTool:update_page()
-    local map = self.maps[self.mapIndex]
+    local map = g_maps[self.mapIndex]
 
     self.gui:setText("Title", map.name)
-    self.gui:setText("Description", map.desc)
-    self.gui:setImage("Image", "$CONTENT_DATA/Gui/Images/" .. map.image)
+	if not map.custom then
+		self.gui:setText("Description", map.desc)
+		self.gui:setImage("Image", "$CONTENT_DATA/Gui/Images/" .. map.image)
+	else
+		local time = os.time() - map.time
+		--TODO copy formatting code from SurvivalServers Mod
+		self.gui:setText("Description", time .. " old")
+		self.gui:setImage("Image", "$CONTENT_DATA/Gui/Images/CustomMap.png")
+	end
 end
 
 function MapTool:cl_change_map(button)
     local change = tonumber(button)
     self.mapIndex = self.mapIndex + change
-    self.mapIndex = math.min(#self.maps, self.mapIndex)
+    self.mapIndex = math.min(#g_maps, self.mapIndex)
     self.mapIndex = math.max(1, self.mapIndex)
 
     self:update_page()

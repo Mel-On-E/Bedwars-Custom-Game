@@ -150,6 +150,66 @@ function Game:cl_bedDestroyed(params)
 	sm.gui.displayAlertText(params.color .. "Bed destroyed!")
 end
 
+function Game.sv_exportMap( self, params )
+	local obj = sm.json.parseJsonString( sm.creation.exportToString( params.body ) )
+	
+	--remove helper blocks
+	local blk_map_building = "fada88d2-0b6e-4fdd-9fa6-5fd4c6098fd6"
+	local newObj = { bodies = {} }
+
+	for _, body in pairs(obj.bodies) do
+		local newBody = { childs = {} }
+		newBody.type = body.type
+
+		for __, child in pairs(body.childs) do
+			if child.shapeId ~= blk_map_building then
+				newBody.childs[#newBody.childs+1] = child
+			end
+		end
+
+		if #newBody.childs > 0 then
+			newObj.bodies[#newObj.bodies+1] = newBody
+		end
+	end
+
+
+	newObj.dependencies = obj.dependencies
+	for k, dependency in ipairs(newObj.dependencies) do
+		local newShapeIds = {}
+		for __, shapeId in ipairs(dependency.shapeIds) do
+			if shapeId ~= blk_map_building then
+				newShapeIds[#newShapeIds+1] = shapeId
+			end
+		end
+		dependency.shapeIds = newShapeIds
+	end
+	
+	sm.json.save( newObj, "$CONTENT_DATA/Maps/Custom/"..params.name..".blueprint" )
+
+	--update custom.json
+	local custom_maps = sm.json.open("$CONTENT_DATA/Maps/custom.json")
+	local newMap = {}
+	newMap.name = params.name
+	newMap.blueprint = params.name
+	newMap.custom = true
+	newMap.time = os.time()
+
+	updateMapTable(custom_maps, newMap)
+	self.network:sendToClients("cl_updateMapList", newMap)
+
+	sm.json.save(custom_maps, "$CONTENT_DATA/Maps/custom.json")
+end
+
+function updateMapTable(t, newMap)
+	local newKey = #t + 1
+	for key, map in ipairs(t) do
+		if map.name == newMap.name then
+			newKey = key
+		end
+	end
+	t[newKey] = newMap
+end
+
 
 
 --CLIENT
@@ -183,6 +243,8 @@ function Game:client_onCreate()
 		sm.game.bindChatCommand( "/unlimited", {}, "cl_onChatCommand", "Use the unlimited inventory" )
 		sm.game.bindChatCommand( "/encrypt", {}, "cl_onChatCommand", "Restrict interactions in all warehouses" )
 		sm.game.bindChatCommand( "/decrypt", {}, "cl_onChatCommand", "Unrestrict interactions in all warehouses" )
+
+		sm.game.bindChatCommand( "/savemap", { { "string", "name", false } }, "cl_onChatCommand", "Exports custom map" )
 	end
 
 	sm.game.bindChatCommand( "/fly", {}, "cl_onChatCommand", "Toggle fly mode" )
@@ -202,6 +264,23 @@ function Game:cl_onChatCommand(params)
 		self.network:sendToServer( "sv_toggleFly")
 	elseif params[1] == "/spectator" then
 		self.network:sendToServer( "sv_setSpectator")
+	elseif params[1] == "/savemap" then
+		local rayCastValid, rayCastResult = sm.localPlayer.getRaycast( 100 )
+		if rayCastValid and rayCastResult.type == "body" then
+			local importParams = {
+				name = params[2],
+				body = rayCastResult:getBody()
+			}
+			self.network:sendToServer( "sv_exportMap", importParams )
+		else
+			sm.gui.chatMessage("#ff0000Look at the map while saving it")
+		end
+	end
+end
+
+function Game:cl_updateMapList(newMap)
+	if sm.isHost then
+		updateMapTable(g_maps, newMap)
 	end
 end
 
