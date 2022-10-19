@@ -156,7 +156,15 @@ end
 
 function Game:client_onCreate()
     g_survivalHud = sm.gui.createSurvivalHudGui()
-    g_survivalHud:setVisible("BindingPanel", false)
+	if sm.isHost then
+		local invis = { "InventoryIconBackground", "InventoryBinding", "HandbookIconBackground", "HandbookBinding"}
+		for _, name in pairs(invis) do
+			g_survivalHud:setVisible(name, false)
+		end
+		g_survivalHud:setImage("LogbookImageBox", "$CONTENT_DATA/Gui/Images/Map1.png")
+	else
+		g_survivalHud:setVisible("BindingPanel", false)
+	end
 
     if g_respawnManager == nil then
 		assert( not sm.isHost )
