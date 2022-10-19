@@ -44,9 +44,19 @@ function MapTool:update_page()
 		self.gui:setText("Description", map.desc)
 		self.gui:setImage("Image", "$CONTENT_DATA/Gui/Images/" .. map.image)
 	else
-		local time = os.time() - map.time
-		--TODO copy formatting code from SurvivalServers Mod
-		self.gui:setText("Description", time .. " old")
+		local unit = "minutes"
+		local value = math.floor((os.time() - map.time)/60)
+		if value >= 60 then
+			unit = "hours"
+			value = math.floor(value/60)
+			if value >= 24 then
+				unit = "days"
+				value = math.floor(value/24)
+			end
+		end
+		
+		local date = tostring(value) .. " " .. unit .. " old"
+		self.gui:setText("Description", date)
 		self.gui:setImage("Image", "$CONTENT_DATA/Gui/Images/CustomMap.png")
 	end
 end
