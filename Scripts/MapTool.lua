@@ -148,6 +148,14 @@ end
 function MapTool:sv_load_map(file)
 	local world = self.tool:getOwner():getCharacter():getWorld()
 	sm.event.sendToWorld(world, "server_changeMap", file)
+
+	for _, player in ipairs(sm.player.getAllPlayers()) do
+		local team = TeamManager.sv_getTeamColor(player)
+		if team then
+			TeamManager.sv_setTeam(player, nil)
+			self.network:sendToClients("client_showMessage", player.name .. " is now a spectator")
+		end
+	end
 end
 
 
