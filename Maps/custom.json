@@ -2,13 +2,6 @@
 [
 	
 	{
-		"blueprint" : "test",
-		"custom" : true,
-		"name" : "test",
-		"time" : 1666197731.0
-	},
-	
-	{
 		"blueprint" : "test2",
 		"custom" : true,
 		"name" : "test2",

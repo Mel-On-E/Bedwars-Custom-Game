@@ -16,12 +16,16 @@ function MapTool:client_onCreate()
 	self.cl = {}
 	self:client_onRefresh()
 
-    g_maps = sm.json.open("$CONTENT_DATA/Maps/maps.json")
+    load_map_data()
+    self.mapIndex = 1
+end
+
+function load_map_data()
+	g_maps = sm.json.open("$CONTENT_DATA/Maps/maps.json")
 	local custom_maps = sm.json.open("$CONTENT_DATA/Maps/custom.json")
 	for k,v in ipairs(custom_maps) do
 		g_maps[#g_maps+1] = v
 	end
-    self.mapIndex = 1
 end
 
 function MapTool:cl_openGui()
@@ -30,6 +34,9 @@ function MapTool:cl_openGui()
     self.gui:setOnCloseCallback("cl_onGuiClosed")
     self.gui:setButtonCallback("+1", "cl_change_map")
     self.gui:setButtonCallback("-1", "cl_change_map")
+
+	self.gui:setButtonCallback("DeleteMap", "cl_delete_map_button")
+	
 
     self:update_page()
 
@@ -40,6 +47,8 @@ function MapTool:update_page()
     local map = g_maps[self.mapIndex]
 
     self.gui:setText("Title", map.name)
+	self.gui:setVisible("DeleteMap", map.custom)
+
 	if not map.custom then
 		self.gui:setText("Description", map.desc)
 		self.gui:setImage("Image", "$CONTENT_DATA/Gui/Images/" .. map.image)
@@ -54,7 +63,7 @@ function MapTool:update_page()
 				value = math.floor(value/24)
 			end
 		end
-		
+
 		local date = tostring(value) .. " " .. unit .. " old"
 		self.gui:setText("Description", date)
 		self.gui:setImage("Image", "$CONTENT_DATA/Gui/Images/CustomMap.png")
@@ -69,6 +78,49 @@ function MapTool:cl_change_map(button)
 
     self:update_page()
 end
+
+function MapTool:cl_createConfirmGui(callback, description)
+	self.gui:close()
+
+	self.cl.confirmGui = sm.gui.createGuiFromLayout( "$GAME_DATA/Gui/Layouts/PopUp/PopUp_YN.layout" )
+	self.cl.confirmGui:setButtonCallback( "Yes", callback )
+	self.cl.confirmGui:setButtonCallback( "No", callback )
+	self.cl.confirmGui:setText( "Title", "#{MENU_YN_TITLE_ARE_YOU_SURE}" )
+	self.cl.confirmGui:setText( "Message", description )
+	self.cl.confirmGui:open()
+end
+
+function MapTool:cl_delete_map_button()
+	local msg = "#999999Do you REALLY want to DELETE #ff0000" .. g_maps[self.mapIndex].name .. "#999999 FOREVER?"
+	self:cl_createConfirmGui("cl_delete_map", msg)
+end
+
+function MapTool:cl_delete_map(name)
+	if name == "Yes" then
+		self.cl.confirmGui:close()
+		
+		sm.json.save({}, "$CONTENT_DATA/Maps/Custom/".. g_maps[self.mapIndex].blueprint ..".blueprint")
+
+		local custom_maps = sm.json.open("$CONTENT_DATA/Maps/custom.json")
+		for k, map in ipairs(custom_maps) do
+			if map.name == g_maps[self.mapIndex].name then
+				custom_maps[k] = nil
+			end
+		end
+		sm.json.save(custom_maps, "$CONTENT_DATA/Maps/custom.json")
+		load_map_data()
+		self.mapIndex = math.min(#g_maps, self.mapIndex)
+
+
+		sm.gui.displayAlertText("Map Deleted!")
+
+	elseif name == "No" then
+		self.cl.confirmGui:close()
+	end
+	self.cl.confirmGui = nil
+end
+
+
 
 function MapTool.client_onEquip(self)
     if not sm.isHost then

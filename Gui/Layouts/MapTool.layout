@@ -23,12 +23,12 @@
                 <Property key="TextAlign" value="Center"/>
                 <Property key="FontName" value="X_Hud_PlayerName"/>
             </Widget>
-            <Widget type="Button" skin="PrimaryButton" position_real="0.19259259259259259 0.8089887640449438 0.26666666666666666 0.11235955056179775">
+            <Widget type="Button" skin="PrimaryButton" position_real="0.19259259259259259 0.8089887640449438 0.26666666666666666 0.11235955056179775" name="LoadMap">
                 <Property key="Caption" value="Load"/>
                 <Property key="FontName" value="SM_ItemTitle"/>
                 <Property key="TextAlign" value="Center"/>
             </Widget>
-            <Widget type="Button" skin="PrimaryButton" position_real="0.54074074074074074 0.8089887640449438 0.27407407407407408 0.11235955056179775">
+            <Widget type="Button" skin="PrimaryButton" position_real="0.54074074074074074 0.8089887640449438 0.27407407407407408 0.11235955056179775" name="DeleteMap">
                 <Property key="Caption" value="Delete map"/>
                 <Property key="FontName" value="SM_ItemTitle"/>
                 <Property key="TextAlign" value="Center"/>
