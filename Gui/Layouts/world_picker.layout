@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <MyGUI type="Layout" version="3.2.0">
     <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="BackPanel">
-        <Widget type="Widget" skin="BackgroundLiftExport" position_real="0.32421875 0.293981481481485 0.3515625 0.41203703703703703" name="MainPanel">
+        <Widget type="Widget" skin="BackgroundLiftExport" position_real="0 0 0.3515625 0.41203703703703703" name="MainPanel">
             <Property key="NeedKey" value="false"/>
             <Property key="NeedMouse" value="true"/>
             <Property key="InheritsAlpha" value="false"/>
