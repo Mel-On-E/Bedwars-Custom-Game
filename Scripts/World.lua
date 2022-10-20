@@ -44,6 +44,24 @@ function World.server_onProjectile( self, hitPos, hitTime, hitVelocity, _, attac
 end
 
 function World:server_changeMap(name)
+    --reset inventories
+    for _, player in ipairs(sm.player.getAllPlayers()) do
+        local inventory = player:getInventory()
+
+        sm.container.beginTransaction()
+        for i = 0, 39, 1 do
+            if i == 0 then
+                sm.container.setItem( inventory, i, tool_sledgehammer, 1 )
+            elseif i == 1 then
+                sm.container.setItem( inventory, i, tool_lift, 1 )
+            else
+                sm.container.setItem( inventory, i, sm.uuid.getNil(), 0 )
+            end
+        end
+        sm.container.endTransaction()
+    end
+
+    --clear harvestables(loot)
     for x = -2, 2, 1 do
         for y = -2, 2, 1 do
             for _, harvestable in ipairs(sm.cell.getHarvestables(x,y)) do
@@ -52,16 +70,18 @@ function World:server_changeMap(name)
         end
     end
 
-
+    --clear bodies
     for _, body in ipairs( sm.body.getAllBodies() ) do
 		for _, shape in ipairs( body:getShapes() ) do
 			shape:destroyShape()
 		end
 	end
 
+    --import new map
     sm.creation.importFromFile(self.world, string.format("$CONTENT_DATA/Maps/%s.blueprint", name) ,
         MAP_SPAWNPOINT)
 
+    --remove helper blocks
     sm.event.sendToWorld(self.world, "sv_remove_helper_blocks")
 end
 

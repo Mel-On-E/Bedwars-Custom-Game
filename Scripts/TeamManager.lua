@@ -13,6 +13,8 @@ function TeamManager:server_onCreate()
             self.sv.beds = {}
             self.sv.teamSpawnpoints = {}
         end
+
+        self.init = true
     end
 end
 
@@ -20,6 +22,20 @@ function TeamManager:server_onFixedUpdate()
     if self.sv.updateClientData then
         self.sv.updateClientData = false
         self.network:setClientData(self.sv)
+    end
+
+    if self.init then
+        --set fly state on init
+        for _, player in ipairs(sm.player.getAllPlayers()) do
+            if player.character then
+                self.init = false
+
+                if not TeamManager.sv_getTeamColor(player) then
+                    player.character:setSwimming(true)
+                    player.character.publicData.waterMovementSpeedFraction = 5
+                end
+            end
+        end
     end
 end
 
