@@ -7,8 +7,15 @@ shapesetFolders = [
 ]
 modShapeSet = "C:/Users/claas/AppData/Roaming/Axolot Games/Scrap Mechanic/User/User_76561198207895823/Mods/Bedwars Custom Game/Objects/Database/ShapeSets/generated.shapeset"
 
-bedwarsRecipes = "C:/Users/claas/AppData/Roaming/Axolot Games/Scrap Mechanic/User/User_76561198207895823/Mods/Bedwars Custom Game/bedwars.json"
 recipeUuuids = []
+
+extraItems = "C:/Users/claas/AppData/Roaming/Axolot Games/Scrap Mechanic/User/User_76561198207895823/Mods/Bedwars Custom Game/extra_items.json"
+with open(extraItems) as f:
+    data = json.loads(f.read())
+    recipeUuuids = data
+    
+
+bedwarsRecipes = "C:/Users/claas/AppData/Roaming/Axolot Games/Scrap Mechanic/User/User_76561198207895823/Mods/Bedwars Custom Game/bedwars.json"
 with open(bedwarsRecipes) as f:
     data = json.loads(f.read())
     for recipe in data:

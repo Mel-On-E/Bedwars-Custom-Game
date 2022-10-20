@@ -3,7 +3,7 @@ dofile( "$SURVIVAL_DATA/scripts/game/quest_util.lua" )
 
 Player = class( BasePlayer )
 
-local respawnTime = 15*40
+local respawnTime = 10*40
 
 
 local StatsTickRate = 40
@@ -343,16 +343,16 @@ function Player.sv_takeDamage( self, damage, source, attacker )
 
 					local team = TeamManager.sv_getTeamColor(self.player)
 
-					if attacker then
-						self.network:sendToClients( "cl_msg", (team or "") .. self.player.name .. "#ffffff was pwned by " .. (TeamManager.sv_getTeamColor(attacker) or "") .. attacker.name )
-					else
-						self.network:sendToClients( "cl_msg", (team or "") .. self.player.name .. " #ffffffdied" )
-					end
-
 					--I'm too lazy to make useful documentation, but here is a comment anyway
 					if team then
+						if attacker then
+							self.network:sendToClients( "cl_msg", (team or "") .. self.player.name .. "#ffffff was pwned by " .. (TeamManager.sv_getTeamColor(attacker) or "") .. attacker.name )
+						else
+							self.network:sendToClients( "cl_msg", (team or "") .. self.player.name .. " #ffffffdied" )
+						end
 						if not TeamManager.sv_isBedExisting(team) then
 							TeamManager.sv_setTeam(self.player, nil)
+							self.network:sendToClients("cl_msg", self.player.name .. " is now a spectator")
 
 							local remainingPlayers = TeamManager.sv_getTeamCount(team)
 							local stopComplainingAboutGrammar = "players"
@@ -365,6 +365,22 @@ function Player.sv_takeDamage( self, damage, source, attacker )
 								self.network:sendToClients("cl_msg", msg)
 							else
 								self.network:sendToClients("cl_msg", team .. "TEAM ELIMINATED!")
+
+								local remainingTeams = TeamManager.sv_getTeamsCount()
+								local stopComplainingAboutGrammar = "teams"
+								if remainingTeams == 1 then
+									stopComplainingAboutGrammar = "team"
+								end
+
+								if remainingTeams > 1 then
+									self.network:sendToClients("cl_msg", tostring(remainingTeams) .. " " .. stopComplainingAboutGrammar .. " remaining!")
+								else
+									local winner = TeamManager.sv_getLastTeam()
+									local msg = (winner and winner .. "TEAM WON!") or "NOBODY WON"
+									self.network:sendToClients("cl_msg", msg)
+									self.network:sendToClients("cl_alert", msg)
+									sm.event.sendToWorld(self.player.character:getWorld(), "sv_justPlayTheGoddamnSound", {effect = "game finish"})
+								end
 							end
 
 							--please forgive me. I have sinned in jank.
@@ -583,4 +599,8 @@ end
 
 function Player:cl_msg(msg)
 	sm.gui.chatMessage(msg)
+end
+
+function Player:cl_alert(msg)
+    sm.gui.displayAlertText(msg)
 end

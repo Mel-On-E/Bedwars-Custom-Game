@@ -2090,10 +2090,7 @@
                 "buoyancy": 1
             },
             "flammable": false,
-            "stackSize": 10,
-            "restrictions": {
-                "erasable": false
-            }
+            "stackSize": 10
         },
         {
             "uuid": "edd445cc-c298-4ce3-9a58-745c1bee1bc7",
@@ -2117,10 +2114,7 @@
                 "buoyancy": 1
             },
             "flammable": false,
-            "stackSize": 10,
-            "restrictions": {
-                "erasable": false
-            }
+            "stackSize": 10
         },
         {
             "uuid": "2ccaa006-008e-4069-8de1-15668050f92e",
@@ -19756,10 +19750,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": true,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": true
         },
         {
             "uuid": "470b9a92-ed94-4ef2-b1ea-b45f47ef0982",
@@ -19785,10 +19776,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": true,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": true
         },
         {
             "uuid": "bfcaac1a-5a7f-4fba-9980-1159617a7212",
@@ -19814,10 +19802,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": false,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": false
         },
         {
             "uuid": "3091926a-9340-46d9-83d6-4fd7c68ad950",
@@ -19843,10 +19828,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": false,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": false
         },
         {
             "uuid": "5e5d231e-405e-4f45-9bd0-b3557dbb42eb",
@@ -19896,10 +19878,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": true,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": true
         },
         {
             "uuid": "56cea967-a685-494d-85ef-3aa121a0c193",
@@ -19924,10 +19903,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": true,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": true
         },
         {
             "uuid": "5e57e0f7-e87c-4269-b274-146fe40e1b44",
@@ -19952,10 +19928,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": false,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": false
         },
         {
             "uuid": "22f3e797-82f5-4819-a085-c3cc28ec9025",
@@ -19980,10 +19953,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": false,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": false
         },
         {
             "uuid": "df8528ed-15ad-4a39-a33a-698880684001",
@@ -20027,10 +19997,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": true,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": true
         },
         {
             "uuid": "4c1cc8de-7af1-4f8e-a5c4-c583460af9e5",
@@ -20052,10 +20019,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": true,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": true
         },
         {
             "uuid": "e6db321c-6f98-47f6-9f7f-4e6794a62cb8",
@@ -20077,10 +20041,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": false,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": false
         },
         {
             "uuid": "a736ffdf-22c1-40f2-8e40-988cab7c0559",
@@ -20102,10 +20063,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": false,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": false
         },
         {
             "uuid": "598d865c-324c-4129-9c57-21a6abd2cb2e",
@@ -20147,10 +20105,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": true,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": true
         },
         {
             "uuid": "6bb84152-c4d7-4644-bc37-a3becd79298d",
@@ -20171,10 +20126,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": true,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": true
         },
         {
             "uuid": "2354cd24-3dd3-4db5-84ab-df64c32d2c72",
@@ -20195,10 +20147,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": false,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": false
         },
         {
             "uuid": "a092359d-5cea-484d-a274-470d9a567632",
@@ -20219,10 +20168,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": false,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": false
         },
         {
             "uuid": "1d4793af-cb66-4628-804a-9d7404712643",
@@ -20266,10 +20212,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": true,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": true
         },
         {
             "uuid": "90fc3603-3544-4254-97ef-ea6723510961",
@@ -20291,10 +20234,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": true,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": true
         },
         {
             "uuid": "de018bc6-1db5-492c-bfec-045e63f9d64b",
@@ -20316,10 +20256,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": false,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": false
         },
         {
             "uuid": "20dcd41c-0a11-4668-9b00-97f278ce21af",
@@ -20341,10 +20278,7 @@
                 "friction": 5,
                 "buoyancy": 2
             },
-            "flammable": false,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": false
         },
         {
             "uuid": "8c741785-5eae-4c48-9f99-d62bf522a83f",
@@ -20410,10 +20344,7 @@
                 "friction": 5,
                 "buoyancy": 0
             },
-            "flammable": false,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": false
         },
         {
             "uuid": "46396518-8c29-4da9-81bb-a020f4baf5b2",
@@ -20446,10 +20377,7 @@
                 "friction": 5,
                 "buoyancy": 0
             },
-            "flammable": true,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": true
         },
         {
             "uuid": "7324219e-2b19-4098-baa3-9876984ead08",
@@ -20482,10 +20410,7 @@
                 "friction": 5,
                 "buoyancy": 0
             },
-            "flammable": false,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": false
         },
         {
             "uuid": "2f004fdf-bfb0-46f3-a7ac-7711100bee0c",
@@ -20518,10 +20443,7 @@
                 "friction": 5,
                 "buoyancy": 0
             },
-            "flammable": false,
-            "restrictions": {
-                "erasable": false
-            }
+            "flammable": false
         },
         {
             "uuid": "e91b0bf2-dafa-439e-a503-286e91461bb0",
@@ -22760,10 +22682,7 @@
                 "buoyancy": 3
             },
             "flammable": true,
-            "stackSize": 10,
-            "restrictions": {
-                "erasable": false
-            }
+            "stackSize": 10
         },
         {
             "uuid": "c9396a42-67c3-4fa3-b682-31428ff9eced",

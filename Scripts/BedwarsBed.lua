@@ -41,7 +41,6 @@ function BedwarsBed:server_onCreate()
     self.saved = true
     self.storage:save(self.saved)
 
-    self.color = self.shape.color
     self.key = #g_beds+1
     g_beds[self.key] = self.shape
     self.network:sendToClients("cl_create")
@@ -53,10 +52,10 @@ function BedwarsBed:server_onFixedUpdate()
         local oldColor = (self.color and "#" .. tostring(self.color):sub(1, 6)) or nil
 
         if not self.color then
-            TeamManager.sv_setBed(newColor, true)
+            TeamManager.sv_setBed(newColor, true, self.shape)
         elseif self.color ~= self.shape.color then
-            TeamManager.sv_setBed(oldColor, false)
-            TeamManager.sv_setBed(newColor, true)
+            TeamManager.sv_setBed(oldColor, false, self.shape)
+            TeamManager.sv_setBed(newColor, true, self.shape)
         end
 
         self.color = self.shape.color
@@ -71,7 +70,7 @@ function BedwarsBed:server_onDestroy()
     g_respawnManager:sv_destroyBed( self.shape )
 
     local color = "#" .. tostring(self.color):sub(1, 6)
-    TeamManager.sv_setBed(color)
+    TeamManager.sv_setBed(color, false, self.shape)
     sm.event.sendToGame("sv_bedDestroyed", color)
 end
 

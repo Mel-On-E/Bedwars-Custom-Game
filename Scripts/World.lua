@@ -87,6 +87,20 @@ function World:server_changeMap(name)
 
     sm.creation.importFromFile(self.world, string.format("$CONTENT_DATA/Maps/%s.blueprint", name) ,
         MAP_SPAWNPOINT)
+
+    sm.event.sendToWorld(self.world, "sv_remove_helper_blocks")
+end
+
+function World:sv_remove_helper_blocks()
+    local blk_map_building = sm.uuid.new("fada88d2-0b6e-4fdd-9fa6-5fd4c6098fd6")
+
+    for _, body in ipairs( sm.body.getAllBodies() ) do
+		for _, shape in ipairs( body:getShapes() ) do
+            if shape.uuid == blk_map_building then
+			    shape:destroyShape()
+            end
+		end
+	end
 end
 
 function World:sv_justPlayTheGoddamnSound(params)

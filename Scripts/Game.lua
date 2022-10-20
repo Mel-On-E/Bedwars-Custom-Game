@@ -1,7 +1,7 @@
 dofile( "$CONTENT_DATA/Scripts/RespawnManager.lua" )
 dofile( "$SURVIVAL_DATA/Scripts/game/managers/BeaconManager.lua" )
 
-local DEBUG = true
+local DEBUG = false
 
 Game = class( nil )
 Game.enableLimitedInventory = not DEBUG
@@ -45,6 +45,15 @@ function Game.server_onPlayerJoined( self, player, isNewPlayer )
             sm.world.loadWorld( self.sv.saved.world )
         end
         self.sv.saved.world:loadCell( 0, 0, player, "sv_createPlayerCharacter" )
+
+		local inventory = player:getInventory()
+
+		sm.container.beginTransaction()
+
+		sm.container.setItem( inventory, 0, tool_sledgehammer, 1 )
+		sm.container.setItem( inventory, 1, tool_lift, 1 )
+
+		sm.container.endTransaction()
     end
 end
 
@@ -141,13 +150,49 @@ function Game:cl_bedDestroyed(params)
 	sm.gui.displayAlertText(params.color .. "Bed destroyed!")
 end
 
+function Game.sv_exportMap( self, params )
+	local obj = sm.json.parseJsonString( sm.creation.exportToString( params.body ) )
+	sm.json.save( obj, "$CONTENT_DATA/Maps/Custom/"..params.name..".blueprint" )
+
+	--update custom.json
+	local custom_maps = sm.json.open("$CONTENT_DATA/Maps/custom.json")
+	local newMap = {}
+	newMap.name = params.name
+	newMap.blueprint = params.name
+	newMap.custom = true
+	newMap.time = os.time()
+
+	updateMapTable(custom_maps, newMap)
+	self.network:sendToClients("cl_updateMapList", newMap)
+
+	sm.json.save(custom_maps, "$CONTENT_DATA/Maps/custom.json")
+end
+
+function updateMapTable(t, newMap)
+	local newKey = #t + 1
+	for key, map in ipairs(t) do
+		if map.name == newMap.name then
+			newKey = key
+		end
+	end
+	t[newKey] = newMap
+end
+
 
 
 --CLIENT
 
 function Game:client_onCreate()
     g_survivalHud = sm.gui.createSurvivalHudGui()
-    g_survivalHud:setVisible("BindingPanel", false)
+	if sm.isHost then
+		local invis = { "InventoryIconBackground", "InventoryBinding", "HandbookIconBackground", "HandbookBinding"}
+		for _, name in pairs(invis) do
+			g_survivalHud:setVisible(name, false)
+		end
+		g_survivalHud:setImage("LogbookImageBox", "$CONTENT_DATA/Gui/Images/Map1.png")
+	else
+		g_survivalHud:setVisible("BindingPanel", false)
+	end
 
     if g_respawnManager == nil then
 		assert( not sm.isHost )
@@ -166,6 +211,8 @@ function Game:client_onCreate()
 		sm.game.bindChatCommand( "/unlimited", {}, "cl_onChatCommand", "Use the unlimited inventory" )
 		sm.game.bindChatCommand( "/encrypt", {}, "cl_onChatCommand", "Restrict interactions in all warehouses" )
 		sm.game.bindChatCommand( "/decrypt", {}, "cl_onChatCommand", "Unrestrict interactions in all warehouses" )
+
+		sm.game.bindChatCommand( "/savemap", { { "string", "name", false } }, "cl_onChatCommand", "Exports custom map" )
 	end
 
 	sm.game.bindChatCommand( "/fly", {}, "cl_onChatCommand", "Toggle fly mode" )
@@ -185,6 +232,23 @@ function Game:cl_onChatCommand(params)
 		self.network:sendToServer( "sv_toggleFly")
 	elseif params[1] == "/spectator" then
 		self.network:sendToServer( "sv_setSpectator")
+	elseif params[1] == "/savemap" then
+		local rayCastValid, rayCastResult = sm.localPlayer.getRaycast( 100 )
+		if rayCastValid and rayCastResult.type == "body" then
+			local importParams = {
+				name = params[2],
+				body = rayCastResult:getBody()
+			}
+			self.network:sendToServer( "sv_exportMap", importParams )
+		else
+			sm.gui.chatMessage("#ff0000Look at the map while saving it")
+		end
+	end
+end
+
+function Game:cl_updateMapList(newMap)
+	if sm.isHost then
+		updateMapTable(g_maps, newMap)
 	end
 end
 

@@ -1,4 +1,5 @@
 {
    "shapeSetList" : [ "$CONTENT_DATA/Objects/Database/ShapeSets/interactive.shapeset",
+                      "$CONTENT_DATA/Objects/Database/ShapeSets/blocks.shapeset",
                       "$CONTENT_DATA/Objects/Database/ShapeSets/generated.shapeset" ]
 }
