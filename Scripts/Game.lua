@@ -150,7 +150,7 @@ function Game:cl_bedDestroyed(params)
 	sm.gui.displayAlertText(params.color .. "Bed destroyed!")
 end
 
-function Game.sv_exportMap( self, params )
+function Game.sv_exportMap( self, params, player )
 	local obj = sm.json.parseJsonString( sm.creation.exportToString( params.body ) )
 	sm.json.save( obj, "$CONTENT_DATA/Maps/Custom/"..params.name..".blueprint" )
 
@@ -166,6 +166,8 @@ function Game.sv_exportMap( self, params )
 	self.network:sendToClients("cl_updateMapList", newMap)
 
 	sm.json.save(custom_maps, "$CONTENT_DATA/Maps/custom.json")
+
+	self.network:sendToClient(player, "client_showMessage", "Map saved!")
 end
 
 function updateMapTable(t, newMap)
