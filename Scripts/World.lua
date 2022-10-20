@@ -44,6 +44,15 @@ function World.server_onProjectile( self, hitPos, hitTime, hitVelocity, _, attac
 end
 
 function World:server_changeMap(name)
+    for x = -2, 2, 1 do
+        for y = -2, 2, 1 do
+            for _, harvestable in ipairs(sm.cell.getHarvestables(x,y)) do
+                harvestable:destroy()
+            end
+        end
+    end
+
+
     for _, body in ipairs( sm.body.getAllBodies() ) do
 		for _, shape in ipairs( body:getShapes() ) do
 			shape:destroyShape()
