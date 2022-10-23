@@ -71,10 +71,7 @@ function BedwarsBed:server_onDestroy()
 
     local color = "#" .. tostring(self.color):sub(1, 6)
     TeamManager.sv_setBed(color, false, self.shape)
-end
-
-function BedwarsBed:client_onDestroy()
-    sm.effect.playEffect("bed gone", sm.localPlayer.getPlayer().character.worldPosition)
+    sm.event.sendToGame("sv_bedDestroyed", color)
 end
 
 function BedwarsBed:sv_set_color(color, player)
