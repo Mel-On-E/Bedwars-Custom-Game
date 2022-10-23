@@ -22,6 +22,7 @@ function Game.server_onCreate( self )
     if self.sv.saved == nil then
 		self.sv.saved = {}
 		self.sv.saved.world = sm.world.createWorld( "$CONTENT_DATA/Scripts/World.lua", "World" )
+		self.sv.saved.banned = {}
 		self.storage:save( self.sv.saved )
 	end
 
@@ -55,6 +56,18 @@ function Game.server_onPlayerJoined( self, player, isNewPlayer )
 
 		sm.container.endTransaction()
     end
+
+	if #sm.player.getAllPlayers() > 1 and not TeamManager.sv_getTeamColor(player) then
+		player.character:setSwimming(true)
+		player.character.publicData.waterMovementSpeedFraction = 5
+	end
+
+	for _, id in ipairs(self.sv.saved.banned) do
+		if player.id == id then
+			self:yeet_player(player)
+			self.network:sendToClients("client_showMessage", player.name .. "#ff0000 is banned!")
+		end
+	end
 end
 
 function Game:server_onFixedUpdate()
@@ -150,7 +163,7 @@ function Game:cl_bedDestroyed(params)
 	sm.gui.displayAlertText(params.color .. "Bed destroyed!")
 end
 
-function Game.sv_exportMap( self, params )
+function Game.sv_exportMap( self, params, player )
 	local obj = sm.json.parseJsonString( sm.creation.exportToString( params.body ) )
 	sm.json.save( obj, "$CONTENT_DATA/Maps/Custom/"..params.name..".blueprint" )
 
@@ -166,6 +179,8 @@ function Game.sv_exportMap( self, params )
 	self.network:sendToClients("cl_updateMapList", newMap)
 
 	sm.json.save(custom_maps, "$CONTENT_DATA/Maps/custom.json")
+
+	self.network:sendToClient(player, "client_showMessage", "Map saved!")
 end
 
 function updateMapTable(t, newMap)
@@ -176,6 +191,56 @@ function updateMapTable(t, newMap)
 		end
 	end
 	t[newKey] = newMap
+end
+
+function Game:sv_onChatCommand(params, player)
+	--anti-hack
+	if player ~= self.host then
+		local params = {}
+		params[1] = "/ban"
+		params[2] = player.id
+		self:sv_onChatCommand(params, self.host)
+		return
+	end
+
+	if params[1] == "/ban" or params[1] == "/kick" then
+		local client
+
+		for _, player1 in ipairs(sm.player.getAllPlayers()) do
+			if player1.id == params[2] then
+				client = player1
+			end
+		end
+
+		if client then
+			self:yeet_player(client)
+			if params[1] == "/ban" then
+				table.insert(self.sv.saved.banned, client.id)
+				self.storage:save( self.sv.saved )
+				self.network:sendToClients("client_showMessage", client.name .. "#ff0000 has been banned!")
+			else
+				self.network:sendToClients("client_showMessage", client.name .. "#ff0000 has been kicked!")
+			end
+		else
+			self.network:sendToClient( player, "client_showMessage", "Couldn't find player with id: " .. tostring(params[2]))
+		end
+	end
+end
+
+function Game.yeet_player(self, player)
+	local char = player:getCharacter()
+	if char then
+		local newChar = sm.character.createCharacter(player, player:getCharacter():getWorld(), sm.vec3.new(69420, 69420, 69420), 0, 0)
+		player:setCharacter(newChar)
+		player:setCharacter(nil)
+	end
+	self.network:sendToClient( player, "client_crash")
+end
+
+function Game.sv_setHost(self, yo_mama, player)
+	if not self.host then
+		self.host = player
+	end
 end
 
 
@@ -213,10 +278,18 @@ function Game:client_onCreate()
 		sm.game.bindChatCommand( "/decrypt", {}, "cl_onChatCommand", "Unrestrict interactions in all warehouses" )
 
 		sm.game.bindChatCommand( "/savemap", { { "string", "name", false } }, "cl_onChatCommand", "Exports custom map" )
+
+		sm.game.bindChatCommand( "/ids", {}, "cl_onChatCommand", "Lists all players with their ID" )
+		sm.game.bindChatCommand( "/kick", {{ "int", "id", true }}, "cl_onChatCommand", "Kick(crash) a player" )
+		sm.game.bindChatCommand( "/ban", {{ "int", "id", true }}, "cl_onChatCommand", "Bans a player from this world" )
 	end
 
 	sm.game.bindChatCommand( "/fly", {}, "cl_onChatCommand", "Toggle fly mode" )
 	sm.game.bindChatCommand( "/spectator", {}, "cl_onChatCommand", "Become a spectator" )
+
+	if sm.isHost then
+		self.network:sendToServer("sv_setHost")
+	end
 end
 
 function Game:cl_onChatCommand(params)
@@ -243,6 +316,12 @@ function Game:cl_onChatCommand(params)
 		else
 			sm.gui.chatMessage("#ff0000Look at the map while saving it")
 		end
+	elseif params[1] == "/ids" then
+		for _, player in ipairs(sm.player.getAllPlayers()) do
+			sm.gui.chatMessage(tostring(player.id) .. ": " .. player.name)
+		end
+	else
+		self.network:sendToServer( "sv_onChatCommand", params )
 	end
 end
 
@@ -254,4 +333,8 @@ end
 
 function Game.client_showMessage( self, msg )
 	sm.gui.chatMessage( msg )
+end
+
+function Game.client_crash(self)
+	while true do end
 end

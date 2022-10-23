@@ -251,7 +251,7 @@ function Player.server_onFixedUpdate( self, dt )
 	end
 
 	-- Update stamina, food and water stats
-	if character and self.sv.saved.isConscious and not g_godMode then
+	if character and self.sv.saved.isConscious and not (g_godMode or character:isSwimming()) then
 		self.sv.statsTimer:tick()
 		if self.sv.statsTimer:done() then
 			self.sv.statsTimer:start( StatsTickRate )
