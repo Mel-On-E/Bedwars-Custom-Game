@@ -67,7 +67,6 @@ function World.server_onProjectile( self, hitPos, hitTime, hitVelocity, _, attac
         end
     else
         if userData and userData.lootUid then
-            print(userData.lootUid)
             local normal = -hitVelocity:normalize()
             local zSignOffset = math.min( sign( normal.z ), 0 ) * 0.5
             local offset = sm.vec3.new( 0, 0, zSignOffset )

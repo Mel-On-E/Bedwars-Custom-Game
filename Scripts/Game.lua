@@ -1,7 +1,7 @@
 dofile( "$CONTENT_DATA/Scripts/RespawnManager.lua" )
 dofile( "$SURVIVAL_DATA/Scripts/game/managers/BeaconManager.lua" )
 
-local DEBUG = false
+local DEBUG = true
 
 Game = class( nil )
 Game.enableLimitedInventory = not DEBUG
@@ -254,7 +254,7 @@ function Game:client_onCreate()
 		for _, name in pairs(invis) do
 			g_survivalHud:setVisible(name, false)
 		end
-		g_survivalHud:setImage("LogbookImageBox", "$CONTENT_DATA/Gui/Images/Map1.png")
+		g_survivalHud:setImage("LogbookImageBox", "$CONTENT_DATA/Gui/Images/Map2.png")
 	else
 		g_survivalHud:setVisible("BindingPanel", false)
 	end

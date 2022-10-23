@@ -23,6 +23,7 @@ end
 function load_map_data()
 	g_maps = sm.json.open("$CONTENT_DATA/Maps/maps.json")
 	local custom_maps = sm.json.open("$CONTENT_DATA/Maps/custom.json")
+	if custom_maps == {} then return end
 	for k,v in ipairs(custom_maps) do
 		g_maps[#g_maps+1] = v
 	end
@@ -41,7 +42,7 @@ function MapTool:cl_openGui()
 
     self:update_page()
 
-    self.gui:open()
+	self.gui:open()
 end
 
 function MapTool:update_page()
