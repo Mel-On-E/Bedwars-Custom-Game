@@ -1,33 +1,44 @@
-dofile( "$CONTENT_DATA/Scripts/RespawnManager.lua" )
-dofile( "$SURVIVAL_DATA/Scripts/game/managers/BeaconManager.lua" )
+dofile("$CONTENT_DATA/Scripts/RespawnManager.lua")
+dofile("$SURVIVAL_DATA/Scripts/game/managers/BeaconManager.lua")
 
 local DEBUG = false
 
-Game = class( nil )
+Game = class(nil)
 Game.enableLimitedInventory = not DEBUG
 Game.enableRestrictions = not DEBUG
 Game.enableFuelConsumption = not DEBUG
 Game.enableAmmoConsumption = not DEBUG
 Game.enableUpgrade = true
+Game.functions = {} -- Array under the class array should prevent network callbacks.
 
-START_AREA_SPAWN_POINT = sm.vec3.new( 0, 0, 5 )
+START_AREA_SPAWN_POINT = sm.vec3.new(0, 0, 5)
 local deathDepth = -69
 
---SERVER
+function updateMapTable(t, newMap)
+	local newKey = #t + 1
+	for key, map in ipairs(t) do
+		if map.name == newMap.name then
+			newKey = key
+		end
+	end
+	t[newKey] = newMap
+end
 
-function Game.server_onCreate( self )
+-- GameClass Callbacks --
+
+function Game:server_onCreate()
 	print("Game.server_onCreate")
-    self.sv = {}
+	self.sv = {}
 	self.sv.saved = self.storage:load()
-    if self.sv.saved == nil then
+	if self.sv.saved == nil then
 		self.sv.saved = {}
-		self.sv.saved.world = sm.world.createWorld( "$CONTENT_DATA/Scripts/World.lua", "World" )
+		self.sv.saved.world = sm.world.createWorld("$CONTENT_DATA/Scripts/World.lua", "World")
 		self.sv.saved.banned = {}
-		self.storage:save( self.sv.saved )
+		self.storage:save(self.sv.saved)
 	end
 
-    g_respawnManager = RespawnManager()
-	g_respawnManager:sv_onCreate( self.sv.saved.world )
+	g_respawnManager = RespawnManager()
+	g_respawnManager:sv_onCreate(self.sv.saved.world)
 
 	g_beaconManager = BeaconManager()
 	g_beaconManager:sv_onCreate()
@@ -37,25 +48,74 @@ function Game.server_onCreate( self )
 		self.sv.teamManager = sm.scriptableObject.createScriptableObject(sm.uuid.new("cb5871ae-c677-4480-94e9-31d16899d093"))
 		sm.storage.save(69, self.sv.teamManager)
 	end
+
+	self.sv.authorised = {[1] = true} -- Player ids.
+
 end
 
-function Game.server_onPlayerJoined( self, player, isNewPlayer )
-    print("Game.server_onPlayerJoined")
-    if isNewPlayer then
-        if not sm.exists( self.sv.saved.world ) then
-            sm.world.loadWorld( self.sv.saved.world )
-        end
-        self.sv.saved.world:loadCell( 0, 0, player, "sv_createPlayerCharacter" )
+function Game:client_onCreate()
+	print("Game.client_onCreate")
+	g_survivalHud = sm.gui.createSurvivalHudGui()
+	if sm.isHost then
+		local invis = { "InventoryIconBackground", "InventoryBinding", "HandbookIconBackground", "HandbookBinding" }
+		for _, name in pairs(invis) do
+			g_survivalHud:setVisible(name, false)
+		end
+		g_survivalHud:setImage("LogbookImageBox", "$CONTENT_DATA/Gui/Images/Map1.png")
+	else
+		g_survivalHud:setVisible("BindingPanel", false)
+	end
+
+	if g_respawnManager == nil then
+		assert(not sm.isHost)
+		g_respawnManager = RespawnManager()
+	end
+	g_respawnManager:cl_onCreate()
+
+	if g_beaconManager == nil then
+		assert(not sm.isHost)
+		g_beaconManager = BeaconManager()
+	end
+	g_beaconManager:cl_onCreate()
+
+	if sm.isHost then
+		sm.game.bindChatCommand("/limited", {}, "cl_onChatCommand", "Use the limited inventory")
+		sm.game.bindChatCommand("/unlimited", {}, "cl_onChatCommand", "Use the unlimited inventory")
+		sm.game.bindChatCommand("/encrypt", {}, "cl_onChatCommand", "Restrict interactions in all warehouses")
+		sm.game.bindChatCommand("/decrypt", {}, "cl_onChatCommand", "Unrestrict interactions in all warehouses")
+
+		sm.game.bindChatCommand("/savemap", { { "string", "name", false } }, "cl_onChatCommand", "Exports custom map")
+
+		sm.game.bindChatCommand("/ids", {}, "cl_onChatCommand", "Lists all players with their ID")
+		sm.game.bindChatCommand("/kick", { { "int", "id", true } }, "cl_onChatCommand", "Kick(crash) a player")
+		sm.game.bindChatCommand("/ban", { { "int", "id", true } }, "cl_onChatCommand", "Bans a player from this world")
+
+		sm.game.bindChatCommand("/auth",{ { "int", "id", true } },"cl_onChatCommand","Authorise a player.")
+		sm.game.bindChatCommand("/unauth",{ { "int", "id", true } },"cl_onChatCommand","Unauthorise a player.")
+		sm.game.bindChatCommand("/authlist",{},"cl_onChatCommand","Get authorised players.")
+	end
+
+	sm.game.bindChatCommand("/fly", {}, "cl_onChatCommand", "Toggle fly mode")
+	sm.game.bindChatCommand("/spectator", {}, "cl_onChatCommand", "Become a spectator")
+end
+
+function Game:server_onPlayerJoined(player, isNewPlayer)
+	print("Game.server_onPlayerJoined")
+	if isNewPlayer then
+		if not sm.exists(self.sv.saved.world) then
+			sm.world.loadWorld(self.sv.saved.world)
+		end
+		self.sv.saved.world:loadCell(0, 0, player, "sv_createPlayerCharacter")
 
 		local inventory = player:getInventory()
 
 		sm.container.beginTransaction()
 
-		sm.container.setItem( inventory, 0, tool_sledgehammer, 1 )
-		sm.container.setItem( inventory, 1, tool_lift, 1 )
+		sm.container.setItem(inventory, 0, tool_sledgehammer, 1)
+		sm.container.setItem(inventory, 1, tool_lift, 1)
 
 		sm.container.endTransaction()
-    end
+	end
 
 	if #sm.player.getAllPlayers() > 1 and not TeamManager.sv_getTeamColor(player) then
 		player.character:setSwimming(true)
@@ -64,108 +124,121 @@ function Game.server_onPlayerJoined( self, player, isNewPlayer )
 
 	for _, id in ipairs(self.sv.saved.banned) do
 		if player.id == id then
-			self:yeet_player(player)
+			self.functions.yeet_player(self, player)
 			self.network:sendToClients("client_showMessage", player.name .. "#ff0000 is banned!")
 		end
 	end
 end
 
 function Game:server_onFixedUpdate()
-    --kill the fallen ones
-    for _, player in ipairs(sm.player.getAllPlayers()) do
-        local char = player.character
-        if char and char.worldPosition.z < deathDepth then
-            local params = { damage = 6969, player = player}
-            sm.event.sendToPlayer( params.player, "sv_e_receiveDamage", params )
+	for _, player in ipairs(sm.player.getAllPlayers()) do
+		local char = player.character
+		if char and char.worldPosition.z < deathDepth then
+			local params = { damage = 6969, player = player }
+			sm.event.sendToPlayer(params.player, "sv_e_receiveDamage", params)
 
-            local tumbleMod = math.sin(sm.game.getCurrentTick()/2)*420
-            char:applyTumblingImpulse(sm.vec3.new(0,0,1) * tumbleMod )
-        end
-    end
+			local tumbleMod = math.sin(sm.game.getCurrentTick() / 2) * 420
+			char:applyTumblingImpulse(sm.vec3.new(0, 0, 1) * tumbleMod)
+		end
+	end
 
 	g_respawnManager:server_onFixedUpdate()
 end
 
-function Game.sv_createPlayerCharacter( self, world, x, y, player, params )
-    local character = sm.character.createCharacter( player, world, START_AREA_SPAWN_POINT, 0, 0 )
-	player:setCharacter( character )
-end
+-- Command Handling --
 
-function Game.sv_e_respawn( self, params )
-	if params.player.character and sm.exists( params.player.character ) then
-		g_respawnManager:sv_requestRespawnCharacter( params.player )
-	else
-		local spawnPoint = START_AREA_SPAWN_POINT
-		if not sm.exists( self.sv.saved.world ) then
-			sm.world.loadWorld( self.sv.saved.world )
-		end
-		self.sv.saved.world:loadCell( math.floor( spawnPoint.x/64 ), math.floor( spawnPoint.y/64 ), params.player, "sv_createPlayerCharacter" )
+function Game:sv_onChatCommand(params, player)
+	if params[1] == "/fly" then
+		self.functions.sv_toggleFly(self,nil,player)
+	elseif params[1] == "/spectator" then
+		self.functions.sv_setSpectator(self,nil,player)
 	end
-end
 
-function Game.sv_e_onSpawnPlayerCharacter( self, player )
-	if player.character and sm.exists( player.character ) then
-		g_respawnManager:sv_onSpawnCharacter( player )
-		g_beaconManager:sv_onSpawnCharacter( player )
-	else
-		sm.log.warning("SurvivalGame.sv_e_onSpawnPlayerCharacter for a character that doesn't exist")
-	end
-end
+	if not self.functions.Authorised(self, player) then return end
 
-function Game.sv_loadedRespawnCell( self, world, x, y, player )
-	g_respawnManager:sv_respawnCharacter( player, world )
-end
-
-function Game.sv_enableRestrictions( self, state )
-	sm.game.setEnableRestrictions( state )
-	self.network:sendToClients( "client_showMessage", ( state and "Restricted" or "Unrestricted"  ) )
-end
-
-function Game.sv_setLimitedInventory( self, state )
-	sm.game.setLimitedInventory( state )
-	self.network:sendToClients( "client_showMessage", ( state and "Limited inventory" or "Unlimited inventory"  ) )
-end
-
-function Game.sv_toggleFly( self, params, player )
-	if TeamManager.sv_getTeamColor(player) then
-		self.network:sendToClient( player, "client_showMessage", "You need to be /spectator to fly" )
+	if params[1] == "/encrypt" then
+		sm.game.setEnableRestrictions(true)
+		self.functions.Alert(self, "Restricted")
+		return
+	elseif params[1] == "/decrypt" then
+		sm.game.setEnableRestrictions(false)
+		self.functions.Alert(self, "Unrestricted")
+		return
+	elseif params[1] == "/unlimited" then
+		sm.game.setLimitedInventory(true)
+		self.functions.Alert(self, "Unlimited inventory")
+		return
+	elseif params[1] == "/limited" then
+		sm.game.setLimitedInventory(false)
+		self.functions.Alert(self, "Limited inventory")
 		return
 	end
 
-	local char = player.character
-	local isSwimming = not char:isSwimming()
-	char:setSwimming(isSwimming)
-	char.publicData.waterMovementSpeedFraction = (isSwimming and 5 or 1)
-end
+	if params[1] == "/ban" or params[1] == "/kick" then
+		local client
 
-function Game:sv_setSpectator(params, player)
-	TeamManager.sv_setTeam(player, nil)
+		for _, player1 in ipairs(sm.player.getAllPlayers()) do
+			if player1.id == params[2] then
+				client = player1
+			end
+		end
 
-	self.network:sendToClients("client_showMessage", player.name .. " is now a spectator")
-end
-
-function Game:sv_bedDestroyed(color)
-	local remainingPlayers = TeamManager.sv_getTeamCount(color)
-	self.network:sendToClients("cl_bedDestroyed", {color = color, players = remainingPlayers})
-	sm.event.sendToWorld(self.sv.saved.world, "sv_justPlayTheGoddamnSound", {effect = "bed gone"})
-end
-
-function Game:cl_bedDestroyed(params)
-	local stopComplainingAboutGrammar = "players"
-	if params.players == 1 then
-		stopComplainingAboutGrammar = "player"
+		if client then
+			self.functions.yeet_player(self, client)
+			if params[1] == "/ban" then
+				table.insert(self.sv.saved.banned, client.id)
+				self.storage:save(self.sv.saved)
+				self.network:sendToClients("client_showMessage", client.name .. "#ff0000 has been banned!")
+			else
+				self.network:sendToClients("client_showMessage", client.name .. "#ff0000 has been kicked!")
+			end
+		else
+			self.network:sendToClient(player, "client_showMessage", "Couldn't find player with id: " .. tostring(params[2]))
+		end
 	end
 
-	sm.gui.chatMessage(params.color .. "Bed destroyed! (" ..
-		"#ffffff" .. params.players .. " " .. stopComplainingAboutGrammar .. " left" .. params.color .. ")"
-	)
+	if player.id ~= 1 then return end
 
-	sm.gui.displayAlertText(params.color .. "Bed destroyed!")
+	if params[1] == "/auth" then
+		local Result = self.functions.Authorise(self,params[2]) and "Success" or "Already Authed"
+		self.functions.Alert(self,Result,1)
+	elseif params[1] == "/unauth" then
+		local Result = self.functions.Unauthorise(self,params[2]) and "Success" or "Not Authed"
+		self.functions.Alert(self,Result,1)
+	elseif params[1] == "/authlist" then
+		for key, auth in ipairs(self.sv.authorised) do
+			self.network:sendToClient(player,"client_showMessage",tostring(key)..":"..tostring(auth))
+		end
+	end
 end
 
-function Game.sv_exportMap( self, params, player )
-	local obj = sm.json.parseJsonString( sm.creation.exportToString( params.body ) )
-	sm.json.save( obj, "$CONTENT_DATA/Maps/Custom/"..params.name..".blueprint" )
+function Game:cl_onChatCommand(params) -- just don't handle the command if its a server side command. (unless you need client data)
+	if params[1] == "/savemap" then
+		local rayCastValid, rayCastResult = sm.localPlayer.getRaycast(100)
+		if rayCastValid and rayCastResult.type == "body" then
+			local importParams = {
+				name = params[2],
+				body = rayCastResult:getBody()
+			}
+			self.network:sendToServer("sv_exportMap", importParams)
+		else
+			sm.gui.chatMessage("#ff0000Look at the map while saving it")
+		end
+	elseif params[1] == "/ids" then
+		for _, player in ipairs(sm.player.getAllPlayers()) do
+			sm.gui.chatMessage(tostring(player.id) .. ": " .. player.name)
+		end
+	else
+		self.network:sendToServer("sv_onChatCommand", params)
+	end
+end
+
+-- Commands --
+
+function Game:sv_exportMap(params, player)
+	if not self.functions.Authorised(self, player) then return end
+	local obj = sm.json.parseJsonString(sm.creation.exportToString(params.body))
+	sm.json.save(obj, "$CONTENT_DATA/Maps/Custom/" .. params.name .. ".blueprint")
 
 	--update custom.json
 	local custom_maps = sm.json.open("$CONTENT_DATA/Maps/custom.json")
@@ -183,158 +256,150 @@ function Game.sv_exportMap( self, params, player )
 	self.network:sendToClient(player, "client_showMessage", "Map saved!")
 end
 
-function updateMapTable(t, newMap)
-	local newKey = #t + 1
-	for key, map in ipairs(t) do
-		if map.name == newMap.name then
-			newKey = key
-		end
-	end
-	t[newKey] = newMap
-end
-
-function Game:sv_onChatCommand(params, player)
-	--anti-hack
-	if player ~= self.host then
-		local params = {}
-		params[1] = "/ban"
-		params[2] = player.id
-		self:sv_onChatCommand(params, self.host)
+function Game.functions:sv_toggleFly(_, player)
+	if TeamManager.sv_getTeamColor(player) then
+		self.network:sendToClient(player, "client_showMessage", "You need to be /spectator to fly")
 		return
 	end
 
-	if params[1] == "/ban" or params[1] == "/kick" then
-		local client
+	local char = player.character
+	local isSwimming = not char:isSwimming()
+	char:setSwimming(isSwimming)
+	char.publicData.waterMovementSpeedFraction = (isSwimming and 5 or 1)
+end
 
-		for _, player1 in ipairs(sm.player.getAllPlayers()) do
-			if player1.id == params[2] then
-				client = player1
-			end
-		end
+function Game.functions:sv_setSpectator(_, player)
+	TeamManager.sv_setTeam(player, nil)
 
-		if client then
-			self:yeet_player(client)
-			if params[1] == "/ban" then
-				table.insert(self.sv.saved.banned, client.id)
-				self.storage:save( self.sv.saved )
-				self.network:sendToClients("client_showMessage", client.name .. "#ff0000 has been banned!")
-			else
-				self.network:sendToClients("client_showMessage", client.name .. "#ff0000 has been kicked!")
-			end
-		else
-			self.network:sendToClient( player, "client_showMessage", "Couldn't find player with id: " .. tostring(params[2]))
+	self.network:sendToClients("client_showMessage", player.name .. " is now a spectator")
+end
+
+-- Callbacks --
+
+function Game:sv_createPlayerCharacter(world, x, y, player, params)
+	if not self.functions.SecureTest(self, x, "sv_createPlayerCharacter", true, true) then return end
+	local character = sm.character.createCharacter(player, world, START_AREA_SPAWN_POINT, 0, 0)
+	player:setCharacter(character)
+end
+
+function Game:sv_bedDestroyed(color, player)
+	if not self.functions.SecureTest(self, player, "sv_bedDestroyed", true, true) then return end
+	local remainingPlayers = TeamManager.sv_getTeamCount(color)
+	self.network:sendToClients("cl_bedDestroyed", { color = color, players = remainingPlayers })
+end
+
+function Game:cl_bedDestroyed(params, player)
+	if not self.functions.SecureTest(self, player, "cl_bedDestroyed", false, true) then return end
+	local stopComplainingAboutGrammar = "players"
+	if params.players == 1 then
+		stopComplainingAboutGrammar = "player"
+	end
+
+	sm.gui.chatMessage(params.color .. "Bed destroyed! (" ..
+		"#ffffff" .. params.players .. " " .. stopComplainingAboutGrammar .. " left" .. params.color .. ")"
+	)
+
+	sm.gui.displayAlertText(params.color .. "Bed destroyed!")
+end
+
+function Game:sv_e_respawn(params, player)
+	if not self.functions.SecureTest(self, player, "sv_e_respawn", true, true) then return end
+	if params.player.character and sm.exists(params.player.character) then
+		g_respawnManager:sv_requestRespawnCharacter(params.player)
+	else
+		local spawnPoint = START_AREA_SPAWN_POINT
+		if not sm.exists(self.sv.saved.world) then
+			sm.world.loadWorld(self.sv.saved.world)
 		end
+		self.sv.saved.world:loadCell(math.floor(spawnPoint.x / 64), math.floor(spawnPoint.y / 64), params.player,
+			"sv_createPlayerCharacter")
 	end
 end
 
-function Game.yeet_player(self, player)
+function Game:sv_e_onSpawnPlayerCharacter(plr, player)
+	if not self.functions.SecureTest(self, player, "sv_e_onSpawnPlayerCharacter", true, true) then return end
+	if plr.character and sm.exists(plr.character) then
+		g_respawnManager:sv_onSpawnCharacter(plr)
+		g_beaconManager:sv_onSpawnCharacter(plr)
+	else
+		sm.log.warning("SurvivalGame.sv_e_onSpawnPlayerCharacter for a character that doesn't exist")
+	end
+end
+
+function Game:sv_loadedRespawnCell(world, x, y, player)
+	if not self.functions.SecureTest(self, x, "sv_loadedRespawnCell", true, true) then return end
+	g_respawnManager:sv_respawnCharacter(player, world)
+end
+
+function Game:client_showMessage(msg, player)
+	if not self.functions.SecureTest(self, player, "client_showMessage", false, true) then return end
+	sm.gui.chatMessage(msg)
+end
+
+function Game:client_crash(_, player) -- don't hold the thread just bugsplat :|, its kinda shitty to do this but axolot hasn't given us much options.
+	if not self.functions.SecureTest(self, player, "client_showMessage", false, true) then return end
+	self.sv.saved.world:reloadCell(0, 0)
+end
+
+function Game.functions:yeet_player(player)
 	local char = player:getCharacter()
 	if char then
-		local newChar = sm.character.createCharacter(player, player:getCharacter():getWorld(), sm.vec3.new(69420, 69420, 69420), 0, 0)
+		local newChar = sm.character.createCharacter(player, player:getCharacter():getWorld(), sm.vec3.new(69420, 69420, 69420)
+			, 0, 0)
 		player:setCharacter(newChar)
 		player:setCharacter(nil)
 	end
-	self.network:sendToClient( player, "client_crash")
+	self.network:sendToClient(player, "client_crash")
 end
 
-function Game.sv_setHost(self, yo_mama, player)
-	if not self.host then
-		self.host = player
-	end
-end
-
-
-
---CLIENT
-
-function Game:client_onCreate()
-    g_survivalHud = sm.gui.createSurvivalHudGui()
-	if sm.isHost then
-		local invis = { "InventoryIconBackground", "InventoryBinding", "HandbookIconBackground", "HandbookBinding"}
-		for _, name in pairs(invis) do
-			g_survivalHud:setVisible(name, false)
-		end
-		g_survivalHud:setImage("LogbookImageBox", "$CONTENT_DATA/Gui/Images/Map1.png")
-	else
-		g_survivalHud:setVisible("BindingPanel", false)
-	end
-
-    if g_respawnManager == nil then
-		assert( not sm.isHost )
-		g_respawnManager = RespawnManager()
-	end
-	g_respawnManager:cl_onCreate()
-
-	if g_beaconManager == nil then
-		assert( not sm.isHost )
-		g_beaconManager = BeaconManager()
-	end
-	g_beaconManager:cl_onCreate()
-
-	if sm.isHost then
-		sm.game.bindChatCommand( "/limited", {}, "cl_onChatCommand", "Use the limited inventory" )
-		sm.game.bindChatCommand( "/unlimited", {}, "cl_onChatCommand", "Use the unlimited inventory" )
-		sm.game.bindChatCommand( "/encrypt", {}, "cl_onChatCommand", "Restrict interactions in all warehouses" )
-		sm.game.bindChatCommand( "/decrypt", {}, "cl_onChatCommand", "Unrestrict interactions in all warehouses" )
-
-		sm.game.bindChatCommand( "/savemap", { { "string", "name", false } }, "cl_onChatCommand", "Exports custom map" )
-
-		sm.game.bindChatCommand( "/ids", {}, "cl_onChatCommand", "Lists all players with their ID" )
-		sm.game.bindChatCommand( "/kick", {{ "int", "id", true }}, "cl_onChatCommand", "Kick(crash) a player" )
-		sm.game.bindChatCommand( "/ban", {{ "int", "id", true }}, "cl_onChatCommand", "Bans a player from this world" )
-	end
-
-	sm.game.bindChatCommand( "/fly", {}, "cl_onChatCommand", "Toggle fly mode" )
-	sm.game.bindChatCommand( "/spectator", {}, "cl_onChatCommand", "Become a spectator" )
-
-	if sm.isHost then
-		self.network:sendToServer("sv_setHost")
-	end
-end
-
-function Game:cl_onChatCommand(params)
-	if params[1] == "/encrypt" then
-		self.network:sendToServer( "sv_enableRestrictions", true )
-	elseif params[1] == "/decrypt" then
-		self.network:sendToServer( "sv_enableRestrictions", false )
-	elseif params[1] == "/unlimited" then
-		self.network:sendToServer( "sv_setLimitedInventory", false )
-	elseif params[1] == "/limited" then
-		self.network:sendToServer( "sv_setLimitedInventory", true )
-	elseif params[1] == "/fly" then
-		self.network:sendToServer( "sv_toggleFly")
-	elseif params[1] == "/spectator" then
-		self.network:sendToServer( "sv_setSpectator")
-	elseif params[1] == "/savemap" then
-		local rayCastValid, rayCastResult = sm.localPlayer.getRaycast( 100 )
-		if rayCastValid and rayCastResult.type == "body" then
-			local importParams = {
-				name = params[2],
-				body = rayCastResult:getBody()
-			}
-			self.network:sendToServer( "sv_exportMap", importParams )
-		else
-			sm.gui.chatMessage("#ff0000Look at the map while saving it")
-		end
-	elseif params[1] == "/ids" then
-		for _, player in ipairs(sm.player.getAllPlayers()) do
-			sm.gui.chatMessage(tostring(player.id) .. ": " .. player.name)
-		end
-	else
-		self.network:sendToServer( "sv_onChatCommand", params )
-	end
-end
-
-function Game:cl_updateMapList(newMap)
+function Game.functions:cl_updateMapList(newMap)
 	if sm.isHost then
 		updateMapTable(g_maps, newMap)
 	end
 end
 
-function Game.client_showMessage( self, msg )
-	sm.gui.chatMessage( msg )
+function Game:Alert(data,player)
+	if not self.functions.SecureTest(self, player, "Alert", false, true) then return end
+	sm.gui.displayAlertText(tostring(data.Text),tonumber(data.Duration))
 end
 
-function Game.client_crash(self)
-	while true do end
+function Game.functions:Alert(T, D)
+	self.network:sendToClients("Alert", { Text = T, Duration = D })
+end
+-- Auth Functions --
+
+function Game.functions:SecureTest(player, text, server, preventplayer)
+	if sm.isServerMode() ~= server then
+		print(player:getName() .. " Fired " .. text .. " (Server Mode Violation)")
+		return false
+	end
+	if preventplayer and type(player) == "Player" then
+		print(player:getName() .. " Fired " .. text .. " (Prevent Player Violation)")
+		return false
+	end
+	return true
+end
+
+function Game.functions:Authorised(player)
+	if self.sv.authorised[player.id] then
+		return true
+	end
+	return false
+end
+
+function Game.functions:Authorise(id)
+	if not self.sv.authorised[id] then
+		self.sv.authorised[id] = true
+		return true
+	end
+	return false
+end
+
+function Game.functions:Unauthorise(id)
+	if id == 1 then return false end
+	if self.sv.authorised[id] then
+		self.sv.authorised[id] = nil
+		return true
+	end
+	return false
 end
