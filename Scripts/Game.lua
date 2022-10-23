@@ -165,11 +165,11 @@ function Game:sv_onChatCommand(params, player)
 		self.functions.Alert(self, "Unrestricted")
 		return
 	elseif params[1] == "/unlimited" then
-		sm.game.setLimitedInventory(true)
+		sm.game.setLimitedInventory(false)
 		self.functions.Alert(self, "Unlimited inventory")
 		return
 	elseif params[1] == "/limited" then
-		sm.game.setLimitedInventory(false)
+		sm.game.setLimitedInventory(true)
 		self.functions.Alert(self, "Limited inventory")
 		return
 	end
