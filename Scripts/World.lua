@@ -8,10 +8,13 @@ World.cellMinY = -2
 World.cellMaxY = 1
 World.worldBorder = false
 World.enableSurface = false
+World.functions = {}
 
 local MAP_SPAWNPOINT = sm.vec3.zero()
 local clearDebrisInterval = 40*10
 local doomDepth = -69
+
+-- World Callbacks --
 
 function World:server_onCellCreated( x, y )
     if x == y and x == 0 then      
@@ -43,7 +46,10 @@ function World.server_onProjectile( self, hitPos, hitTime, hitVelocity, _, attac
 	end
 end
 
-function World:server_changeMap(name)
+-- Functions --
+
+function World:server_changeMap(name, player)
+    self.functions.SecureTest(self, player, "server_changeMap", true, true)
     --reset inventories
     for _, player in ipairs(sm.player.getAllPlayers()) do
         local inventory = player:getInventory()
@@ -82,10 +88,11 @@ function World:server_changeMap(name)
         MAP_SPAWNPOINT)
 
     --remove helper blocks
-    sm.event.sendToWorld(self.world, "sv_remove_helper_blocks")
+    sm.event.sendToWorld(self.world,"sv_remove_helper_blocks") -- 1 Tick Delay (it appears importFromFile returns a readonly creation?)
 end
 
-function World:sv_remove_helper_blocks()
+function World:sv_remove_helper_blocks(_, player)
+    self.functions.SecureTest(self, player, "sv_justPlayTheGoddamnSound", true, true)
     local blk_map_building = sm.uuid.new("fada88d2-0b6e-4fdd-9fa6-5fd4c6098fd6")
 
     for _, body in ipairs( sm.body.getAllBodies() ) do
@@ -97,11 +104,25 @@ function World:sv_remove_helper_blocks()
 	end
 end
 
-function World:sv_justPlayTheGoddamnSound(params)
+function World:sv_justPlayTheGoddamnSound(params, player)
+    self.functions.SecureTest(self, player, "sv_justPlayTheGoddamnSound", true, true)
     self.network:sendToClients("cl_justPlayTheGoddamnSound", params)
 end
 
-function World:cl_justPlayTheGoddamnSound(params)
+function World:cl_justPlayTheGoddamnSound(params, player)
+    self.functions.SecureTest(self, player, "cl_justPlayTheGoddamnSound", false, true)
     local pos = params.pos or sm.localPlayer.getPlayer().character.worldPosition
     sm.effect.playEffect(params.effect, pos)
+end
+
+function World.functions:SecureTest(player, text, server, preventplayer)
+	if sm.isServerMode() ~= server then
+		print(player:getName() .. " Fired " .. text .. " (Server Mode Violation)")
+		return false
+	end
+	if preventplayer and type(player) == "Player" then
+		print(player:getName() .. " Fired " .. text .. " (Prevent Player Violation)")
+		return false
+	end
+	return true
 end
