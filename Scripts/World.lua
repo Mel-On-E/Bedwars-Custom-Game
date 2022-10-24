@@ -92,7 +92,7 @@ function World:server_changeMap(name, player)
 end
 
 function World:sv_remove_helper_blocks(_, player)
-    self.functions.SecureTest(self, player, "sv_justPlayTheGoddamnSound", true, true)
+    self.functions.SecureTest(self, player, "sv_remove_helper_blocks", true, true)
     local blk_map_building = sm.uuid.new("fada88d2-0b6e-4fdd-9fa6-5fd4c6098fd6")
 
     for _, body in ipairs( sm.body.getAllBodies() ) do
