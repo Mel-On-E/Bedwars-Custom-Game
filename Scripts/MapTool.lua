@@ -147,7 +147,7 @@ end
 
 function MapTool:sv_load_map(file)
 	local world = self.tool:getOwner():getCharacter():getWorld()
-	sm.event.sendToWorld(world, "server_changeMap", file)
+	sm.event.sendToWorld(world, "sv_changeMap", file)
 
 	for _, player in ipairs(sm.player.getAllPlayers()) do
 		local team = TeamManager.sv_getTeamColor(player)

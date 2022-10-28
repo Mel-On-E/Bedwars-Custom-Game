@@ -1,5 +1,7 @@
-dofile("$CONTENT_DATA/Scripts/RespawnManager.lua")
 dofile("$SURVIVAL_DATA/Scripts/game/managers/BeaconManager.lua")
+
+dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
+dofile("$CONTENT_DATA/Scripts/RespawnManager.lua")
 
 local DEBUG = false
 
@@ -9,7 +11,6 @@ Game.enableRestrictions = not DEBUG
 Game.enableFuelConsumption = not DEBUG
 Game.enableAmmoConsumption = not DEBUG
 Game.enableUpgrade = true
-Game.functions = {} -- Array under the class array should prevent network callbacks.
 
 START_AREA_SPAWN_POINT = sm.vec3.new(0, 0, 5)
 local deathDepth = -69
@@ -124,7 +125,7 @@ function Game:server_onPlayerJoined(player, isNewPlayer)
 
 	for _, id in ipairs(self.sv.saved.banned) do
 		if player.id == id then
-			self.functions.yeet_player(self, player)
+			self:sv_yeet_player(player)
 			self.network:sendToClients("client_showMessage", player.name .. "#ff0000 is banned!")
 		end
 	end
@@ -147,30 +148,30 @@ end
 
 -- Command Handling --
 
-function Game:sv_onChatCommand(params, player)
+function Game:server_onChatCommand(params, player)
 	if params[1] == "/fly" then
-		self.functions.sv_toggleFly(self,nil,player)
+		self:sv_toggleFly(player)
 	elseif params[1] == "/spectator" then
-		self.functions.sv_setSpectator(self,nil,player)
+		self:sv_setSpectator(player)
 	end
 
-	if not self.functions.Authorised(self, player) then return end
+	if not self:Authorised(player) then return end
 
 	if params[1] == "/encrypt" then
 		sm.game.setEnableRestrictions(true)
-		self.functions.Alert(self, "Restricted")
+		self:sv_Alert("Restricted")
 		return
 	elseif params[1] == "/decrypt" then
 		sm.game.setEnableRestrictions(false)
-		self.functions.Alert(self, "Unrestricted")
+		self:sv_Alert("Unrestricted")
 		return
 	elseif params[1] == "/unlimited" then
 		sm.game.setLimitedInventory(false)
-		self.functions.Alert(self, "Unlimited inventory")
+		self:sv_Alert("Unlimited inventory")
 		return
 	elseif params[1] == "/limited" then
 		sm.game.setLimitedInventory(true)
-		self.functions.Alert(self, "Limited inventory")
+		self:sv_Alert("Limited inventory")
 		return
 	end
 
@@ -184,7 +185,7 @@ function Game:sv_onChatCommand(params, player)
 		end
 
 		if client then
-			self.functions.yeet_player(self, client)
+			self:sv_yeet_player(client)
 			if params[1] == "/ban" then
 				table.insert(self.sv.saved.banned, client.id)
 				self.storage:save(self.sv.saved)
@@ -200,11 +201,11 @@ function Game:sv_onChatCommand(params, player)
 	if player.id ~= 1 then return end
 
 	if params[1] == "/auth" then
-		local Result = self.functions.Authorise(self,params[2]) and "Success" or "Already Authed"
-		self.functions.Alert(self,Result,1)
+		local Result = self:Authorise(params[2]) and "Success" or "Already Authed"
+		self:sv_Alert(Result,1)
 	elseif params[1] == "/unauth" then
-		local Result = self.functions.Unauthorise(self,params[2]) and "Success" or "Not Authed"
-		self.functions.Alert(self,Result,1)
+		local Result = self:Unauthorise(params[2]) and "Success" or "Not Authed"
+		self:sv_Alert(Result,1)
 	elseif params[1] == "/authlist" then
 		for key, auth in ipairs(self.sv.authorised) do
 			self.network:sendToClient(player,"client_showMessage",tostring(key)..":"..tostring(auth))
@@ -220,7 +221,7 @@ function Game:cl_onChatCommand(params) -- just don't handle the command if its a
 				name = params[2],
 				body = rayCastResult:getBody()
 			}
-			self.network:sendToServer("sv_exportMap", importParams)
+			self.network:sendToServer("server_exportMap", importParams)
 		else
 			sm.gui.chatMessage("#ff0000Look at the map while saving it")
 		end
@@ -229,14 +230,14 @@ function Game:cl_onChatCommand(params) -- just don't handle the command if its a
 			sm.gui.chatMessage(tostring(player.id) .. ": " .. player.name)
 		end
 	else
-		self.network:sendToServer("sv_onChatCommand", params)
+		self.network:sendToServer("server_onChatCommand", params)
 	end
 end
 
 -- Commands --
 
-function Game:sv_exportMap(params, player)
-	if not self.functions.Authorised(self, player) then return end
+function Game:server_exportMap(params, player)
+	if not self:Authorised(player) then return end
 	local obj = sm.json.parseJsonString(sm.creation.exportToString(params.body))
 	sm.json.save(obj, "$CONTENT_DATA/Maps/Custom/" .. params.name .. ".blueprint")
 
@@ -256,7 +257,7 @@ function Game:sv_exportMap(params, player)
 	self.network:sendToClient(player, "client_showMessage", "Map saved!")
 end
 
-function Game.functions:sv_toggleFly(_, player)
+function Game:sv_toggleFly(player)
 	if TeamManager.sv_getTeamColor(player) then
 		self.network:sendToClient(player, "client_showMessage", "You need to be /spectator to fly")
 		return
@@ -268,7 +269,7 @@ function Game.functions:sv_toggleFly(_, player)
 	char.publicData.waterMovementSpeedFraction = (isSwimming and 5 or 1)
 end
 
-function Game.functions:sv_setSpectator(_, player)
+function Game:sv_setSpectator(player)
 	TeamManager.sv_setTeam(player, nil)
 
 	self.network:sendToClients("client_showMessage", player.name .. " is now a spectator")
@@ -277,19 +278,16 @@ end
 -- Callbacks --
 
 function Game:sv_createPlayerCharacter(world, x, y, player, params)
-	if not self.functions.SecureTest(self, x, "sv_createPlayerCharacter", true, true) then return end
 	local character = sm.character.createCharacter(player, world, START_AREA_SPAWN_POINT, 0, 0)
 	player:setCharacter(character)
 end
 
 function Game:sv_bedDestroyed(color, player)
-	if not self.functions.SecureTest(self, player, "sv_bedDestroyed", true, true) then return end
 	local remainingPlayers = TeamManager.sv_getTeamCount(color)
-	self.network:sendToClients("cl_bedDestroyed", { color = color, players = remainingPlayers })
+	self.network:sendToClients("client_bedDestroyed", { color = color, players = remainingPlayers })
 end
 
-function Game:cl_bedDestroyed(params, player)
-	if not self.functions.SecureTest(self, player, "cl_bedDestroyed", false, true) then return end
+function Game:client_bedDestroyed(params, player)
 	local stopComplainingAboutGrammar = "players"
 	if params.players == 1 then
 		stopComplainingAboutGrammar = "player"
@@ -303,7 +301,6 @@ function Game:cl_bedDestroyed(params, player)
 end
 
 function Game:sv_e_respawn(params, player)
-	if not self.functions.SecureTest(self, player, "sv_e_respawn", true, true) then return end
 	if params.player.character and sm.exists(params.player.character) then
 		g_respawnManager:sv_requestRespawnCharacter(params.player)
 	else
@@ -317,7 +314,6 @@ function Game:sv_e_respawn(params, player)
 end
 
 function Game:sv_e_onSpawnPlayerCharacter(plr, player)
-	if not self.functions.SecureTest(self, player, "sv_e_onSpawnPlayerCharacter", true, true) then return end
 	if plr.character and sm.exists(plr.character) then
 		g_respawnManager:sv_onSpawnCharacter(plr)
 		g_beaconManager:sv_onSpawnCharacter(plr)
@@ -327,21 +323,18 @@ function Game:sv_e_onSpawnPlayerCharacter(plr, player)
 end
 
 function Game:sv_loadedRespawnCell(world, x, y, player)
-	if not self.functions.SecureTest(self, x, "sv_loadedRespawnCell", true, true) then return end
 	g_respawnManager:sv_respawnCharacter(player, world)
 end
 
 function Game:client_showMessage(msg, player)
-	if not self.functions.SecureTest(self, player, "client_showMessage", false, true) then return end
 	sm.gui.chatMessage(msg)
 end
 
-function Game:client_crash(_, player) -- don't hold the thread just bugsplat :|, its kinda shitty to do this but axolot hasn't given us much options.
-	if not self.functions.SecureTest(self, player, "client_showMessage", false, true) then return end
-	self.sv.saved.world:reloadCell(0, 0)
+function Game:client_crash(_, player)
+	self.sv.saved.world:reloadCell(0, 0) -- bugsplat
 end
 
-function Game.functions:yeet_player(player)
+function Game:sv_yeet_player(player)
 	local char = player:getCharacter()
 	if char then
 		local newChar = sm.character.createCharacter(player, player:getCharacter():getWorld(), sm.vec3.new(69420, 69420, 69420)
@@ -352,42 +345,29 @@ function Game.functions:yeet_player(player)
 	self.network:sendToClient(player, "client_crash")
 end
 
-function Game.functions:cl_updateMapList(newMap)
+function Game:cl_updateMapList(newMap)
 	if sm.isHost then
 		updateMapTable(g_maps, newMap)
 	end
 end
 
-function Game:Alert(data,player)
-	if not self.functions.SecureTest(self, player, "Alert", false, true) then return end
+function Game:cl_Alert(data)
 	sm.gui.displayAlertText(tostring(data.Text),tonumber(data.Duration))
 end
 
-function Game.functions:Alert(T, D)
-	self.network:sendToClients("Alert", { Text = T, Duration = D })
+function Game:sv_Alert(T, D)
+	self.network:sendToClients("cl_Alert", { Text = T, Duration = D })
 end
 -- Auth Functions --
 
-function Game.functions:SecureTest(player, text, server, preventplayer)
-	if sm.isServerMode() ~= server then
-		print(player:getName() .. " Fired " .. text .. " (Server Mode Violation)")
-		return false
-	end
-	if preventplayer and type(player) == "Player" then
-		print(player:getName() .. " Fired " .. text .. " (Prevent Player Violation)")
-		return false
-	end
-	return true
-end
-
-function Game.functions:Authorised(player)
+function Game:Authorised(player)
 	if self.sv.authorised[player.id] then
 		return true
 	end
 	return false
 end
 
-function Game.functions:Authorise(id)
+function Game:Authorise(id)
 	if not self.sv.authorised[id] then
 		self.sv.authorised[id] = true
 		return true
@@ -395,7 +375,7 @@ function Game.functions:Authorise(id)
 	return false
 end
 
-function Game.functions:Unauthorise(id)
+function Game:Unauthorise(id)
 	if id == 1 then return false end
 	if self.sv.authorised[id] then
 		self.sv.authorised[id] = nil
@@ -403,3 +383,5 @@ function Game.functions:Unauthorise(id)
 	end
 	return false
 end
+
+SecureClass(Game)
