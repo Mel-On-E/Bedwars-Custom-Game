@@ -48,7 +48,7 @@
         "blueprint": "Garages"
     },
     {
-        "name": "Emtpy Map",
+        "name": "Empty Map",
         "desc": "Empty map. Useful as template for building.",
         "image": "Empty.png",
         "blueprint": "Empty"
