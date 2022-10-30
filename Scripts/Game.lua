@@ -131,6 +131,11 @@ function Game:server_onPlayerJoined(player, isNewPlayer)
 	end
 end
 
+function Game:server_onPlayerLeft(player)
+	sm.event.sendToPlayer(player, "sv_removePlayer", player)
+end
+
+
 function Game:server_onFixedUpdate()
 	for _, player in ipairs(sm.player.getAllPlayers()) do
 		local char = player.character
