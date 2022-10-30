@@ -368,7 +368,7 @@ function Player.sv_takeDamage( self, damage, source, attacker )
 end
 
 function Player:sv_removePlayer(player)
-	local team = TeamManager.sv_getTeamColor(player)
+	local team = TeamManager.sv_getTeamColor(player) or ""
 	TeamManager.sv_setTeam(player, nil)
 	self.network:sendToClients("cl_msg", player.name .. " is now a spectator")
 
