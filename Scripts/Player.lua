@@ -405,7 +405,7 @@ function Player:sv_removePlayer(player)
 	end
 end						
 
-function Player.sv_n_revive( self )
+function Player.server_n_revive( self )
 	local character = self.player:getCharacter()
 	if not self.sv.saved.isConscious and self.sv.saved.hasRevivalItem and not self.sv.spawnparams.respawn then
 		print( "Player", self.player.id, "revived" )
