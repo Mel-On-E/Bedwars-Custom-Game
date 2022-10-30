@@ -55,6 +55,19 @@ function Game:server_onCreate()
 	self.teams = sm.scriptableObject.createScriptableObject(sm.uuid.new("cb5871ae-c677-4480-94e9-31d16899d094"))
 end
 
+
+--cursed stuff to disable chunk unloading
+function Game.sv_loadTerrain(self, data)
+	for x = data.minX, data.maxX do
+		for y = data.minY, data.maxY do
+			data.world:loadCell(x, y, nil, "sv_empty")
+		end
+	end
+end
+
+function Game.sv_empty(self)
+end
+
 function Game:client_onCreate()
 	print("Game.client_onCreate")
 	g_survivalHud = sm.gui.createSurvivalHudGui()
@@ -139,6 +152,15 @@ function Game:server_onPlayerLeft(player)
 	sm.event.sendToScriptableObject(self.teams,"sv_onPlayerLeft",player)
 end
 
+function Game:server_onPlayerLeft(player)
+	sm.event.sendToPlayer(player, "sv_removePlayer", player)
+end
+
+function Game:sv_jankySussySus(params)
+	sm.event.sendToWorld(self.sv.saved.world, params.callback, params)
+end
+
+
 function Game:server_onFixedUpdate()
 	for _, player in ipairs(sm.player.getAllPlayers()) do
 		local char = player.character
@@ -195,7 +217,7 @@ function Game:server_onChatCommand(params, player)
 		if client then
 			self:sv_yeet_player(client)
 			if params[1] == "/ban" then
-				table.insert(self.sv.saved.banned, client.id)
+				self.sv.saved.banned[#self.sv.saved.banned+1] = client.id
 				self.storage:save(self.sv.saved)
 				self.network:sendToClients("client_showMessage", client.name .. "#ff0000 has been banned!")
 			else
