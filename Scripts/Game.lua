@@ -54,6 +54,19 @@ function Game:server_onCreate()
 
 end
 
+
+--cursed stuff to disable chunk unloading
+function Game.sv_loadTerrain(self, data)
+	for x = data.minX, data.maxX do
+		for y = data.minY, data.maxY do
+			data.world:loadCell(x, y, nil, "sv_empty")
+		end
+	end
+end
+
+function Game.sv_empty(self)
+end
+
 function Game:client_onCreate()
 	print("Game.client_onCreate")
 	g_survivalHud = sm.gui.createSurvivalHudGui()
