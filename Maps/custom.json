@@ -6,12 +6,5 @@
 		"custom" : true,
 		"name" : "tren",
 		"time" : 1666281315.0
-	},
-	
-	{
-		"blueprint" : "test",
-		"custom" : true,
-		"name" : "test",
-		"time" : 1666786080.0
 	}
 ]
