@@ -4,8 +4,6 @@ dofile( "$SURVIVAL_DATA/Scripts/game/util/Timer.lua" )
 dofile( "$SURVIVAL_DATA/Scripts/game/survival_camera.lua" )
 dofile( "$SURVIVAL_DATA/Scripts/game/managers/QuestManager.lua" )
 
-dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
-
 BasePlayer = class( nil )
 
 local FireDamage = 10
@@ -531,5 +529,3 @@ function BasePlayer.cl_n_onMessage( self, params )
 	local displayTime = params.displayTime or 2
 	sm.gui.displayAlertText( message, displayTime )
 end
-
-SecureClass(BasePlayer)
