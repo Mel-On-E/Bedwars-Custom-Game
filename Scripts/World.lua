@@ -47,23 +47,27 @@ end
 --local loot = { uuid = sm.uuid.new("c5e56da5-bc3f-4519-91c2-b307d36e15aa"), quantity = amount }
 --SpawnLoot( phrv, loot, phrv.worldPosition)
 function World:makeHarvestables(hitPos, offset, userData)
-    f = true
     local q = 0
+    local HowOver = 0
     local stufs = sm.physics.getSphereContacts(hitPos, 1)
     for _,st in pairs(stufs.harvestables) do
-        f = false
         if not sm.exists(st) then return end
         if st:getPublicData().uuid == userData.lootUid then
-            --[[local lastHrv = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
-            lastHrv:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity, epic = userData.epic  } ) 
-            ]]--
-            q = q + st:getPublicData().quantity
-            if sm.exists(st) then st:destroy() end
+            if st:getPublicData().quantity + userData.lootQuantity > 10 and st:getPublicData().quantity < 10 then
+                HowOver = math.abs(st:getPublicData().quantity + userData.lootQuantity - 10)
+            end
+            if st:getPublicData().quantity ~= 10 then
+                q = q + st:getPublicData().quantity
+                if sm.exists(st) then st:destroy() end
+            end
         end
-
+    end
+    if HowOver > 0 then
+        local lastHrv = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
+        lastHrv:setParams( { uuid = userData.lootUid, quantity = HowOver, epic = userData.epic  } ) 
     end
     local lastHrv = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
-    lastHrv:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity + q, epic = userData.epic  } ) 
+    lastHrv:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity + q - HowOver, epic = userData.epic  } ) 
 end
 
 function World.server_onProjectile( self, hitPos, hitTime, hitVelocity, _, attacker, damage, userData, hitNormal, target, projectileUuid )
@@ -73,11 +77,9 @@ function World.server_onProjectile( self, hitPos, hitTime, hitVelocity, _, attac
             local normal = -hitVelocity:normalize()
             local zSignOffset = math.min( sign( normal.z ), 0 ) * 0.5
             local offset = sm.vec3.new( 0, 0, zSignOffset )
-            --local trg = sm.areaTrigger.createSphere(1 ,hitPos, sm.quat.identity, 512)
-            --trg:bindOnStay("makeHarvestables")
             self:makeHarvestables(hitPos, offset, userData)
         end
-    else
+    else --old code, keeping it in you can remove it :D 
         if userData and userData.lootUid then
             local normal = -hitVelocity:normalize()
             local zSignOffset = math.min( sign( normal.z ), 0 ) * 0.5
@@ -86,7 +88,6 @@ function World.server_onProjectile( self, hitPos, hitTime, hitVelocity, _, attac
             lootHarvestable:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity, epic = userData.epic  } )
         end
     end
-	
 end
 
 function World:sv_changeMap(name)
