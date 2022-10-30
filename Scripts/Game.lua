@@ -209,7 +209,7 @@ function Game:server_onChatCommand(params, player)
 		if client then
 			self:sv_yeet_player(client)
 			if params[1] == "/ban" then
-				table.insert(self.sv.saved.banned, client.id)
+				self.sv.saved.banned[#self.sv.saved.banned+1] = client.id
 				self.storage:save(self.sv.saved)
 				self.network:sendToClients("client_showMessage", client.name .. "#ff0000 has been banned!")
 			else
