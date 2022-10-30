@@ -62,7 +62,7 @@ function Game:client_onCreate()
 		for _, name in pairs(invis) do
 			g_survivalHud:setVisible(name, false)
 		end
-		g_survivalHud:setImage("LogbookImageBox", "$CONTENT_DATA/Gui/Images/Map1.png")
+		g_survivalHud:setImage("LogbookImageBox", "$CONTENT_DATA/Gui/Images/map_icon.png")
 	else
 		g_survivalHud:setVisible("BindingPanel", false)
 	end

@@ -2,9 +2,9 @@ local NetworkingStrings = {"server_"}
 local ServerStrings = {"server_","sv_"}
 local ClientStrings = {"client_","cl_"}
 
----@param array array array of strings
----@param string string string to be searched
----@return boolean result contains one of the array strings
+---@param array table list of strings.
+---@param string string string to be searched.
+---@return boolean result contains one of the array strings.
 local function ContainsStrings(array,string)
     for _,str in ipairs(array) do
         if string.find(string.lower(string),string.lower(str)) then
@@ -14,11 +14,11 @@ local function ContainsStrings(array,string)
     return false
 end
 
----@param Name string name for logging
----@param Function function function to proxy
----@param Server boolean isServerMode check
----@param PreventNetworking boolean prevents player variable
----@return function proxy proxy function
+---@param Name string name for logging.
+---@param Function function function to proxy.
+---@param Server boolean isServerMode check.
+---@param PreventNetworking boolean prevents player variable.
+---@return function proxy proxy function.
 local function SecureNetworking(Name,Function,Server,PreventNetworking)
     local function Hook(self,param1,plr,...)
         if sm.isServerMode() ~= Server and Server ~= nil then
@@ -36,6 +36,7 @@ local function SecureNetworking(Name,Function,Server,PreventNetworking)
     return Hook
 end
 
+---@param Class class class to secure.
 function SecureClass(Class)
     for key,val in pairs(Class) do
         if type(val) == "function" then
