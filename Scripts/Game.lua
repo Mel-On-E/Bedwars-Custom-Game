@@ -168,7 +168,7 @@ function Game.sv_exportMap( self, params, player )
 	sm.json.save( obj, "$CONTENT_DATA/Maps/Custom/"..params.name..".blueprint" )
 
 	--update custom.json
-	local custom_maps = sm.json.open("$CONTENT_DATA/Maps/custom.json")
+	local custom_maps = sm.json.open("$CONTENT_DATA/Maps/custom.json") or {}
 	local newMap = {}
 	newMap.name = params.name
 	newMap.blueprint = params.name
