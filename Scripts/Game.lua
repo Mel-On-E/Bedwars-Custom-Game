@@ -51,13 +51,10 @@ function Game:server_onCreate()
 	end
 
 	self.sv.authorised = {[1] = true} -- Player ids.
-
-	self.teams = sm.scriptableObject.createScriptableObject(sm.uuid.new("cb5871ae-c677-4480-94e9-31d16899d094"))
 end
 
-
 --cursed stuff to disable chunk unloading
-function Game.sv_loadTerrain(self, data)
+function Game:sv_loadTerrain(data)
 	for x = data.minX, data.maxX do
 		for y = data.minY, data.maxY do
 			data.world:loadCell(x, y, nil, "sv_empty")
@@ -143,17 +140,6 @@ function Game:server_onPlayerJoined(player, isNewPlayer)
 			self.network:sendToClients("client_showMessage", player.name .. "#ff0000 is banned!")
 		end
 	end
-
-	print("fire")
-	sm.event.sendToScriptableObject(self.teams,"sv_onPlayerJoined",player)
-end
-
-function Game:server_onPlayerLeft(player)
-	sm.event.sendToScriptableObject(self.teams,"sv_onPlayerLeft",player)
-end
-
-function Game:server_onPlayerLeft(player)
-	sm.event.sendToPlayer(player, "sv_removePlayer", player)
 end
 
 function Game:sv_jankySussySus(params)
