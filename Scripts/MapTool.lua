@@ -39,11 +39,12 @@ function MapTool:cl_openGui()
 
 	self.gui:setButtonCallback("DeleteMap", "cl_delete_map_button")
 	self.gui:setButtonCallback("LoadMap", "cl_load_map_button")
+	self.gui:setButtonCallback("ShareMap", "cl_share_map_button")
 	
 
     self:update_page()
 
-    self.gui:open()
+	self.gui:open()
 end
 
 function MapTool:update_page()
@@ -51,6 +52,7 @@ function MapTool:update_page()
 
     self.gui:setText("Title", map.name)
 	self.gui:setVisible("DeleteMap", map.custom)
+	self.gui:setVisible("ShareMap", map.custom)
 
 	if not map.custom then
 		self.gui:setText("Description", map.desc)
@@ -128,6 +130,11 @@ function MapTool:cl_load_map_button()
 	self:cl_createConfirmGui("cl_load_map", msg)
 end
 
+function MapTool:cl_share_map_button()
+	sm.event.sendToGame("cl_shareMap", g_maps[self.mapIndex])
+end
+
+
 function MapTool:cl_load_map(name)
 	if name == "Yes" then
 		self.cl.confirmGui:close()
@@ -167,6 +174,7 @@ function MapTool.client_onEquip(self)
         sm.tool.forceTool(nil)
         return
     end
+
 
 	if self.tool:isLocal() then
 		self:cl_openGui()

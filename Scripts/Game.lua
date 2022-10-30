@@ -3,7 +3,7 @@ dofile("$SURVIVAL_DATA/Scripts/game/managers/BeaconManager.lua")
 dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
 dofile("$CONTENT_DATA/Scripts/RespawnManager.lua")
 
-local DEBUG = false
+local DEBUG = true
 
 Game = class(nil)
 Game.enableLimitedInventory = not DEBUG
@@ -412,6 +412,10 @@ function Game:Unauthorise(id)
 		return true
 	end
 	return false
+end
+
+function Game:cl_shareMap( params)
+	self.network:sendToServer("sv_shareMap", params)
 end
 
 SecureClass(Game)
