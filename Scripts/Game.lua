@@ -183,6 +183,70 @@ function Game.sv_exportMap( self, params, player )
 	self.network:sendToClient(player, "client_showMessage", "Map saved!")
 end
 
+function Game.sv_devStuff( self, params, player)
+	Game.sv_shareMap( self, params)
+end
+
+function Game.sv_shareMap( self, params, player )
+	local obj = sm.json.open("$CONTENT_DATA/Maps/Custom/"..params.name..".blueprint" )
+
+	for i=1, 100 do
+		local exist = sm.json.fileExists( "$CONTENT_DATA/Maps/Share/World"..i..".json" )
+		if not exist then
+			wid = i
+			break
+		end
+	end
+
+	local newMap = {}
+	newMap.name = params.name
+	newMap.custom = true
+	newMap.time = os.time()
+	newMap.bString = obj
+
+	sm.json.save(newMap, "$CONTENT_DATA/Maps/Share/World"..wid..".json")
+
+	self.network:sendToClient(player, "client_showMessage", "Map Exported! File Name | World"..wid..".json")
+end
+
+function Game.sv_importMap( self, params, player)
+	if params[2] then
+		local exist = sm.json.fileExists( "$CONTENT_DATA/Maps/Share/"..params[2]..".json" )
+		if not exist then
+			self.network:sendToClient(player, "client_showMessage", "Map file doesnt exist")
+			return
+		end
+		obj = sm.json.open("$CONTENT_DATA/Maps/Share/"..params[2]..".json" )
+	else
+		for i=1, 100 do
+			local exist = sm.json.fileExists( "$CONTENT_DATA/Maps/Share/World"..i..".json" )
+			if exist then
+				wid = i
+				break
+			end
+		end
+		obj = sm.json.open("$CONTENT_DATA/Maps/Share/World"..wid..".json" )
+	end
+
+
+	sm.json.save( obj.bString, "$CONTENT_DATA/Maps/Custom/"..obj.name..".blueprint" )
+
+	local custom_maps = sm.json.open("$CONTENT_DATA/Maps/custom.json")
+	local newMap = {}
+	newMap.name = obj.name
+	newMap.blueprint = obj.name
+	newMap.custom = true
+	newMap.time = os.time()
+
+	updateMapTable(custom_maps, newMap)
+	self.network:sendToClients("cl_updateMapList", newMap)
+
+	sm.json.save(custom_maps, "$CONTENT_DATA/Maps/custom.json")
+
+	self.network:sendToClient(player, "client_showMessage", "Map Imported!")
+
+end
+
 function updateMapTable(t, newMap)
 	local newKey = #t + 1
 	for key, map in ipairs(t) do
@@ -277,7 +341,11 @@ function Game:client_onCreate()
 		sm.game.bindChatCommand( "/encrypt", {}, "cl_onChatCommand", "Restrict interactions in all warehouses" )
 		sm.game.bindChatCommand( "/decrypt", {}, "cl_onChatCommand", "Unrestrict interactions in all warehouses" )
 
+		sm.game.bindChatCommand( "/dev", { { "string", "name", true } }, "cl_onChatCommand", "DEV COMMAND!" )
+
 		sm.game.bindChatCommand( "/savemap", { { "string", "name", false } }, "cl_onChatCommand", "Exports custom map" )
+		sm.game.bindChatCommand( "/loadmaps", { { "string", "name", true } }, "cl_onChatCommand", "Loads custom maps in Share folder" )
+
 
 		sm.game.bindChatCommand( "/ids", {}, "cl_onChatCommand", "Lists all players with their ID" )
 		sm.game.bindChatCommand( "/kick", {{ "int", "id", true }}, "cl_onChatCommand", "Kick(crash) a player" )
@@ -295,6 +363,20 @@ end
 function Game:cl_onChatCommand(params)
 	if params[1] == "/encrypt" then
 		self.network:sendToServer( "sv_enableRestrictions", true )
+	elseif params[1] == "/dev" then
+		if not Dev then
+			sm.gui.chatMessage("This is for development! dont use if you dont know what you doing c:")
+			sm.gui.chatMessage("Run again to confirm!")
+			Dev = 1
+		elseif Dev == 1 then
+			sm.gui.chatMessage("Dev Activated!")
+			Dev = 2
+			self.network:sendToServer( "sv_devStuff")
+		elseif Dev == 2 then
+			self.network:sendToServer( "sv_devStuff")
+		end
+	elseif params[1] == "/loadmaps" then
+		self.network:sendToServer( "sv_importMap", params)
 	elseif params[1] == "/decrypt" then
 		self.network:sendToServer( "sv_enableRestrictions", false )
 	elseif params[1] == "/unlimited" then
@@ -329,6 +411,10 @@ function Game:cl_updateMapList(newMap)
 	if sm.isHost then
 		updateMapTable(g_maps, newMap)
 	end
+end
+
+function Game:cl_shareMap( params)
+	self.network:sendToServer("sv_shareMap", params)
 end
 
 function Game.client_showMessage( self, msg )

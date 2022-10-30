@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <MyGUI type="Layout" version="3.2.0">
     <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="BackPanel">
-        <Widget type="Widget" skin="BackgroundLiftExport" position_real="0.32421875 0.293981481481485 0.3515625 0.41203703703703703" name="MainPanel">
+        <Widget type="Widget" skin="BackgroundLiftExport" position_real="0.32395833333333335 0.29351851851851851 0.3515625 0.41203703703703703" name="MainPanel">
             <Property key="NeedKey" value="false"/>
             <Property key="NeedMouse" value="true"/>
             <Property key="InheritsAlpha" value="false"/>
@@ -32,6 +32,16 @@
                 <Property key="Caption" value="Delete map"/>
                 <Property key="FontName" value="SM_ItemTitle"/>
                 <Property key="TextAlign" value="Center"/>
+            </Widget>
+            <Widget type="Button" skin="LogbookButton" position="555 360 100 50" name="ShareMap">
+                <Property key="Caption" value="Share"/>
+                <Property key="FontName" value="SM_Button"/>
+                <Property key="TextAlign" value="Center"/>
+                <Property key="TextColour" value="0.117647 0.117647 0.117647"/>
+                <Property key="ModeImage" value="false"/>
+                <Property key="StateSelected" value="false"/>
+                <Property key="TextShadow" value="false"/>
+                <Property key="Visible" value="false"/>
             </Widget>
         </Widget>
     </Widget>
