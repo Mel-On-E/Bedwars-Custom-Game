@@ -41,14 +41,15 @@ function World:makeHarvestables(hitPos, offset, userData)
     local stufs = sm.physics.getSphereContacts(hitPos, 1)
     for _,st in pairs(stufs.harvestables) do
         f = false
-        if st:getPublicData().uuid ~= userData.lootUid then
-            local lastHrv = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
+        if not sm.exists(st) then return end
+        if st:getPublicData().uuid == userData.lootUid then
+            --[[local lastHrv = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
             lastHrv:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity, epic = userData.epic  } ) 
-            stufs = sm.physics.getSphereContacts(hitPos, 1)
-            return
+            ]]--
+            q = q + st:getPublicData().quantity
+            if sm.exists(st) then st:destroy() end
         end
-        st:destroy()
-        q = q + st:getPublicData().quantity
+
     end
     local lastHrv = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
     lastHrv:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity + q, epic = userData.epic  } ) 

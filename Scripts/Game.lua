@@ -163,52 +163,6 @@ function Game:cl_bedDestroyed(params)
 	sm.gui.displayAlertText(params.color .. "Bed destroyed!")
 end
 
-function Game.sv_exportMap( self, params, player )
-	local obj = sm.json.parseJsonString( sm.creation.exportToString( params.body ) )
-	sm.json.save( obj, "$CONTENT_DATA/Maps/Custom/"..params.name..".blueprint" )
-
-	--update custom.json
-	local custom_maps = sm.json.open("$CONTENT_DATA/Maps/custom.json") or {}
-	local newMap = {}
-	newMap.name = params.name
-	newMap.blueprint = params.name
-	newMap.custom = true
-	newMap.time = os.time()
-
-	updateMapTable(custom_maps, newMap)
-	self.network:sendToClients("cl_updateMapList", newMap)
-
-	sm.json.save(custom_maps, "$CONTENT_DATA/Maps/custom.json")
-
-	self.network:sendToClient(player, "client_showMessage", "Map saved!")
-end
-
-function Game.sv_devStuff( self, params, player)
-	Game.sv_shareMap( self, params)
-end
-
-function Game.sv_shareMap( self, params, player )
-	local obj = sm.json.open("$CONTENT_DATA/Maps/Custom/"..params.name..".blueprint" )
-
-	for i=1, 100 do
-		local exist = sm.json.fileExists( "$CONTENT_DATA/Maps/Share/World"..i..".json" )
-		if not exist then
-			wid = i
-			break
-		end
-	end
-
-	local newMap = {}
-	newMap.name = params.name
-	newMap.custom = true
-	newMap.time = os.time()
-	newMap.bString = obj
-
-	sm.json.save(newMap, "$CONTENT_DATA/Maps/Share/World"..wid..".json")
-
-	self.network:sendToClient(player, "client_showMessage", "Map Exported! File Name | World"..wid..".json")
-end
-
 function Game.sv_importMap( self, params, player)
 	if params[2] then
 		local exist = sm.json.fileExists( "$CONTENT_DATA/Maps/Share/"..params[2]..".json" )
