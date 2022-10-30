@@ -285,6 +285,7 @@ end
 function Game:sv_bedDestroyed(color)
 	local remainingPlayers = TeamManager.sv_getTeamCount(color)
 	self.network:sendToClients("client_bedDestroyed", { color = color, players = remainingPlayers })
+	sm.event.sendToWorld(self.sv.saved.world, "sv_justPlayTheGoddamnSound", {effect = "bed gone"})
 end
 
 function Game:client_bedDestroyed(params)
@@ -298,6 +299,7 @@ function Game:client_bedDestroyed(params)
 	)
 
 	sm.gui.displayAlertText(params.color .. "Bed destroyed!")
+
 end
 
 function Game:sv_e_respawn(params)
