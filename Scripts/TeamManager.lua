@@ -45,8 +45,10 @@ function TeamManager.sv_setTeam(player, color)
     g_teamManager.sv.updateClientData = true
 
     local char = player.character
-    char:setSwimming(not color)
-	char.publicData.waterMovementSpeedFraction = (not color and 5) or 1
+    if char then
+        char:setSwimming(not color)
+        char.publicData.waterMovementSpeedFraction = (not color and 5) or 1
+    end
 end
 
 function TeamManager.sv_setBed(color, exists, shape)

@@ -135,6 +135,10 @@ function Game:server_onPlayerLeft(player)
 	sm.event.sendToPlayer(player, "sv_removePlayer", player)
 end
 
+function Game:sv_jankySussySus(params)
+	sm.event.sendToWorld(self.sv.saved.world, params.callback, params)
+end
+
 
 function Game:server_onFixedUpdate()
 	for _, player in ipairs(sm.player.getAllPlayers()) do

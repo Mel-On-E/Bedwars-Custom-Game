@@ -383,6 +383,7 @@ function Player:sv_removePlayer(player)
 		self.network:sendToClients("cl_msg", msg)
 	else
 		self.network:sendToClients("cl_msg", team .. "TEAM ELIMINATED!")
+		self.network:sendToClients("cl_alert", team .. "TEAM ELIMINATED!")
 
 		local remainingTeams = TeamManager.sv_getTeamsCount()
 		local stopComplainingAboutGrammar = "teams"
@@ -397,7 +398,7 @@ function Player:sv_removePlayer(player)
 			local msg = (winner and winner .. "TEAM WON!") or "NOBODY WON"
 			self.network:sendToClients("cl_msg", msg)
 			self.network:sendToClients("cl_alert", msg)
-			sm.event.sendToWorld(player.character:getWorld(), "sv_justPlayTheGoddamnSound", {effect = "game finish"})
+			sm.event.sendToGame("sv_jankySussySus", {callback = "sv_justPlayTheGoddamnSound", effect = "game finish"})
 		end
 	end
 end						
