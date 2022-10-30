@@ -229,7 +229,7 @@ function Game:server_onChatCommand(params, player)
 		local Result = self:Unauthorise(params[2]) and "Success" or "Not Authed"
 		self:sv_Alert(Result,1)
 	elseif params[1] == "/authlist" then
-		for key, auth in ipairs(self.sv.authorised) do
+		for key, auth in pairs(self.sv.authorised) do
 			self.network:sendToClient(player,"client_showMessage",tostring(key)..":"..tostring(auth))
 		end
 	end
@@ -376,11 +376,17 @@ function Game:cl_updateMapList(newMap)
 end
 
 function Game:cl_Alert(data)
-	sm.gui.displayAlertText(tostring(data.Text),tonumber(data.Duration))
+	sm.gui.displayAlertText(tostring(data.Text),tonumber(data.Duration) or 4)
 end
 
-function Game:sv_Alert(T, D)
-	self.network:sendToClients("cl_Alert", { Text = T, Duration = D })
+function Game:sv_Alert(T, D, PL)
+	if PL then
+		for _,plr in ipairs(PL) do
+			self.network:sendToClient(plr,"cl_Alert", { Text = T, Duration = D })
+		end
+	else
+		self.network:sendToClients("cl_Alert", { Text = T, Duration = D })
+	end
 end
 -- Auth Functions --
 
