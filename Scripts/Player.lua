@@ -351,37 +351,7 @@ function Player.sv_takeDamage( self, damage, source, attacker )
 							self.network:sendToClients( "cl_msg", (team or "") .. self.player.name .. " #ffffffdied" )
 						end
 						if not TeamManager.sv_isBedExisting(team) then
-							TeamManager.sv_setTeam(self.player, nil)
-							self.network:sendToClients("cl_msg", self.player.name .. " is now a spectator")
-
-							local remainingPlayers = TeamManager.sv_getTeamCount(team)
-							local stopComplainingAboutGrammar = "players"
-							if remainingPlayers == 1 then
-								stopComplainingAboutGrammar = "player"
-							end
-
-							if remainingPlayers > 0 then
-								local msg = tostring(remainingPlayers) .. team .. "#ffffff " .. stopComplainingAboutGrammar .. " left!"
-								self.network:sendToClients("cl_msg", msg)
-							else
-								self.network:sendToClients("cl_msg", team .. "TEAM ELIMINATED!")
-
-								local remainingTeams = TeamManager.sv_getTeamsCount()
-								local stopComplainingAboutGrammar = "teams"
-								if remainingTeams == 1 then
-									stopComplainingAboutGrammar = "team"
-								end
-
-								if remainingTeams > 1 then
-									self.network:sendToClients("cl_msg", tostring(remainingTeams) .. " " .. stopComplainingAboutGrammar .. " remaining!")
-								else
-									local winner = TeamManager.sv_getLastTeam()
-									local msg = (winner and winner .. "TEAM WON!") or "NOBODY WON"
-									self.network:sendToClients("cl_msg", msg)
-									self.network:sendToClients("cl_alert", msg)
-									sm.event.sendToWorld(self.player.character:getWorld(), "sv_justPlayTheGoddamnSound", {effect = "game finish"})
-								end
-							end
+							self:sv_removePlayer(self.player)
 
 							--please forgive me. I have sinned in jank.
 						end
@@ -396,6 +366,42 @@ function Player.sv_takeDamage( self, damage, source, attacker )
 		end
 	end
 end
+
+function Player:sv_removePlayer(player)
+	local team = TeamManager.sv_getTeamColor(player) or ""
+	TeamManager.sv_setTeam(player, nil)
+	self.network:sendToClients("cl_msg", player.name .. " is now a spectator")
+
+	local remainingPlayers = TeamManager.sv_getTeamCount(team)
+	local stopComplainingAboutGrammar = "players"
+	if remainingPlayers == 1 then
+		stopComplainingAboutGrammar = "player"
+	end
+
+	if remainingPlayers > 0 then
+		local msg = tostring(remainingPlayers) .. team .. "#ffffff " .. stopComplainingAboutGrammar .. " left!"
+		self.network:sendToClients("cl_msg", msg)
+	else
+		self.network:sendToClients("cl_msg", team .. "TEAM ELIMINATED!")
+		self.network:sendToClients("cl_alert", team .. "TEAM ELIMINATED!")
+
+		local remainingTeams = TeamManager.sv_getTeamsCount()
+		local stopComplainingAboutGrammar = "teams"
+		if remainingTeams == 1 then
+			stopComplainingAboutGrammar = "team"
+		end
+
+		if remainingTeams > 1 then
+			self.network:sendToClients("cl_msg", tostring(remainingTeams) .. " " .. stopComplainingAboutGrammar .. " remaining!")
+		else
+			local winner = TeamManager.sv_getLastTeam()
+			local msg = (winner and winner .. "TEAM WON!") or "NOBODY WON"
+			self.network:sendToClients("cl_msg", msg)
+			self.network:sendToClients("cl_alert", msg)
+			sm.event.sendToGame("sv_jankySussySus", {callback = "sv_justPlayTheGoddamnSound", effect = "game finish"})
+		end
+	end
+end						
 
 function Player.sv_n_revive( self )
 	local character = self.player:getCharacter()
@@ -595,6 +601,14 @@ function Player.server_onInventoryChanges( self, container, changes )
 			sm.container.endTransaction()
 		end
 	end
+end
+
+function Player:sv_msg(msg)
+	self.network:sendToClients("cl_msg", msg)
+end
+
+function Player:sv_alertg(msg)
+	self.network:sendToClients("cl_alert", msg)
 end
 
 function Player:cl_msg(msg)
