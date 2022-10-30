@@ -1,14 +1,56 @@
 [
     {
-        "name": "Yo Mama",
-        "desc": "Deez nuts",
-        "image": "Map1.png",
-        "blueprint": "map1"
+        "name": "Old Train Station",
+        "desc": "Up to 4 teams.\n\nBuilt by DavidWarNichtVerfügbar",
+        "image": "Tren.png",
+        "blueprint": "tren"
     },
     {
-        "name": "Rick Astley",
-        "desc": "Never Gonna Give you up",
-        "image": "Map2.png",
-        "blueprint": "map2"
+        "name": "Plane",
+        "desc": "Up to 4 Teams.\n\nBuilt by Holzameise",
+        "image": "Plane.png",
+        "blueprint": "Plane"
+    },
+    {
+        "name": "Warehouses 4 Teams",
+        "desc": "Up to 4 Teams.\n\nBuilt by Planty",
+        "image": "Warehouses.png",
+        "blueprint": "Warehouses4"
+    },
+    {
+        "name": "Warehouses 8 Teams",
+        "desc": "Up to 8 Teams.\n\nBuilt by Planty",
+        "image": "Warehouses.png",
+        "blueprint": "Warehouses8"
+    },
+    {
+        "name": "Factory 4 Teams",
+        "desc": "Up to 4 Teams map.\n\nBuilt by Pixelmaker",
+        "image": "Factory.png",
+        "blueprint": "Factory4"
+    },
+    {
+        "name": "Factory 8 Teams",
+        "desc": "Up to 8 Teams map.\n\nBuilt by Pixelmaker",
+        "image": "Factory.png",
+        "blueprint": "Factory8"
+    },
+    {
+        "name": "Turbine",
+        "desc": "Up to 4 Teams map.\n\nBuilt by DavidWarNichtVerfügbar",
+        "image": "Turbine.png",
+        "blueprint": "Turbine"
+    },
+    {
+        "name": "Floating Garages",
+        "desc": "Up to 4 Teams map.\n\nBuilt by GrubyOut",
+        "image": "Garage.png",
+        "blueprint": "Garages"
+    },
+    {
+        "name": "Empty Map",
+        "desc": "Empty map. Useful as template for building.",
+        "image": "Empty.png",
+        "blueprint": "Empty"
     }
 ]

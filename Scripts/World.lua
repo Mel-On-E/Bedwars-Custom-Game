@@ -15,7 +15,7 @@ local doomDepth = -69
 
 function World:server_onCellCreated( x, y )
     if x == y and x == 0 then      
-        self:server_changeMap("map1")
+        self:server_changeMap("Factory4")
     end
 end
 
