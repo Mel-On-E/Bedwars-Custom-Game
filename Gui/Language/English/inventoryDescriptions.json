@@ -1,1 +1,22 @@
-{}
+{
+    "5fcb4cb8-7623-11ea-bc55-0242ac130003": {
+      "description": "Use the items you get from the spawners to buy items from the trader",
+      "title": "Bedwars Trader"
+    },
+    "108d772f-9851-400f-a014-d847900458a7": {
+      "description": "Spawns items in your base",
+      "title": "Base Spawner"
+    },
+    "208d772f-9851-400f-a014-d847900458a7": {
+      "description": "Spawns items in the middle of the map (glow only)",
+      "title": "Middle Spawner"
+    },
+    "6488a8fa-1187-45e8-8dac-47d13bdaa026": {
+      "description": "Sleep in it to change team. Protect it at all costs.",
+      "title": "Bedwars Bed"
+    },
+    "f2aa1e44-aea8-4431-9b7e-f7e35163dd7c": {
+      "description": "Shiny block used to protect your bed",
+      "title": "Shiny Block"
+    }
+  }
