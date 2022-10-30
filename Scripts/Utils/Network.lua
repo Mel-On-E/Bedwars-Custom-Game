@@ -1,3 +1,16 @@
+--[[
+
+    Networking Strings:
+    server_, this enables player variable.
+
+    server_,sv_ set function to only Servermode
+    client_,sv_ set function to only Clientmode
+
+    When a proxy is fired it will check Servermode,
+    it will then check if there is a player passed through and if player variable is permitted.
+        
+]]
+
 local NetworkingStrings = {"server_"}
 local ServerStrings = {"server_","sv_"}
 local ClientStrings = {"client_","cl_"}
@@ -55,10 +68,3 @@ function SecureClass(Class)
         end
     end
 end
-
---[[
-    server_ for networking
-    sv_ for server functions
-
-    client_ & cl_ for client
-]]
