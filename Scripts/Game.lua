@@ -282,12 +282,12 @@ function Game:sv_createPlayerCharacter(world, x, y, player, params)
 	player:setCharacter(character)
 end
 
-function Game:sv_bedDestroyed(color, player)
+function Game:sv_bedDestroyed(color)
 	local remainingPlayers = TeamManager.sv_getTeamCount(color)
 	self.network:sendToClients("client_bedDestroyed", { color = color, players = remainingPlayers })
 end
 
-function Game:client_bedDestroyed(params, player)
+function Game:client_bedDestroyed(params)
 	local stopComplainingAboutGrammar = "players"
 	if params.players == 1 then
 		stopComplainingAboutGrammar = "player"
@@ -300,7 +300,7 @@ function Game:client_bedDestroyed(params, player)
 	sm.gui.displayAlertText(params.color .. "Bed destroyed!")
 end
 
-function Game:sv_e_respawn(params, player)
+function Game:sv_e_respawn(params)
 	if params.player.character and sm.exists(params.player.character) then
 		g_respawnManager:sv_requestRespawnCharacter(params.player)
 	else
@@ -313,7 +313,7 @@ function Game:sv_e_respawn(params, player)
 	end
 end
 
-function Game:sv_e_onSpawnPlayerCharacter(plr, player)
+function Game:sv_e_onSpawnPlayerCharacter(plr)
 	if plr.character and sm.exists(plr.character) then
 		g_respawnManager:sv_onSpawnCharacter(plr)
 		g_beaconManager:sv_onSpawnCharacter(plr)
@@ -326,11 +326,11 @@ function Game:sv_loadedRespawnCell(world, x, y, player)
 	g_respawnManager:sv_respawnCharacter(player, world)
 end
 
-function Game:client_showMessage(msg, player)
+function Game:client_showMessage(msg)
 	sm.gui.chatMessage(msg)
 end
 
-function Game:client_crash(_, player)
+function Game:client_crash()
 	self.sv.saved.world:reloadCell(0, 0) -- bugsplat
 end
 
