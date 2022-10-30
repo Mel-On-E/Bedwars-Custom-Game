@@ -14,7 +14,7 @@ local clearDebrisInterval = 40*10
 local doomDepth = -69
 
 function World:server_onCellCreated( x, y )
-    if x == y and x == 0 then      
+    if x == y and x == 0 then
         self:server_changeMap("Factory4")
     end
 end
@@ -43,7 +43,7 @@ function World.server_onProjectile( self, hitPos, hitTime, hitVelocity, _, attac
 	end
 end
 
-function World:server_changeMap(name)
+function World:sv_changeMap(name)
     --reset inventories
     for _, player in ipairs(sm.player.getAllPlayers()) do
         local inventory = player:getInventory()
