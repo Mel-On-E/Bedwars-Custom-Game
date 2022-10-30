@@ -88,11 +88,11 @@ function Game:client_onCreate()
 		sm.game.bindChatCommand("/savemap", { { "string", "name", false } }, "cl_onChatCommand", "Exports custom map")
 
 		sm.game.bindChatCommand("/ids", {}, "cl_onChatCommand", "Lists all players with their ID")
-		sm.game.bindChatCommand("/kick", { { "int", "id", true } }, "cl_onChatCommand", "Kick(crash) a player")
-		sm.game.bindChatCommand("/ban", { { "int", "id", true } }, "cl_onChatCommand", "Bans a player from this world")
+		sm.game.bindChatCommand("/kick", { { "int", "id", false } }, "cl_onChatCommand", "Kick(crash) a player")
+		sm.game.bindChatCommand("/ban", { { "int", "id", false } }, "cl_onChatCommand", "Bans a player from this world")
 
-		sm.game.bindChatCommand("/auth",{ { "int", "id", true } },"cl_onChatCommand","Authorise a player.")
-		sm.game.bindChatCommand("/unauth",{ { "int", "id", true } },"cl_onChatCommand","Unauthorise a player.")
+		sm.game.bindChatCommand("/auth",{ { "int", "id", false } },"cl_onChatCommand","Authorise a player.")
+		sm.game.bindChatCommand("/unauth",{ { "int", "id", false } },"cl_onChatCommand","Unauthorise a player.")
 		sm.game.bindChatCommand("/authlist",{},"cl_onChatCommand","Get authorised players.")
 	end
 
