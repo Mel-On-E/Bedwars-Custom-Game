@@ -1,6 +1,8 @@
 dofile "$SURVIVAL_DATA/Scripts/game/survival_items.lua"
 dofile( "$SURVIVAL_DATA/Scripts/game/util/Timer.lua" )
 
+dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
+
 Spawner = class( nil )
 Spawner.maxParentCount = 1
 Spawner.connectionInput = sm.interactable.connectionType.logic
@@ -57,3 +59,5 @@ end
 function Spawner:client_onUpdate()
 	self.interactable:setPoseWeight(0, self.interactable.active and 1 or 0)
 end
+
+SecureClass(Spawner)

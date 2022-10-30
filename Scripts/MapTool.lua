@@ -1,4 +1,6 @@
 dofile("$GAME_DATA/Scripts/game/AnimationUtil.lua")
+
+dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
 local renderables = { "$SURVIVAL_DATA/Character/Char_Tools/Char_logbook/char_logbook.rend" }
 local renderablesTp = { "$SURVIVAL_DATA/Character/Char_Male/Animations/char_male_tp_logbook.rend",
 	"$SURVIVAL_DATA/Character/Char_Tools/Char_logbook/char_logbook_tp_animlist.rend" }
@@ -355,3 +357,5 @@ function MapTool.cl_loadAnimations(self)
 	setTpAnimation(self.tpAnimations, "idle", 5.0)
 	self.cl.blendTime = 0.2
 end
+
+SecureClass(MapTool)

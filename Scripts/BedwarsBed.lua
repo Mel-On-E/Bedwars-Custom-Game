@@ -1,4 +1,5 @@
 dofile("$CONTENT_DATA/Scripts/TeamManager.lua")
+dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
 
 BedwarsBed = class()
 
@@ -72,6 +73,18 @@ function BedwarsBed:server_onDestroy()
     local color = "#" .. tostring(self.color):sub(1, 6)
     TeamManager.sv_setBed(color, false, self.shape)
     sm.event.sendToGame("sv_bedDestroyed", color)
+end
+
+function BedwarsBed:server_onCellCreated(x,y)
+    if x == 0 and y == 0 then
+        sm.event.sendToGame("sv_preventunload",{world=self.world,minX=-2,minY=-2,maxX=1,maxY=1})
+    end
+end
+
+function BedwarsBed:server_onCellLoaded(x,y)
+    if x == 0 and y == 0 then
+        sm.event.sendToGame("sv_preventunload",{world=self.world,minX=-2,minY=-2,maxX=1,maxY=1})
+    end
 end
 
 function BedwarsBed:sv_set_color(color, player)
@@ -169,3 +182,5 @@ end
 function BedwarsBed.client_showMessage( self, msg )
 	sm.gui.chatMessage( msg )
 end
+
+SecureClass(BedwarsBed)

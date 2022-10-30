@@ -1,5 +1,7 @@
-dofile( "$GAME_DATA/Scripts/game/BasePlayer.lua" )
+dofile( "$CONTENT_DATA/Scripts/ModifyedDependicences/BasePlayer.lua" )
 dofile( "$SURVIVAL_DATA/scripts/game/quest_util.lua" )
+
+dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
 
 Player = class( BasePlayer )
 
@@ -183,13 +185,13 @@ function Player.client_onInteract( self, character, state )
 		if not self.cl.isConscious then
 			if self.cl.hasRevivalItem then
 				if self.cl.revivalChewCount >= BaguetteSteps then
-					self.network:sendToServer( "sv_n_revive" )
+					self.network:sendToServer( "server_n_revive" )
 					self.cl.respawnTimer = 0
 				end
 				self.cl.revivalChewCount = self.cl.revivalChewCount + 1
-				self.network:sendToServer( "sv_onEvent", { type = "character", data = "chew" } )
+				self.network:sendToServer( "server_onEvent", { type = "character", data = "chew" } )
 			elseif self.cl.respawnTimer == 0 then
-				self.network:sendToServer( "sv_n_tryRespawn" )
+				self.network:sendToServer( "server_n_tryRespawn" )
 			end
 		end
 	end
@@ -397,7 +399,7 @@ function Player.sv_takeDamage( self, damage, source, attacker )
 	end
 end
 
-function Player.sv_n_revive( self )
+function Player.server_n_revive( self )
 	local character = self.player:getCharacter()
 	if not self.sv.saved.isConscious and self.sv.saved.hasRevivalItem and not self.sv.spawnparams.respawn then
 		print( "Player", self.player.id, "revived" )
@@ -436,7 +438,7 @@ function Player.sv_e_respawn( self )
 	end
 end
 
-function Player.sv_n_tryRespawn( self )
+function Player.server_n_tryRespawn( self )
 	if not self.sv.saved.isConscious and not self.sv.respawnDelayTimer and not self.sv.respawnInteractionAttempted then
 		self.sv.respawnInteractionAttempted = true
 		self.sv.respawnEndTimer = nil;
@@ -604,3 +606,5 @@ end
 function Player:cl_alert(msg)
     sm.gui.displayAlertText(msg)
 end
+
+SecureClass(Player)

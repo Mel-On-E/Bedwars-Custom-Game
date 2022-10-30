@@ -1,6 +1,8 @@
 -- BedwarsTrader.lua --
 dofile( "$SURVIVAL_DATA/Scripts/util.lua" )
 
+dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
+
 BedwarsTrader = class( nil )
 BedwarsTrader.VacuumTickTime = 40 * 2.0
 
@@ -488,3 +490,5 @@ function BedwarsTrader.cl_updateAnimation( self, dt )
 	end
 
 end
+
+SecureClass(BedwarsTrader)

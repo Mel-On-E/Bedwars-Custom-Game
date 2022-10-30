@@ -1,5 +1,7 @@
 dofile( "$SURVIVAL_DATA/Scripts/game/survival_harvestable.lua" )
 
+dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
+
 World = class( nil )
 World.terrainScript = "$CONTENT_DATA/Scripts/terrain.lua"
 World.cellMinX = -2
@@ -105,3 +107,5 @@ function World:cl_justPlayTheGoddamnSound(params)
     local pos = params.pos or sm.localPlayer.getPlayer().character.worldPosition
     sm.effect.playEffect(params.effect, pos)
 end
+
+SecureClass(World)

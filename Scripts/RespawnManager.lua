@@ -1,5 +1,7 @@
 dofile( "$SURVIVAL_DATA/Scripts/game/managers/RespawnManager.lua" )
 
+dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
+
 OldRespawnManager = class(RespawnManager)
 
 function RespawnManager:sv_onCreate(overworld)
@@ -58,3 +60,5 @@ function RespawnManager:server_onFixedUpdate()
         end
     end
 end
+
+SecureClass(RespawnManager)
