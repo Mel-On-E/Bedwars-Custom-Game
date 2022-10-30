@@ -26,7 +26,7 @@ end
 
 function World:server_onCellCreated( x, y )
     if x == y and x == 0 then
-        self:server_changeMap("Factory4")
+        self:sv_changeMap("Factory4")
     end
 end
 
