@@ -197,6 +197,11 @@ function Game:server_onChatCommand(params, player)
 		return
 	elseif params[1] == "/tm" then
 		local team = TeamManager.sv_getTeamColor(player)
+		if not team then
+			self.network:sendToClient(player, "client_showMessage", "#ff0000Not in a team!")
+
+			return
+		end
 		for _, p in pairs(sm.player.getAllPlayers()) do
 			if TeamManager.sv_getTeamColor(p) ~= team then goto continue end
 
