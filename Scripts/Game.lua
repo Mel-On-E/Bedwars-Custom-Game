@@ -57,12 +57,9 @@ end
 function Game:sv_loadTerrain(data)
 	for x = data.minX, data.maxX do
 		for y = data.minY, data.maxY do
-			data.world:loadCell(x, y, nil, "sv_empty")
+			data.world:loadCell(x, y, nil)
 		end
 	end
-end
-
-function Game.sv_empty(self)
 end
 
 function Game:client_onCreate()

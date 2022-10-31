@@ -139,7 +139,7 @@ function MapTool:cl_load_map(name)
 		if map.custom then
 			name = "Custom/" .. name
 		end
-		self.network:sendToServer("sv_load_map", name)
+		self.network:sendToServer("server_load_map", name)
 
 		sm.gui.displayAlertText("Map Loading...")
 
@@ -149,7 +149,7 @@ function MapTool:cl_load_map(name)
 	self.cl.confirmGui = nil
 end
 
-function MapTool:sv_load_map(file)
+function MapTool:server_load_map(file)
 	local world = self.tool:getOwner():getCharacter():getWorld()
 	sm.event.sendToWorld(world, "sv_changeMap", file)
 

@@ -1,6 +1,33 @@
 {
    "partList" : [
       {
+			"uuid": "5fcd5514-526a-4782-8a79-843827818f55",
+			"name": "obj_interactive_freecam",
+			"legacyId": 119,
+			"renderable": "$GAME_DATA/Objects/Renderable/Interactive/obj_interactive_logicgate.rend",
+			"color": "df7f01",
+			"box": {
+				"x": 1,
+				"y": 1,
+				"z": 1
+			},
+			"scripted": {
+            "filename":"$CONTENT_DATA/Scripts/Parts/Freecam.lua",
+            "classname":"Freecam"
+         },
+			"rotationSet": "PropYZ",
+			"physicsMaterial": "Mechanical",
+			"ratings": {
+				"density": 10,
+				"durability": 10,
+				"friction": 10,
+				"buoyancy": 10
+			},
+			"flammable": false,
+			"stackSize": 10,
+         "showInInventory": false
+		},
+      {
          "box" : {
             "x" : 20,
             "y" : 17,
