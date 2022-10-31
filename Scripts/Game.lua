@@ -196,10 +196,32 @@ end
 
 ---@param player Player
 function Game:server_onChatCommand(params, player)
+
 	if params[1] == "/fly" then
 		self:sv_toggleFly(player)
 	elseif params[1] == "/spectator" then
 		self:sv_setSpectator(player)
+	elseif params[1] == "/tm" then
+		local team = TeamManager.sv_getTeamColor(player)
+		if not team then
+			self.network:sendToClient(player, "client_showMessage", "#ff0000Not in a team!")
+
+			return
+		end
+		local msg = ""
+
+		table.remove(params, 1)
+
+		for _, v in pairs(params) do
+			msg = msg .. " " .. v
+		end
+		for _, p in pairs(sm.player.getAllPlayers()) do
+			if TeamManager.sv_getTeamColor(p) ~= team then goto continue end
+
+			self.network:sendToClient(p, "client_showMessage", team .. player:getName() .. "#ffffff : " .. msg)
+
+			::continue::
+		end
 	end
 
 	if not self:Authorised(player) then return end
@@ -220,28 +242,6 @@ function Game:server_onChatCommand(params, player)
 		sm.game.setLimitedInventory(true)
 		self:sv_Alert("Limited inventory")
 		return
-	elseif params[1] == "/tm" then
-		local team = TeamManager.sv_getTeamColor(player)
-		if not team then
-			self.network:sendToClient(player, "client_showMessage", "#ff0000Not in a team!")
-
-			return
-		end
-		local msg = ""
-
-		table.remove(params, 1)
-
-		for _, v in pairs(params) do
-			msg = msg .. " " .. v
-		end
-		for _, p in pairs(sm.player.getAllPlayers()) do
-			if TeamManager.sv_getTeamColor(p) ~= team then goto continue end
-
-
-			self.network:sendToClient(p, "client_showMessage", team .. player:getName() .. "#ffffff : " .. msg)
-
-			::continue::
-		end
 	end
 
 	if params[1] == "/ban" or params[1] == "/kick" then
