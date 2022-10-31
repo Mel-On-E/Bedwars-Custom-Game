@@ -110,7 +110,32 @@ function Game:client_onCreate()
 
 	sm.game.bindChatCommand("/fly", {}, "cl_onChatCommand", "Toggle fly mode")
 	sm.game.bindChatCommand("/spectator", {}, "cl_onChatCommand", "Become a spectator")
-	sm.game.bindChatCommand("/tm", { { "string", "message", true } }, "cl_onChatCommand", "Team message")
+	sm.game.bindChatCommand("/tm",
+		{ { "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true }, }, "cl_onChatCommand",
+		"Team message")
+
 end
 
 function Game:server_onPlayerJoined(player, isNewPlayer)
@@ -202,10 +227,18 @@ function Game:server_onChatCommand(params, player)
 
 			return
 		end
+		local msg = ""
+
+		table.remove(params, 1)
+
+		for _, v in pairs(params) do
+			msg = msg .. " " .. v
+		end
 		for _, p in pairs(sm.player.getAllPlayers()) do
 			if TeamManager.sv_getTeamColor(p) ~= team then goto continue end
 
-			self.network:sendToClient(p, "client_showMessage", team .. player:getName() .. "#ffffff : " .. params[2])
+
+			self.network:sendToClient(p, "client_showMessage", team .. player:getName() .. "#ffffff : " .. msg)
 
 			::continue::
 		end
