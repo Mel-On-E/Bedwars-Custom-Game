@@ -89,6 +89,7 @@ function World.server_onProjectile( self, hitPos, hitTime, hitVelocity, _, attac
             lootHarvestable:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity, epic = userData.epic  } )
         end
     end
+end
 	
 function World:server_onInteractableCreated(interactable)
     if not self.uuidinteractables[tostring(interactable:getShape().uuid)] then
