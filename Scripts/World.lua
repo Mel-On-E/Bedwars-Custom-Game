@@ -47,19 +47,49 @@ function World:server_onFixedUpdate()
     end
 end
 
-function World.server_onProjectile(self, hitPos, hitTime, hitVelocity, _, attacker, damage, userData, hitNormal, target,
-                                   projectileUuid)
-    -- Spawn loot from projectiles with loot user data
-    if userData and userData.lootUid then
-        local normal = -hitVelocity:normalize()
-        local zSignOffset = math.min(sign(normal.z), 0) * 0.5
-        local offset = sm.vec3.new(0, 0, zSignOffset)
-        local lootHarvestable = sm.harvestable.createHarvestable(hvs_loot, hitPos + offset,
-            sm.vec3.getRotation(sm.vec3.new(0, 1, 0), sm.vec3.new(0, 0, 1)))
-        lootHarvestable:setParams({ uuid = userData.lootUid, quantity = userData.lootQuantity, epic = userData.epic })
+--local loot = { uuid = sm.uuid.new("c5e56da5-bc3f-4519-91c2-b307d36e15aa"), quantity = amount }
+--SpawnLoot( phrv, loot, phrv.worldPosition)
+function World:makeHarvestables(hitPos, offset, userData)
+    f = true
+    local q = 0
+    local stufs = sm.physics.getSphereContacts(hitPos, 1)
+    for _,st in pairs(stufs.harvestables) do
+        f = false
+        if not sm.exists(st) then return end
+        if st:getPublicData().uuid == userData.lootUid then
+            --[[local lastHrv = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
+            lastHrv:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity, epic = userData.epic  } ) 
+            ]]--
+            q = q + st:getPublicData().quantity
+            if sm.exists(st) then st:destroy() end
+        end
+
     end
+    local lastHrv = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
+    lastHrv:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity + q, epic = userData.epic  } ) 
 end
 
+function World.server_onProjectile( self, hitPos, hitTime, hitVelocity, _, attacker, damage, userData, hitNormal, target, projectileUuid )
+	-- Spawn loot from projectiles with loot user data
+    if true then
+        if userData and userData.lootUid then
+            local normal = -hitVelocity:normalize()
+            local zSignOffset = math.min( sign( normal.z ), 0 ) * 0.5
+            local offset = sm.vec3.new( 0, 0, zSignOffset )
+            --local trg = sm.areaTrigger.createSphere(1 ,hitPos, sm.quat.identity, 512)
+            --trg:bindOnStay("makeHarvestables")
+            self:makeHarvestables(hitPos, offset, userData)
+        end
+    else
+        if userData and userData.lootUid then
+            local normal = -hitVelocity:normalize()
+            local zSignOffset = math.min( sign( normal.z ), 0 ) * 0.5
+            local offset = sm.vec3.new( 0, 0, zSignOffset )
+            local lootHarvestable = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
+            lootHarvestable:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity, epic = userData.epic  } )
+        end
+    end
+	
 function World:server_onInteractableCreated(interactable)
     if not self.uuidinteractables[tostring(interactable:getShape().uuid)] then
         self.uuidinteractables[tostring(interactable:getShape().uuid)] = {}

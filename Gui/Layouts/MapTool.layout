@@ -33,6 +33,16 @@
                 <Property key="FontName" value="SM_ItemTitle"/>
                 <Property key="TextAlign" value="Center"/>
             </Widget>
+            <Widget type="Button" skin="LogbookButton" position="695 360 100 50" name="ShareMap">
+                <Property key="Caption" value="Share"/>
+                <Property key="FontName" value="SM_Button"/>
+                <Property key="TextAlign" value="Center"/>
+                <Property key="TextColour" value="0.117647 0.117647 0.117647"/>
+                <Property key="ModeImage" value="false"/>
+                <Property key="StateSelected" value="false"/>
+                <Property key="TextShadow" value="false"/>
+                <Property key="Visible" value="false"/>
+            </Widget>
         </Widget>
     </Widget>
     <CodeGeneratorSettings/>
