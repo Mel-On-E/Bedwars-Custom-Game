@@ -31,6 +31,13 @@ end
 function World:server_onCellCreated(x, y)
     if x == y and x == 0 then
         self:sv_changeMap("Factory4")
+        self:sv_ensureFreecam()
+    end
+end
+
+function World:server_onCellLoaded(x, y)
+    if x == y and x == 0 then
+        self:sv_ensureFreecam()
     end
 end
 
@@ -110,6 +117,9 @@ function World:server_onInteractableDestroyed(interactable)
             break
         end
     end
+    if self.interactables[interactable:getId()] == "5fcd5514-526a-4782-8a79-843827818f55" then
+        self:sv_ensureFreecam()
+    end
     self.interactables[interactable:getId()] = nil
 end
 
@@ -153,9 +163,6 @@ function World:sv_changeMap(name)
 
     --remove helper blocks
     sm.event.sendToWorld(self.world, "sv_remove_helper_blocks")
-
-    -- add freecam to the world
-    sm.shape.createPart( sm.uuid.new("5fcd5514-526a-4782-8a79-843827818f55") , sm.vec3.new(0,0,200), sm.quat.identity(), false, true )
 end
 
 function World:sv_remove_helper_blocks()
@@ -177,6 +184,12 @@ end
 function World:cl_justPlayTheGoddamnSound(params)
     local pos = params.pos or sm.localPlayer.getPlayer().character.worldPosition
     sm.effect.playEffect(params.effect, pos)
+end
+
+function World:sv_ensureFreecam()
+    if not self.uuidinteractables["5fcd5514-526a-4782-8a79-843827818f55"] or next(self.uuidinteractables["5fcd5514-526a-4782-8a79-843827818f55"]) == nil then
+        sm.shape.createPart( sm.uuid.new("5fcd5514-526a-4782-8a79-843827818f55") , sm.vec3.new(0,0,50), sm.quat.identity(), false, true )
+    end
 end
 
 function World:sv_enableFreecam(parameters)

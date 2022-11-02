@@ -106,6 +106,7 @@ function Game:client_onCreate()
 
 	sm.game.bindChatCommand("/fly", {}, "cl_onChatCommand", "Toggle fly mode")
 	sm.game.bindChatCommand("/spectator", {}, "cl_onChatCommand", "Become a spectator")
+	sm.game.bindChatCommand("/freecam", {}, "cl_onChatCommand", "Toggle Freecam")
 end
 
 function Game:server_onPlayerJoined(player, isNewPlayer)
@@ -142,7 +143,6 @@ end
 function Game:sv_jankySussySus(params)
 	sm.event.sendToWorld(self.sv.saved.world, params.callback, params)
 end
-
 
 function Game:server_onFixedUpdate()
 	for _, player in ipairs(sm.player.getAllPlayers()) do
@@ -242,6 +242,9 @@ function Game:cl_onChatCommand(params) -- just don't handle the command if its a
 		for _, player in ipairs(sm.player.getAllPlayers()) do
 			sm.gui.chatMessage(tostring(player.id) .. ": " .. player.name)
 		end
+	elseif params[1] == "/freecam" then
+		local State = sm.camera.getCameraState() == sm.camera.state.default
+		self.network:sendToServer("server_toggleFreecam",State)
 	else
 		self.network:sendToServer("server_onChatCommand", params)
 	end
@@ -268,6 +271,11 @@ function Game:server_exportMap(params, player)
 	sm.json.save(custom_maps, "$CONTENT_DATA/Maps/custom.json")
 
 	self.network:sendToClient(player, "client_showMessage", "Map saved!")
+end
+
+function Game:server_toggleFreecam(state,player)
+	if not self:Authorised(player) then return end
+	sm.event.sendToWorld(self.sv.saved.world,"sv_enableFreecam",{state=state,players={player}})
 end
 
 function Game:sv_toggleFly(player)
