@@ -208,17 +208,13 @@ function Game:server_onChatCommand(params, player)
 
 			return
 		end
-		local msg = ""
-
 		table.remove(params, 1)
+		local msg = table.concat(params, " ")
 
-		for _, v in pairs(params) do
-			msg = msg .. " " .. v
-		end
 		for _, p in pairs(sm.player.getAllPlayers()) do
 			if TeamManager.sv_getTeamColor(p) ~= team then goto continue end
 
-			self.network:sendToClient(p, "client_showMessage", team .. player:getName() .. "#ffffff : " .. msg)
+			self.network:sendToClient(p, "client_showMessage", team .. player:getName() .. "#ffffff: " .. msg)
 
 			::continue::
 		end
