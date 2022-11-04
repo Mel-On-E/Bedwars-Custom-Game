@@ -17,6 +17,8 @@ function TeamManager:server_onCreate()
         end
 
         self.init = true
+        self.settings = {}
+        self.settings.CanChangeTeam = true
     end
 end
 
