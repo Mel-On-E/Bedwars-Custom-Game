@@ -47,6 +47,9 @@ function RespawnManager.sv_respawnCharacter( self, player, world )
             player = player
         }
         self.sv.flyGoBrrr[#self.sv.flyGoBrrr+1] = params
+        if g_teamManager.settings.ForceFreecam then
+            sm.event.sendToGame( "sv_forceFreecam", {true,{params.player}} )
+        end
     end
 end
 

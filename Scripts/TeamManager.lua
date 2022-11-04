@@ -19,6 +19,7 @@ function TeamManager:server_onCreate()
         self.init = true
         self.settings = {}
         self.settings.CanChangeTeam = true
+        self.settings.ForceFreecam = false
     end
 end
 

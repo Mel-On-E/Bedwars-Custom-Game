@@ -54,6 +54,7 @@ function Freecam:client_enable()
     if char then
         sm.camera.setCameraState(sm.camera.state.cutsceneTP)
         char:setLockingInteractable(self.interactable)
+        self.cl.direction = sm.vec3.new(0,0,0)
         self.cl.velocity = sm.vec3.new(0,0,0)
         self.cl.enabled = true
     end
@@ -72,12 +73,18 @@ end
 function Freecam:sv_enable(arr)
     for _,player in ipairs(arr) do
         self.network:sendToClient(player,"client_enable")
+        if player.character then
+            player.character:setWorldPosition(sm.vec3.new(0,0,500))
+        end
     end
 end
 
 function Freecam:sv_disable(arr)
     for _,player in ipairs(arr) do
         self.network:sendToClient(player,"client_disable")
+        if player.character then
+            player.character:setWorldPosition(sm.vec3.new(0,0,50))
+        end
     end
 end
 

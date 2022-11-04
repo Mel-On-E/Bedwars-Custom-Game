@@ -147,6 +147,9 @@ function Game:server_onChatCommand(params, player)
 		self:sv_toggleFly(player)
 	elseif params[1] == "/spectator" then
 		self:sv_setSpectator(player)
+	elseif params[1] == "/freecam" and not g_teamManager.sv_getTeamColor(player) then
+		if g_teamManager.settings.ForceFreecam and not self:Authorised(player) then return end
+		sm.event.sendToWorld(self.sv.saved.world,"sv_enableFreecam",{state=params[2],players={player}})
 	end
 
 	if not self:Authorised(player) then return end
@@ -167,12 +170,13 @@ function Game:server_onChatCommand(params, player)
 		sm.game.setLimitedInventory(true)
 		self:sv_Alert("Limited inventory")
 		return
-	elseif params[1] == "/freecam" then
-		sm.event.sendToWorld(self.sv.saved.world,"sv_enableFreecam",{state=params[2],players={player}})
-		return
 	elseif params[1] == "/lockteams" then
 		g_teamManager.settings.CanChangeTeam = not params[2]
 		self:sv_Alert(params[2] and "Teams Locked!" or "Teams Unlocked!")
+		return
+	elseif params[1] == "/forcefreecam" then
+		g_teamManager.settings.ForceFreecam = params[2]
+		self:sv_Alert(params[2] and "Enforced Spectator Freecam Enabled!" or "Enforced Spectator Freecam Disabled!")
 		return
 	end
 
@@ -272,6 +276,7 @@ function Game:cl_onAssignCommands(authorised)
 		sm.game.bindChatCommand("/decrypt", {}, "cl_onChatCommand", "Unrestrict interactions in all warehouses")
 
 		sm.game.bindChatCommand("/freecam", { { "bool", "state", false } }, "cl_onChatCommand", "Toggle Freecam")
+		sm.game.bindChatCommand("/forcefreecam", { { "bool", "state", false } }, "cl_onChatCommand", "Spectators will be stuck in freecam.")
 		sm.game.bindChatCommand("/lockteams", { { "bool", "state", false } }, "cl_onChatCommand", "Toggles Team Changing.")
 		sm.game.bindChatCommand("/forceteam", { { "int", "id", false } }, "cl_onChatCommand", "Forces Player Into Team. (Stare at a bed)")
 
@@ -294,6 +299,10 @@ end
 
 
 -- Commands --
+
+function Game:sv_forceFreecam(params)
+	sm.event.sendToWorld(self.sv.saved.world,"sv_enableFreecam",{state=params[1],players=params[2]})
+end
 
 function Game:server_exportMap(params, player)
 	if not player.id == 1 then return end
