@@ -86,27 +86,6 @@ function Game:client_onCreate()
 		g_beaconManager = BeaconManager()
 	end
 	g_beaconManager:cl_onCreate()
-
-	if sm.isHost then
-		sm.game.bindChatCommand("/limited", {}, "cl_onChatCommand", "Use the limited inventory")
-		sm.game.bindChatCommand("/unlimited", {}, "cl_onChatCommand", "Use the unlimited inventory")
-		sm.game.bindChatCommand("/encrypt", {}, "cl_onChatCommand", "Restrict interactions in all warehouses")
-		sm.game.bindChatCommand("/decrypt", {}, "cl_onChatCommand", "Unrestrict interactions in all warehouses")
-
-		sm.game.bindChatCommand("/savemap", { { "string", "name", false } }, "cl_onChatCommand", "Exports custom map")
-
-		sm.game.bindChatCommand("/ids", {}, "cl_onChatCommand", "Lists all players with their ID")
-		sm.game.bindChatCommand("/kick", { { "int", "id", false } }, "cl_onChatCommand", "Kick(crash) a player")
-		sm.game.bindChatCommand("/ban", { { "int", "id", false } }, "cl_onChatCommand", "Bans a player from this world")
-
-		sm.game.bindChatCommand("/auth",{ { "int", "id", false } },"cl_onChatCommand","Authorise a player.")
-		sm.game.bindChatCommand("/unauth",{ { "int", "id", false } },"cl_onChatCommand","Unauthorise a player.")
-		sm.game.bindChatCommand("/authlist",{},"cl_onChatCommand","Get authorised players.")
-	end
-
-	sm.game.bindChatCommand("/fly", {}, "cl_onChatCommand", "Toggle fly mode")
-	sm.game.bindChatCommand("/spectator", {}, "cl_onChatCommand", "Become a spectator")
-	sm.game.bindChatCommand("/freecam", {}, "cl_onChatCommand", "Toggle Freecam")
 end
 
 function Game:server_onPlayerJoined(player, isNewPlayer)
@@ -138,6 +117,8 @@ function Game:server_onPlayerJoined(player, isNewPlayer)
 			self.network:sendToClients("client_showMessage", player.name .. "#ff0000 is banned!")
 		end
 	end
+
+	self.network:sendToClient(player,"cl_onAssignCommands",self:Authorised(player))
 end
 
 function Game:sv_jankySussySus(params)
@@ -185,6 +166,9 @@ function Game:server_onChatCommand(params, player)
 	elseif params[1] == "/limited" then
 		sm.game.setLimitedInventory(true)
 		self:sv_Alert("Limited inventory")
+		return
+	elseif params[1] == "/freecam" then
+		sm.event.sendToWorld(self.sv.saved.world,"sv_enableFreecam",{state=params[2],players={player}})
 		return
 	end
 
@@ -242,18 +226,45 @@ function Game:cl_onChatCommand(params) -- just don't handle the command if its a
 		for _, player in ipairs(sm.player.getAllPlayers()) do
 			sm.gui.chatMessage(tostring(player.id) .. ": " .. player.name)
 		end
-	elseif params[1] == "/freecam" then
-		local State = sm.camera.getCameraState() == sm.camera.state.default
-		self.network:sendToServer("server_toggleFreecam",State)
 	else
 		self.network:sendToServer("server_onChatCommand", params)
 	end
 end
 
+function Game:cl_onAssignCommands(authorised)
+	sm.game.bindChatCommand("/fly", {}, "cl_onChatCommand", "Toggle fly mode")
+	sm.game.bindChatCommand("/spectator", {}, "cl_onChatCommand", "Become a spectator")
+
+	if authorised then
+		sm.game.bindChatCommand("/limited", {}, "cl_onChatCommand", "Use the limited inventory")
+		sm.game.bindChatCommand("/unlimited", {}, "cl_onChatCommand", "Use the unlimited inventory")
+		sm.game.bindChatCommand("/encrypt", {}, "cl_onChatCommand", "Restrict interactions in all warehouses")
+		sm.game.bindChatCommand("/decrypt", {}, "cl_onChatCommand", "Unrestrict interactions in all warehouses")
+
+		sm.game.bindChatCommand("/freecam", { { "bool", "state", false } }, "cl_onChatCommand", "Toggle Freecam")
+
+		-- Moderation --
+		sm.game.bindChatCommand("/ids", {}, "cl_onChatCommand", "Lists all players with their ID")
+		sm.game.bindChatCommand("/kick", { { "int", "id", false } }, "cl_onChatCommand", "Kick(crash) a player")
+		sm.game.bindChatCommand("/ban", { { "int", "id", false } }, "cl_onChatCommand", "Bans a player from this world")
+	end
+
+	if sm.isHost then
+		-- Maps --
+		sm.game.bindChatCommand("/savemap", { { "string", "name", false } }, "cl_onChatCommand", "Exports custom map")
+
+		-- Auth --
+		sm.game.bindChatCommand("/auth", { { "int", "id", false } }, "cl_onChatCommand", "Authorise a player.")
+		sm.game.bindChatCommand("/unauth", { { "int", "id", false } }, "cl_onChatCommand", "Unauthorise a player.")
+		sm.game.bindChatCommand("/authlist", {}, "cl_onChatCommand", "Get authorised players.")
+	end
+end
+
+
 -- Commands --
 
 function Game:server_exportMap(params, player)
-	if not self:Authorised(player) then return end
+	if not player.id == 1 then return end
 	local obj = sm.json.parseJsonString(sm.creation.exportToString(params.body))
 	sm.json.save(obj, "$CONTENT_DATA/Maps/Custom/" .. params.name .. ".blueprint")
 
@@ -271,11 +282,6 @@ function Game:server_exportMap(params, player)
 	sm.json.save(custom_maps, "$CONTENT_DATA/Maps/custom.json")
 
 	self.network:sendToClient(player, "client_showMessage", "Map saved!")
-end
-
-function Game:server_toggleFreecam(state,player)
-	if not self:Authorised(player) then return end
-	sm.event.sendToWorld(self.sv.saved.world,"sv_enableFreecam",{state=state,players={player}})
 end
 
 function Game:sv_toggleFly(player)
