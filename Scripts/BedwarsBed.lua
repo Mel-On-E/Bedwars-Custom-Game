@@ -87,7 +87,7 @@ function BedwarsBed:server_onCellLoaded(x,y)
     end
 end
 
-function BedwarsBed:sv_set_color(color, player)
+function BedwarsBed:server_set_color(color, player)
     local sm_color = sm.color.new(string.sub(color, 1) .. "ff")
     for _, shape in pairs(g_beds) do
         if shape.color == sm_color then
@@ -98,7 +98,7 @@ function BedwarsBed:sv_set_color(color, player)
     self.shape:setColor(sm_color)
 end
 
-function BedwarsBed.sv_activateBed( self, character, player )
+function BedwarsBed.server_activateBed( self, character, player )
 	g_respawnManager:sv_registerBed( self.shape, character )
 
     local newColor = "#" .. tostring(self.shape.color):sub(1, 6)
@@ -126,7 +126,7 @@ end
 
 function BedwarsBed.client_onInteract( self, character, state )
 	if state == true then
-		self.network:sendToServer( "sv_activateBed", character )
+		self.network:sendToServer( "server_activateBed", character )
 		self:cl_seat()
 	end
 end
@@ -161,7 +161,7 @@ function BedwarsBed:cl_onColorButton(name)
 	local index = tonumber(string.sub(name, 12))
 	local color = colors[index+1]
 	self.gui:close()
-	self.network:sendToServer("sv_set_color", color)
+	self.network:sendToServer("server_set_color", color)
 end
 
 function BedwarsBed.cl_seat( self )
