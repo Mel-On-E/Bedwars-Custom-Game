@@ -471,7 +471,7 @@ function Game:Unauthorise(id)
 end
 
 function Game:cl_shareMap( params)
-	self.network:sendToServer("sv_shareMap", params)
+	self.network:sendToServer("sv_shareMap", params) -- ?
 end
 
 SecureClass(Game)

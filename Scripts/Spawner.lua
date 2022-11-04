@@ -38,7 +38,7 @@ function Spawner.server_onFixedUpdate( self, timeStep )
 	end
 end
 
-function Spawner:sv_toggle()
+function Spawner:server_toggle()
 	self.interactable.active = not self.interactable.active
 	print("active?")
 end
@@ -52,7 +52,7 @@ end
 
 function Spawner:client_onInteract(char, state)
 	if state then
-		self.network:sendToServer("sv_toggle")
+		self.network:sendToServer("server_toggle")
 	end
 end
 
