@@ -129,7 +129,7 @@ function World:server_onInteractableDestroyed(interactable)
     self.interactables[interactable:getId()] = nil
 end
 
-function World:sv_changeMap(name)
+function World:sv_reset()
     --reset inventories
     for _, player in ipairs(sm.player.getAllPlayers()) do
         local inventory = player:getInventory()
@@ -155,6 +155,10 @@ function World:sv_changeMap(name)
             end
         end
     end
+end
+
+function World:sv_changeMap(name)
+    self:sv_reset()
 
     --clear bodies
     for _, body in ipairs(sm.body.getAllBodies()) do
@@ -206,31 +210,25 @@ function World:sv_enableFreecam(parameters)
 end
 
 function World:sv_start()
-    for x = -2, 2, 1 do
-        for y = -2, 2, 1 do
-            for _, harvestable in ipairs(sm.cell.getHarvestables(x, y)) do
-                harvestable:destroy()
+    self:sv_reset()
+
+    for _, body in ipairs(sm.body.getAllBodies()) do
+        for _, shape in ipairs(body:getShapes()) do
+            if shape.uuid == sm.uuid.new("208d772f-9851-400f-a014-d847900458a7") then
+                sm.event.sendToInteractable(shape:getInteractable(), "server_toggle", true)
             end
         end
     end
-
-    for _, body in ipairs(sm.body.getAllBodies()) do
-		for _,shape in ipairs(body:getShapes()) do
-			if shape.uuid == sm.uuid.new("208d772f-9851-400f-a014-d847900458a7") then
-				sm.event.sendToInteractable(shape:getInteractable(),"server_toggle",true)
-			end
-		end
-	end
 end
 
 function World:sv_stop()
     for _, body in ipairs(sm.body.getAllBodies()) do
-		for _,shape in ipairs(body:getShapes()) do
-			if shape.uuid == sm.uuid.new("208d772f-9851-400f-a014-d847900458a7") then
-				sm.event.sendToInteractable(shape:getInteractable(),"server_toggle",false)
-			end
-		end
-	end
+        for _, shape in ipairs(body:getShapes()) do
+            if shape.uuid == sm.uuid.new("208d772f-9851-400f-a014-d847900458a7") then
+                sm.event.sendToInteractable(shape:getInteractable(), "server_toggle", false)
+            end
+        end
+    end
 end
 
 SecureClass(World)
