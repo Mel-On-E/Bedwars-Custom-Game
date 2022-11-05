@@ -1,242 +1,244 @@
 {
-   "partList" : [
+   "partList": [
       {
-         "box" : {
-            "x" : 20,
-            "y" : 17,
-            "z" : 12
+         "box": {
+            "x": 20,
+            "y": 17,
+            "z": 12
          },
-         "color" : "000000",
-         "flammable" : false,
-         "name" : "obj_bedwars_trader",
-         "physicsMaterial" : "Metal",
-         "ratings" : {
-            "buoyancy" : 5,
-            "density" : 5,
-            "durability" : 10,
-            "friction" : 5
+         "color": "000000",
+         "flammable": false,
+         "name": "obj_bedwars_trader",
+         "physicsMaterial": "Metal",
+         "ratings": {
+            "buoyancy": 5,
+            "density": 5,
+            "durability": 10,
+            "friction": 5
          },
-         "renderable" : "$SURVIVAL_DATA/Character/Char_Hideoutfarmer/char_hideoutfarmer.rend",
-         "restrictions" : {
-            "buildable" : false,
-            "connectable" : false,
-            "convertibleToDynamic" : false,
-            "destructable" : false,
-            "erasable" : false,
-            "liftable" : false,
-            "paintable" : false,
-            "usable" : true
+         "renderable": "$SURVIVAL_DATA/Character/Char_Hideoutfarmer/char_hideoutfarmer.rend",
+         "restrictions": {
+            "buildable": false,
+            "connectable": false,
+            "convertibleToDynamic": false,
+            "destructable": false,
+            "erasable": false,
+            "liftable": false,
+            "paintable": false,
+            "usable": true
          },
-         "rotationSet" : "PropY",
-         "scripted" : {
-            "classname" : "BedwarsTrader",
-            "data" : {
-               "animationList" : [
+         "rotationSet": "PropY",
+         "scripted": {
+            "classname": "BedwarsTrader",
+            "data": {
+               "animationList": [
                   {
-                     "looping" : true,
-                     "name" : "Idle"
+                     "looping": true,
+                     "name": "Idle"
                   },
                   {
-                     "effect" : {
-                        "joint" : "root_jnt",
-                        "name" : "Farmerhideout - Close"
+                     "effect": {
+                        "joint": "root_jnt",
+                        "name": "Farmerhideout - Close"
                      },
-                     "name" : "Close"
+                     "name": "Close"
                   },
                   {
-                     "effect" : {
-                        "joint" : "root_jnt",
-                        "name" : "Farmerhideout - Open"
+                     "effect": {
+                        "joint": "root_jnt",
+                        "name": "Farmerhideout - Open"
                      },
-                     "name" : "Open",
-                     "nextAnimation" : "Idle"
+                     "name": "Open",
+                     "nextAnimation": "Idle"
                   },
                   {
-                     "effect" : {
-                        "joint" : "root_jnt",
-                        "name" : "Farmerhideout - Accept"
+                     "effect": {
+                        "joint": "root_jnt",
+                        "name": "Farmerhideout - Accept"
                      },
-                     "name" : "Confirm01",
-                     "nextAnimation" : "Idle"
+                     "name": "Confirm01",
+                     "nextAnimation": "Idle"
                   },
                   {
-                     "effect" : {
-                        "joint" : "root_jnt",
-                        "name" : "Farmerhideout - Accept"
+                     "effect": {
+                        "joint": "root_jnt",
+                        "name": "Farmerhideout - Accept"
                      },
-                     "name" : "Confirm02",
-                     "nextAnimation" : "Idle"
+                     "name": "Confirm02",
+                     "nextAnimation": "Idle"
                   },
                   {
-                     "effect" : {
-                        "joint" : "root_jnt",
-                        "name" : "Farmerhideout - Accept"
+                     "effect": {
+                        "joint": "root_jnt",
+                        "name": "Farmerhideout - Accept"
                      },
-                     "name" : "Confirm03",
-                     "nextAnimation" : "Idle"
+                     "name": "Confirm03",
+                     "nextAnimation": "Idle"
                   }
                ]
             },
-            "filename" : "$CONTENT_DATA/Scripts/BedwarsTrader.lua"
+            "filename": "$CONTENT_DATA/Scripts/BedwarsTrader.lua"
          },
-         "uuid" : "5fcb4cb8-7623-11ea-bc55-0242ac130003"
+         "uuid": "5fcb4cb8-7623-11ea-bc55-0242ac130003"
       },
       {
-         "box" : {
-            "x" : 2,
-            "y" : 2,
-            "z" : 2
+         "box": {
+            "x": 2,
+            "y": 2,
+            "z": 2
          },
-         "color" : "00ffff",
-         "flammable" : false,
-         "name" : "obj_interactive_basespawner",
-         "physicsMaterial" : "Mechanical",
-         "ratings" : {
-            "buoyancy" : 5,
-            "density" : 4,
-            "durability" : 10,
-            "friction" : 4
+         "color": "00ffff",
+         "flammable": false,
+         "name": "obj_interactive_basespawner",
+         "physicsMaterial": "Mechanical",
+         "ratings": {
+            "buoyancy": 5,
+            "density": 4,
+            "durability": 10,
+            "friction": 4
          },
-         "renderable" : "$GAME_DATA/Objects/Renderable/Interactive/obj_interactive_robotdrumhead.rend",
-         "restrictions" : {
-            "destructable" : false,
-            "erasable" : false,
-            "usable" : false
+         "renderable": "$GAME_DATA/Objects/Renderable/Interactive/obj_interactive_robotdrumhead.rend",
+         "restrictions": {
+            "destructable": false,
+            "erasable": false,
+            "usable": false,
+            "connectable": false
          },
-         "rotationSet" : "PropY",
-         "scripted" : {
-            "classname" : "Spawner",
-            "data" : {
-               "drops" : [
+         "rotationSet": "PropY",
+         "scripted": {
+            "classname": "Spawner",
+            "data": {
+               "drops": [
                   {
-                     "c5e56da5-bc3f-4519-91c2-b307d36e15aa" : 1
+                     "c5e56da5-bc3f-4519-91c2-b307d36e15aa": 1
                   },
                   {
-                     "c5e56da5-bc3f-4519-91c2-b307d36e15aa" : 2
+                     "c5e56da5-bc3f-4519-91c2-b307d36e15aa": 2
                   },
                   {
-                     "c5e56da5-bc3f-4519-91c2-b307d36e15aa" : 3
+                     "c5e56da5-bc3f-4519-91c2-b307d36e15aa": 3
                   },
                   {
-                     "edd445cc-c298-4ce3-9a58-745c1bee1bc7" : 5
+                     "edd445cc-c298-4ce3-9a58-745c1bee1bc7": 5
                   },
                   {
-                     "edd445cc-c298-4ce3-9a58-745c1bee1bc7" : 5
+                     "edd445cc-c298-4ce3-9a58-745c1bee1bc7": 5
                   },
                   {
-                     "388adeab-67e5-4901-afe8-c56217754510" : 36
+                     "388adeab-67e5-4901-afe8-c56217754510": 36
                   }
                ],
-               "spawnInterval" : 200
+               "spawnInterval": 200
             },
-            "filename" : "$CONTENT_DATA/Scripts/Spawner.lua"
+            "filename": "$CONTENT_DATA/Scripts/Spawner.lua"
          },
-         "sticky" : "-X+X-Y+Y-Z",
-         "uuid" : "108d772f-9851-400f-a014-d847900458a7"
+         "sticky": "-X+X-Y+Y-Z",
+         "uuid": "108d772f-9851-400f-a014-d847900458a7"
       },
       {
-         "box" : {
-            "x" : 2,
-            "y" : 2,
-            "z" : 2
+         "box": {
+            "x": 2,
+            "y": 2,
+            "z": 2
          },
-         "color" : "00ff00",
-         "flammable" : false,
-         "name" : "obj_interactive_middlespawner",
-         "physicsMaterial" : "Mechanical",
-         "ratings" : {
-            "buoyancy" : 5,
-            "density" : 4,
-            "durability" : 10,
-            "friction" : 4
+         "color": "00ff00",
+         "flammable": false,
+         "name": "obj_interactive_middlespawner",
+         "physicsMaterial": "Mechanical",
+         "ratings": {
+            "buoyancy": 5,
+            "density": 4,
+            "durability": 10,
+            "friction": 4
          },
-         "renderable" : "$GAME_DATA/Objects/Renderable/Interactive/obj_interactive_robotsynthhead.rend",
-         "restrictions" : {
-            "destructable" : false,
-            "erasable" : false,
-            "usable" : false
+         "renderable": "$GAME_DATA/Objects/Renderable/Interactive/obj_interactive_robotsynthhead.rend",
+         "restrictions": {
+            "destructable": false,
+            "erasable": false,
+            "usable": false,
+            "connectable": false
          },
-         "rotationSet" : "PropY",
-         "scripted" : {
-            "classname" : "Spawner",
-            "data" : {
-               "drops" : [
+         "rotationSet": "PropY",
+         "scripted": {
+            "classname": "Spawner",
+            "data": {
+               "drops": [
                   {
-                     "388adeab-67e5-4901-afe8-c56217754510" : 1
+                     "388adeab-67e5-4901-afe8-c56217754510": 1
                   },
                   {
-                     "388adeab-67e5-4901-afe8-c56217754510" : 5
+                     "388adeab-67e5-4901-afe8-c56217754510": 5
                   }
                ],
-               "spawnInterval" : 2400
+               "spawnInterval": 2400
             },
-            "filename" : "$CONTENT_DATA/Scripts/Spawner.lua"
+            "filename": "$CONTENT_DATA/Scripts/Spawner.lua"
          },
-         "sticky" : "-X+X-Y+Y-Z",
-         "uuid" : "208d772f-9851-400f-a014-d847900458a7"
+         "sticky": "-X+X-Y+Y-Z",
+         "uuid": "208d772f-9851-400f-a014-d847900458a7"
       },
       {
-         "box" : {
-            "x" : 4,
-            "y" : 1,
-            "z" : 7
+         "box": {
+            "x": 4,
+            "y": 1,
+            "z": 7
          },
-         "color" : "ff0000",
-         "flammable" : true,
-         "name" : "obj_bedwars_bed",
-         "physicsMaterial" : "Metal",
-         "ratings" : {
-            "buoyancy" : 6,
-            "density" : 3,
-            "durability" : 10,
-            "friction" : 4
+         "color": "ff0000",
+         "flammable": true,
+         "name": "obj_bedwars_bed",
+         "physicsMaterial": "Metal",
+         "ratings": {
+            "buoyancy": 6,
+            "density": 3,
+            "durability": 10,
+            "friction": 4
          },
-         "renderable" : "$SURVIVAL_DATA/Objects/Renderable/interactive/obj_interactive_comfybed.rend",
-         "restrictions" : {
-            "paintable" : false,
-            "usable" : true
+         "renderable": "$SURVIVAL_DATA/Objects/Renderable/interactive/obj_interactive_comfybed.rend",
+         "restrictions": {
+            "paintable": false,
+            "usable": true
          },
-         "rotationSet" : "PropFullMinusNegY",
-         "scripted" : {
-            "classname" : "BedwarsBed",
-            "data" : {},
-            "filename" : "$CONTENT_DATA/Scripts/BedwarsBed.lua",
-            "seat" : {
-               "bones" : [
+         "rotationSet": "PropFullMinusNegY",
+         "scripted": {
+            "classname": "BedwarsBed",
+            "data": {},
+            "filename": "$CONTENT_DATA/Scripts/BedwarsBed.lua",
+            "seat": {
+               "bones": [
                   {
-                     "name" : "root_jnt",
-                     "offset" : {
-                        "x" : 0.0,
-                        "y" : 1.0,
-                        "z" : 0.30
+                     "name": "root_jnt",
+                     "offset": {
+                        "x": 0.0,
+                        "y": 1.0,
+                        "z": 0.30
                      }
                   },
                   {
-                     "freeRotation" : true,
-                     "name" : "LeftForeArm",
-                     "offset" : {
-                        "x" : 1.50,
-                        "y" : 1.10,
-                        "z" : 1.10
+                     "freeRotation": true,
+                     "name": "LeftForeArm",
+                     "offset": {
+                        "x": 1.50,
+                        "y": 1.10,
+                        "z": 1.10
                      }
                   },
                   {
-                     "freeRotation" : true,
-                     "name" : "RightForeArm",
-                     "offset" : {
-                        "x" : -1.50,
-                        "y" : 1.10,
-                        "z" : 1.10
+                     "freeRotation": true,
+                     "name": "RightForeArm",
+                     "offset": {
+                        "x": -1.50,
+                        "y": 1.10,
+                        "z": 1.10
                      }
                   }
                ],
-               "enterAudio" : "Seat seated",
-               "exitAudio" : "Seat unseated",
-               "ragdollFile" : "$SURVIVAL_DATA/Character/bed_ragdoll.json"
+               "enterAudio": "Seat seated",
+               "exitAudio": "Seat unseated",
+               "ragdollFile": "$SURVIVAL_DATA/Character/bed_ragdoll.json"
             }
          },
-         "sticky" : "-Z+Z-Y-X+X",
-         "uuid" : "6488a8fa-1187-45e8-8dac-47d13bdaa026",
+         "sticky": "-Z+Z-Y-X+X",
+         "uuid": "6488a8fa-1187-45e8-8dac-47d13bdaa026",
          "destroyTime": 6.9
       }
    ]
