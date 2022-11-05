@@ -1,4 +1,6 @@
 dofile("$GAME_DATA/Scripts/game/AnimationUtil.lua")
+
+dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
 local renderables = { "$SURVIVAL_DATA/Character/Char_Tools/Char_logbook/char_logbook.rend" }
 local renderablesTp = { "$SURVIVAL_DATA/Character/Char_Male/Animations/char_male_tp_logbook.rend",
 	"$SURVIVAL_DATA/Character/Char_Tools/Char_logbook/char_logbook_tp_animlist.rend" }
@@ -144,7 +146,7 @@ function MapTool:cl_load_map(name)
 		if map.custom then
 			name = "Custom/" .. name
 		end
-		self.network:sendToServer("sv_load_map", name)
+		self.network:sendToServer("server_load_map", name)
 
 		sm.gui.displayAlertText("Map Loading...")
 
@@ -154,7 +156,7 @@ function MapTool:cl_load_map(name)
 	self.cl.confirmGui = nil
 end
 
-function MapTool:sv_load_map(file)
+function MapTool:server_load_map(file)
 	local world = self.tool:getOwner():getCharacter():getWorld()
 	sm.event.sendToWorld(world, "sv_changeMap", file)
 
@@ -363,3 +365,5 @@ function MapTool.cl_loadAnimations(self)
 	setTpAnimation(self.tpAnimations, "idle", 5.0)
 	self.cl.blendTime = 0.2
 end
+
+SecureClass(MapTool)

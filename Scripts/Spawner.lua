@@ -1,6 +1,8 @@
 dofile "$SURVIVAL_DATA/Scripts/game/survival_items.lua"
 dofile( "$SURVIVAL_DATA/Scripts/game/util/Timer.lua" )
 
+dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
+
 Spawner = class( nil )
 Spawner.maxParentCount = 1
 Spawner.connectionInput = sm.interactable.connectionType.logic
@@ -36,7 +38,7 @@ function Spawner.server_onFixedUpdate( self, timeStep )
 	end
 end
 
-function Spawner:sv_toggle()
+function Spawner:server_toggle()
 	self.interactable.active = not self.interactable.active
 	print("active?")
 end
@@ -50,10 +52,12 @@ end
 
 function Spawner:client_onInteract(char, state)
 	if state then
-		self.network:sendToServer("sv_toggle")
+		self.network:sendToServer("server_toggle")
 	end
 end
 
 function Spawner:client_onUpdate()
 	self.interactable:setPoseWeight(0, self.interactable.active and 1 or 0)
 end
+
+SecureClass(Spawner)

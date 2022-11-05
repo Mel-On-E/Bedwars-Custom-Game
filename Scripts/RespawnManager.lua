@@ -1,5 +1,7 @@
 dofile( "$SURVIVAL_DATA/Scripts/game/managers/RespawnManager.lua" )
 
+dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
+
 OldRespawnManager = class(RespawnManager)
 
 function RespawnManager:sv_onCreate(overworld)
@@ -45,6 +47,9 @@ function RespawnManager.sv_respawnCharacter( self, player, world )
             player = player
         }
         self.sv.flyGoBrrr[#self.sv.flyGoBrrr+1] = params
+        if g_teamManager.settings.ForceFreecam then
+            sm.event.sendToGame( "sv_forceFreecam", {true,{params.player}} )
+        end
     end
 end
 
@@ -58,3 +63,5 @@ function RespawnManager:server_onFixedUpdate()
         end
     end
 end
+
+SecureClass(RespawnManager)

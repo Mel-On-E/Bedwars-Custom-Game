@@ -55,15 +55,12 @@ function Game:server_onCreate()
 end
 
 --cursed stuff to disable chunk unloading
-function Game.sv_loadTerrain(self, data)
+function Game:sv_loadTerrain(data)
 	for x = data.minX, data.maxX do
 		for y = data.minY, data.maxY do
-			data.world:loadCell(x, y, nil, "sv_empty")
+			data.world:loadCell(x, y, nil)
 		end
 	end
-end
-
-function Game.sv_empty(self)
 end
 
 function Game:client_onCreate()
@@ -141,10 +138,8 @@ function Game:server_onPlayerJoined(player, isNewPlayer)
 			self.network:sendToClients("client_showMessage", player.name .. "#ff0000 is banned!")
 		end
 	end
-end
 
-function Game:server_onPlayerLeft(player)
-	sm.event.sendToPlayer(player, "sv_removePlayer", player)
+	self.network:sendToClient(player, "cl_onAssignCommands", self:Authorised(player))
 end
 
 function Game:sv_jankySussySus(params)
@@ -173,6 +168,9 @@ function Game:server_onChatCommand(params, player)
 		self:sv_toggleFly(player)
 	elseif params[1] == "/spectator" then
 		self:sv_setSpectator(player)
+	elseif params[1] == "/freecam" and not g_teamManager.sv_getTeamColor(player) then
+		if g_teamManager.settings.ForceFreecam and not self:Authorised(player) then return end
+		sm.event.sendToWorld(self.sv.saved.world, "sv_enableFreecam", { state = params[2], players = { player } })
 	end
 
 	if not self:Authorised(player) then return end
@@ -192,6 +190,14 @@ function Game:server_onChatCommand(params, player)
 	elseif params[1] == "/limited" then
 		sm.game.setLimitedInventory(true)
 		self:sv_Alert("Limited inventory")
+		return
+	elseif params[1] == "/lockteams" then
+		g_teamManager.settings.CanChangeTeam = not params[2]
+		self:sv_Alert(params[2] and "Teams Locked!" or "Teams Unlocked!")
+		return
+	elseif params[1] == "/forcefreecam" then
+		g_teamManager.settings.ForceFreecam = params[2]
+		self:sv_Alert(params[2] and "Enforced Spectator Freecam Enabled!" or "Enforced Spectator Freecam Disabled!")
 		return
 	end
 
@@ -249,15 +255,79 @@ function Game:cl_onChatCommand(params) -- just don't handle the command if its a
 		for _, player in ipairs(sm.player.getAllPlayers()) do
 			sm.gui.chatMessage(tostring(player.id) .. ": " .. player.name)
 		end
+	elseif params[1] == "/forceteam" then
+		local Player
+		for _, plr in ipairs(sm.player.getAllPlayers()) do
+			if plr.id == params[2] then
+				Player = plr
+				break
+			end
+		end
+		if not Player then self:cl_Alert({ Text = "Invaild PlayerId" }) return end
+		local rayCastValid, rayCastResult = sm.localPlayer.getRaycast(100)
+		if rayCastValid and rayCastResult.type == "body" then
+			local Distance = math.huge
+			local Object = nil
+			for _, shape in ipairs(rayCastResult:getBody():getShapes()) do
+				local Dis = (rayCastResult.pointWorld - shape:getWorldPosition()):length()
+				if Dis < Distance then
+					Distance = Dis
+					Object = shape
+				end
+			end
+			if Object.uuid == sm.uuid.new("6488a8fa-1187-45e8-8dac-47d13bdaa026") then
+				self.network:sendToServer("server_forceTeam", { bed = Object, player = Player })
+			else
+				self.network:sendToServer("server_forceTeam", { player = Player })
+			end
+		end
 	else
 		self.network:sendToServer("server_onChatCommand", params)
 	end
 end
 
+function Game:cl_onAssignCommands(authorised)
+	sm.game.bindChatCommand("/fly", {}, "cl_onChatCommand", "Toggle fly mode")
+	sm.game.bindChatCommand("/spectator", {}, "cl_onChatCommand", "Become a spectator")
+
+	if authorised then
+		sm.game.bindChatCommand("/limited", {}, "cl_onChatCommand", "Use the limited inventory")
+		sm.game.bindChatCommand("/unlimited", {}, "cl_onChatCommand", "Use the unlimited inventory")
+		sm.game.bindChatCommand("/encrypt", {}, "cl_onChatCommand", "Restrict interactions in all warehouses")
+		sm.game.bindChatCommand("/decrypt", {}, "cl_onChatCommand", "Unrestrict interactions in all warehouses")
+
+		sm.game.bindChatCommand("/freecam", { { "bool", "state", false } }, "cl_onChatCommand", "Toggle Freecam")
+		sm.game.bindChatCommand("/forcefreecam", { { "bool", "state", false } }, "cl_onChatCommand",
+			"Spectators will be stuck in freecam.")
+		sm.game.bindChatCommand("/lockteams", { { "bool", "state", false } }, "cl_onChatCommand", "Toggles Team Changing.")
+		sm.game.bindChatCommand("/forceteam", { { "int", "id", false } }, "cl_onChatCommand",
+			"Forces Player Into Team. (Stare at a bed)")
+
+		-- Moderation --
+		sm.game.bindChatCommand("/ids", {}, "cl_onChatCommand", "Lists all players with their ID")
+		sm.game.bindChatCommand("/kick", { { "int", "id", false } }, "cl_onChatCommand", "Kick(crash) a player")
+		sm.game.bindChatCommand("/ban", { { "int", "id", false } }, "cl_onChatCommand", "Bans a player from this world")
+	end
+
+	if sm.isHost then
+		-- Maps --
+		sm.game.bindChatCommand("/savemap", { { "string", "name", false } }, "cl_onChatCommand", "Exports custom map")
+
+		-- Auth --
+		sm.game.bindChatCommand("/auth", { { "int", "id", false } }, "cl_onChatCommand", "Authorise a player.")
+		sm.game.bindChatCommand("/unauth", { { "int", "id", false } }, "cl_onChatCommand", "Unauthorise a player.")
+		sm.game.bindChatCommand("/authlist", {}, "cl_onChatCommand", "Get authorised players.")
+	end
+end
+
 -- Commands --
 
+function Game:sv_forceFreecam(params)
+	sm.event.sendToWorld(self.sv.saved.world, "sv_enableFreecam", { state = params[1], players = params[2] })
+end
+
 function Game:server_exportMap(params, player)
-	if not self:Authorised(player) then return end
+	if not player.id == 1 then return end
 	local obj = sm.json.parseJsonString(sm.creation.exportToString(params.body))
 	sm.json.save(obj, "$CONTENT_DATA/Maps/Custom/" .. params.name .. ".blueprint")
 
@@ -277,6 +347,15 @@ function Game:server_exportMap(params, player)
 	self.network:sendToClient(player, "client_showMessage", "Map saved!")
 end
 
+function Game:server_forceTeam(parameters, player)
+	if not self:Authorised(player) or not sm.exists(parameters.player.character) then return end
+	if parameters.bed then
+		sm.event.sendToInteractable(parameters.bed:getInteractable(), "sv_activatedBed", parameters.player)
+	else
+		TeamManager.sv_setTeam(player, nil)
+	end
+end
+
 function Game:sv_toggleFly(player)
 	if TeamManager.sv_getTeamColor(player) then
 		self.network:sendToClient(player, "client_showMessage", "You need to be /spectator to fly")
@@ -290,6 +369,7 @@ function Game:sv_toggleFly(player)
 end
 
 function Game:sv_setSpectator(player)
+	if not g_teamManager.settings.CanChangeTeam and not self:Authorised(player) then return end
 	TeamManager.sv_setTeam(player, nil)
 
 	self.network:sendToClients("client_showMessage", player.name .. " is now a spectator")
@@ -414,7 +494,7 @@ function Game:Unauthorise(id)
 end
 
 function Game:cl_shareMap(params)
-	self.network:sendToServer("sv_shareMap", params)
+	self.network:sendToServer("sv_shareMap", params) -- ?
 end
 
 SecureClass(Game)

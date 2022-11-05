@@ -1,6 +1,8 @@
 -- BedwarsTrader.lua --
 dofile( "$SURVIVAL_DATA/Scripts/util.lua" )
 
+dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
+
 BedwarsTrader = class( nil )
 BedwarsTrader.VacuumTickTime = 40 * 2.0
 
@@ -140,7 +142,7 @@ function BedwarsTrader.sv_init( self )
 	self.network:setClientData( { cameraNode = self.sv.cameraNode, vacuumInteractable = self.sv.vacuumInteractable } )
 end
 
-function BedwarsTrader.sv_tryCompleteQuest( self, params, player )
+function BedwarsTrader.server_tryCompleteQuest( self, params, player )
 
 	sm.container.beginTransaction()
 
@@ -329,7 +331,7 @@ end
 
 function BedwarsTrader.cl_onCompleteQuest( self, buttonName, index, data )
 
-	self.network:sendToServer( "sv_tryCompleteQuest", data )
+	self.network:sendToServer( "server_tryCompleteQuest", data )
 end
 
 function BedwarsTrader.cl_questCompleted( self, player )
@@ -488,3 +490,5 @@ function BedwarsTrader.cl_updateAnimation( self, dt )
 	end
 
 end
+
+SecureClass(BedwarsTrader)

@@ -1,4 +1,5 @@
 dofile("$CONTENT_DATA/Scripts/TeamManager.lua")
+dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
 
 BedwarsBed = class()
 
@@ -74,7 +75,19 @@ function BedwarsBed:server_onDestroy()
     sm.event.sendToGame("sv_bedDestroyed", color)
 end
 
-function BedwarsBed:sv_set_color(color, player)
+function BedwarsBed:server_onCellCreated(x,y)
+    if x == 0 and y == 0 then
+        sm.event.sendToGame("sv_preventunload",{world=self.world,minX=-2,minY=-2,maxX=1,maxY=1})
+    end
+end
+
+function BedwarsBed:server_onCellLoaded(x,y)
+    if x == 0 and y == 0 then
+        sm.event.sendToGame("sv_preventunload",{world=self.world,minX=-2,minY=-2,maxX=1,maxY=1})
+    end
+end
+
+function BedwarsBed:server_set_color(color, player)
     local sm_color = sm.color.new(string.sub(color, 1) .. "ff")
     for _, shape in pairs(g_beds) do
         if shape.color == sm_color then
@@ -85,8 +98,8 @@ function BedwarsBed:sv_set_color(color, player)
     self.shape:setColor(sm_color)
 end
 
-function BedwarsBed.sv_activateBed( self, character, player )
-	g_respawnManager:sv_registerBed( self.shape, character )
+function BedwarsBed.server_activateBed( self, character, player )
+	g_respawnManager:sv_registerBed( self.shape, player.character )
 
     local newColor = "#" .. tostring(self.shape.color):sub(1, 6)
     local oldColor = TeamManager.sv_getTeamColor(player)
@@ -95,6 +108,11 @@ function BedwarsBed.sv_activateBed( self, character, player )
     if newColor ~= oldColor then
         self.network:sendToClients("client_showMessage", newColor .. player.name .. "#ffffff changed team")
     end
+end
+
+function BedwarsBed:sv_activatedBed(player)
+    self:server_activateBed(nil,player)
+    self.network:sendToClient(player,"cl_seat")
 end
 
 function BedwarsBed.client_onAction( self, controllerAction, state )
@@ -113,7 +131,7 @@ end
 
 function BedwarsBed.client_onInteract( self, character, state )
 	if state == true then
-		self.network:sendToServer( "sv_activateBed", character )
+		self.network:sendToServer( "server_activateBed", character )
 		self:cl_seat()
 	end
 end
@@ -131,6 +149,9 @@ end
 
 
 function BedwarsBed:client_canInteract()
+    if not g_teamManager.settings.CanChangeTeam then
+        return false
+    end
     local keyBindingText =  sm.gui.getKeyBinding( "Use", true )
     sm.gui.setInteractionText( "", keyBindingText, "#{INTERACTION_USE}" )
     if sm.isHost then
@@ -148,7 +169,7 @@ function BedwarsBed:cl_onColorButton(name)
 	local index = tonumber(string.sub(name, 12))
 	local color = colors[index+1]
 	self.gui:close()
-	self.network:sendToServer("sv_set_color", color)
+	self.network:sendToServer("server_set_color", color)
 end
 
 function BedwarsBed.cl_seat( self )
@@ -169,3 +190,5 @@ end
 function BedwarsBed.client_showMessage( self, msg )
 	sm.gui.chatMessage( msg )
 end
+
+SecureClass(BedwarsBed)

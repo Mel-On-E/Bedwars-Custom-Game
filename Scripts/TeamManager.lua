@@ -1,3 +1,5 @@
+dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
+
 TeamManager = class()
 TeamManager.isSaveObject = true
 
@@ -15,6 +17,9 @@ function TeamManager:server_onCreate()
         end
 
         self.init = true
+        self.settings = {}
+        self.settings.CanChangeTeam = true
+        self.settings.ForceFreecam = false
     end
 end
 
@@ -61,7 +66,7 @@ function TeamManager.sv_isBedExisting(color)
 	return g_teamManager.sv.beds[color]
 end
 
-function TeamManager:sv_updateClientData()
+function TeamManager:server_updateClientData()
     self.sv.updateClientData = true
 end
 
@@ -122,7 +127,7 @@ function TeamManager:client_onCreate()
         g_teamManager = self
     end
 
-    self.network:sendToServer("sv_updateClientData")
+    self.network:sendToServer("server_updateClientData")
 end
 
 function TeamManager:client_onClientDataUpdate(clientData, channel)
@@ -141,3 +146,5 @@ function TeamManager:client_onFixedUpdate()
         end
     end
 end
+
+SecureClass(TeamManager)

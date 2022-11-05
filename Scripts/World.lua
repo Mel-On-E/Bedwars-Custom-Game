@@ -1,5 +1,7 @@
 dofile("$SURVIVAL_DATA/Scripts/game/survival_harvestable.lua")
 
+dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
+
 World = class(nil)
 World.terrainScript = "$CONTENT_DATA/Scripts/terrain.lua"
 World.cellMinX = -2
@@ -22,11 +24,20 @@ function World.server_onCreate(self)
         world = self.world
     }
     sm.event.sendToGame("sv_loadTerrain", data)
+    self.uuidinteractables = {}
+    self.interactables = {}
 end
 
 function World:server_onCellCreated(x, y)
     if x == y and x == 0 then
         self:sv_changeMap("Factory4")
+        self:sv_ensureFreecam()
+    end
+end
+
+function World:server_onCellLoaded(x, y)
+    if x == y and x == 0 then
+        self:sv_ensureFreecam()
     end
 end
 
@@ -92,6 +103,32 @@ function World.server_onProjectile(self, hitPos, hitTime, hitVelocity, _, attack
     end
 end
 
+function World:server_onInteractableCreated(interactable)
+    if not self.uuidinteractables[tostring(interactable:getShape().uuid)] then
+        self.uuidinteractables[tostring(interactable:getShape().uuid)] = {}
+    end
+    table.insert(self.uuidinteractables[tostring(interactable:getShape().uuid)], interactable)
+    self.interactables[interactable:getId()] = tostring(interactable:getShape().uuid)
+
+    if interactable:getShape().uuid == sm.uuid.new("5fcd5514-526a-4782-8a79-843827818f55") and
+        #self.uuidinteractables["5fcd5514-526a-4782-8a79-843827818f55"] > 1 then
+        interactable:getShape():destroyShape(0) -- Limit it to one per world.
+    end
+end
+
+function World:server_onInteractableDestroyed(interactable)
+    for key, obj in ipairs(self.uuidinteractables[self.interactables[interactable:getId()]] or {}) do
+        if obj == interactable then
+            table.remove(self.uuidinteractables[self.interactables[interactable:getId()]], key)
+            break
+        end
+    end
+    if self.interactables[interactable:getId()] == "5fcd5514-526a-4782-8a79-843827818f55" then
+        self:sv_ensureFreecam()
+    end
+    self.interactables[interactable:getId()] = nil
+end
+
 function World:sv_changeMap(name)
     --reset inventories
     for _, player in ipairs(sm.player.getAllPlayers()) do
@@ -154,3 +191,18 @@ function World:cl_justPlayTheGoddamnSound(params)
     local pos = params.pos or sm.localPlayer.getPlayer().character.worldPosition
     sm.effect.playEffect(params.effect, pos)
 end
+
+function World:sv_ensureFreecam()
+    if not self.uuidinteractables["5fcd5514-526a-4782-8a79-843827818f55"] or
+        next(self.uuidinteractables["5fcd5514-526a-4782-8a79-843827818f55"]) == nil then
+        sm.shape.createPart(sm.uuid.new("5fcd5514-526a-4782-8a79-843827818f55"), sm.vec3.new(0, 0, 50),
+            sm.quat.identity(), false, true)
+    end
+end
+
+function World:sv_enableFreecam(parameters)
+    sm.event.sendToInteractable(self.uuidinteractables["5fcd5514-526a-4782-8a79-843827818f55"][1],
+        parameters.state == false and "sv_disable" or "sv_enable", parameters.players)
+end
+
+SecureClass(World)

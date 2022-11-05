@@ -63,7 +63,7 @@ function SecureClass(Class)
             if ContainsStrings(NetworkingStrings,key) then
                 PreventNetworking = false
             end
-            sm.log.info(key,ServerMode,PreventNetworking)
+            --sm.log.info(key,ServerMode,PreventNetworking)
             Class[key] = SecureNetworking(key,val,ServerMode,PreventNetworking)
         end
     end
