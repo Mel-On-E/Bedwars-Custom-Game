@@ -19,7 +19,7 @@ function Freecam:client_onUpdate(dt)
     if not self.cl.enabled then return end
     self.cl.velocity = (self.cl.velocity + self:client_local(self.cl.direction * self.cl.speed)) * 0.95
     sm.camera.setPosition(sm.camera.getPosition() + self.cl.velocity * dt)
-    sm.camera.setDirection(sm.player.getAllPlayers()[1].character.direction)
+    sm.camera.setDirection(sm.localPlayer.getPlayer().character.direction)
     sm.camera.setFov(sm.camera.getDefaultFov())
 end
 
@@ -54,8 +54,8 @@ function Freecam:client_enable()
     if char then
         sm.camera.setCameraState(sm.camera.state.cutsceneTP)
         char:setLockingInteractable(self.interactable)
-        self.cl.direction = sm.vec3.new(0,0,0)
-        self.cl.velocity = sm.vec3.new(0,0,0)
+        self.cl.direction = sm.vec3.new(0, 0, 0)
+        self.cl.velocity = sm.vec3.new(0, 0, 0)
         self.cl.enabled = true
     end
 end
@@ -71,19 +71,19 @@ function Freecam:client_disable()
 end
 
 function Freecam:sv_enable(arr)
-    for _,player in ipairs(arr) do
-        self.network:sendToClient(player,"client_enable")
+    for _, player in ipairs(arr) do
+        self.network:sendToClient(player, "client_enable")
         if player.character then
-            player.character:setWorldPosition(sm.vec3.new(0,0,500))
+            player.character:setWorldPosition(sm.vec3.new(0, 0, 500))
         end
     end
 end
 
 function Freecam:sv_disable(arr)
-    for _,player in ipairs(arr) do
-        self.network:sendToClient(player,"client_disable")
+    for _, player in ipairs(arr) do
+        self.network:sendToClient(player, "client_disable")
         if player.character then
-            player.character:setWorldPosition(sm.vec3.new(0,0,50))
+            player.character:setWorldPosition(sm.vec3.new(0, 0, 50))
         end
     end
 end
@@ -94,6 +94,13 @@ end
 
 function Freecam:client_canErase()
     return false
+end
+
+function Freecam:server_onFixedUpdate()
+    if lastGameState ~= g_gameActive and not g_gameActive then
+        self:sv_disable(sm.player.getAllPlayers())
+    end
+    lastGameState = g_gameActive
 end
 
 SecureClass(Freecam)

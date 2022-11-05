@@ -173,6 +173,7 @@ function World:sv_changeMap(name)
 
     --remove helper blocks
     sm.event.sendToWorld(self.world, "sv_remove_helper_blocks")
+    g_gameActive = false
 end
 
 function World:sv_remove_helper_blocks()

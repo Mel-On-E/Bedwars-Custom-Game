@@ -13,6 +13,7 @@ Game.enableUpgrade = true
 
 START_AREA_SPAWN_POINT = sm.vec3.new(0, 0, 5)
 local deathDepth = -69
+g_gameActive = false
 
 function updateMapTable(t, newMap)
 	local newKey = #t + 1
@@ -211,6 +212,9 @@ function Game:server_onChatCommand(params, player)
 	elseif params[1] == "/start" then
 		self:sv_start()
 		return
+	elseif params[1] == "/stop" then
+		self:sv_stop()
+		return
 	end
 
 	if params[1] == "/ban" or params[1] == "/kick" then
@@ -362,6 +366,7 @@ end
 -- Commands --
 
 function Game:sv_start()
+	g_gameActive = true
 	sm.event.sendToWorld(self.sv.saved.world, "sv_start")
 
 	for _, plr in ipairs(sm.player.getAllPlayers()) do
@@ -370,6 +375,10 @@ function Game:sv_start()
 
 	self.network:sendToClients("cl_Alert", { Text = "Game has started!" })
 	self.network:sendToClients("client_showMessage", "Game has started!")
+end
+
+function Game:sv_stop()
+	g_gameActive = false
 end
 
 function Game:sv_forceFreecam(params)

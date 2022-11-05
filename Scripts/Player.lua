@@ -407,6 +407,7 @@ function Player:sv_removePlayer(player)
 			self.network:sendToClients("cl_msg", msg)
 			self.network:sendToClients("cl_alert", msg)
 			sm.event.sendToGame("sv_jankySussySus", { callback = "sv_justPlayTheGoddamnSound", effect = "game finish" })
+			g_gameActive = false
 		end
 	end
 end
@@ -509,6 +510,11 @@ function Player.sv_e_onSpawnCharacter(self)
 	self.sv.spawnparams = {}
 
 	sm.event.sendToGame("sv_e_onSpawnPlayerCharacter", self.player)
+
+	if not TeamManager.sv_getTeamColor(self.player) then
+		sm.event.sendToWorld(self.player.character:getWorld(), "sv_enableFreecam",
+			{ state = g_gameActive, players = { self.player } })
+	end
 end
 
 function Player.cl_seatCharacter(self, params)
