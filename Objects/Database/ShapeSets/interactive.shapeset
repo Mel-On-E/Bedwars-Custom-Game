@@ -267,6 +267,50 @@
          "sticky": "-Z+Z-Y-X+X",
          "uuid": "6488a8fa-1187-45e8-8dac-47d13bdaa026",
          "destroyTime": 6.9
+      },
+      {
+         "uuid": "ea9329c6-48ef-4a1b-b010-b8e0ffc10238",
+         "name": "obj_interactive_logicgate",
+         "renderable": "$GAME_DATA/Objects/Renderable/Interactive/obj_interactive_logicgate.rend",
+         "color": "df7f01",
+         "box": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+         },
+         "logic": {},
+         "rotationSet": "PropYZ",
+         "physicsMaterial": "Mechanical",
+         "ratings": {
+            "density": 2,
+            "durability": 3,
+            "friction": 5,
+            "buoyancy": 2
+         },
+         "flammable": false,
+         "stackSize": 10
+      },
+      {
+         "uuid": "69b4ae0b-30c8-4250-8eda-59911da4bf5a",
+         "name": "obj_interactive_timer",
+         "renderable": "$GAME_DATA/Objects/Renderable/Interactive/obj_interactive_timer.rend",
+         "color": "df7f01",
+         "box": {
+            "x": 1,
+            "y": 2,
+            "z": 1
+         },
+         "timer": {},
+         "rotationSet": "PropYmmNegYmmZ",
+         "physicsMaterial": "Mechanical",
+         "ratings": {
+            "density": 2,
+            "durability": 3,
+            "friction": 5,
+            "buoyancy": 4
+         },
+         "flammable": false,
+         "stackSize": 5
       }
    ]
 }
