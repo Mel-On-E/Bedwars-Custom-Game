@@ -49,9 +49,9 @@ function Game:server_onCreate()
 		sm.storage.save(69, self.sv.teamManager)
 	end
 
-	self.sv.authorised = { [1] = true } -- Player ids.
+	self.sv.authorised = {[1] = true} -- Player ids.
 	self.sv.newPlayers = {}
-
+	self.sv.gamerunning = false
 end
 
 --cursed stuff to disable chunk unloading
@@ -209,6 +209,12 @@ function Game:server_onChatCommand(params, player)
 		g_teamManager.settings.ForceFreecam = params[2]
 		self:sv_Alert(params[2] and "Enforced Spectator Freecam Enabled!" or "Enforced Spectator Freecam Disabled!")
 		return
+	elseif params[1] == "/start" then
+		self:sv_start()
+		return
+	elseif params[1] == "/stop" then
+		self:sv_stop()
+		return
 	end
 
 	if params[1] == "/ban" or params[1] == "/kick" then
@@ -330,6 +336,8 @@ function Game:cl_onAssignCommands(authorised)
 		sm.game.bindChatCommand("/unlimited", {}, "cl_onChatCommand", "Use the unlimited inventory")
 		sm.game.bindChatCommand("/encrypt", {}, "cl_onChatCommand", "Restrict interactions in all warehouses")
 		sm.game.bindChatCommand("/decrypt", {}, "cl_onChatCommand", "Unrestrict interactions in all warehouses")
+		sm.game.bindChatCommand("/start", {}, "cl_onChatCommand", "Start a game!")
+		sm.game.bindChatCommand("/stop", {}, "cl_onChatCommand", "Stop a game!")
 
 		sm.game.bindChatCommand("/freecam", { { "bool", "state", false } }, "cl_onChatCommand", "Toggle Freecam")
 		sm.game.bindChatCommand("/forcefreecam", { { "bool", "state", false } }, "cl_onChatCommand",
@@ -356,6 +364,22 @@ function Game:cl_onAssignCommands(authorised)
 end
 
 -- Commands --
+
+function Game:sv_start()
+	if self.sv.gamerunning then return end
+	self.sv.gamerunning = true
+	sm.event.sendToWorld(self.sv.saved.world,"sv_start")
+
+	for _,plr in ipairs(sm.player.getAllPlayers()) do
+		self:sv_e_respawn({player=plr})
+	end
+end
+
+function Game:sv_stop()
+	if not self.sv.gamerunning then return end
+	self.sv.gamerunning = false
+	sm.event.sendToWorld(self.sv.saved.world,"sv_stop")
+end
 
 function Game:sv_forceFreecam(params)
 	sm.event.sendToWorld(self.sv.saved.world, "sv_enableFreecam", { state = params[1], players = params[2] })

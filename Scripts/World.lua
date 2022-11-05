@@ -205,4 +205,32 @@ function World:sv_enableFreecam(parameters)
         parameters.state == false and "sv_disable" or "sv_enable", parameters.players)
 end
 
+function World:sv_start()
+    for x = -2, 2, 1 do
+        for y = -2, 2, 1 do
+            for _, harvestable in ipairs(sm.cell.getHarvestables(x, y)) do
+                harvestable:destroy()
+            end
+        end
+    end
+
+    for _, body in ipairs(sm.body.getAllBodies()) do
+		for _,shape in ipairs(body:getShapes()) do
+			if shape.uuid == sm.uuid.new("208d772f-9851-400f-a014-d847900458a7") then
+				sm.event.sendToInteractable(shape:getInteractable(),"server_toggle",true)
+			end
+		end
+	end
+end
+
+function World:sv_stop()
+    for _, body in ipairs(sm.body.getAllBodies()) do
+		for _,shape in ipairs(body:getShapes()) do
+			if shape.uuid == sm.uuid.new("208d772f-9851-400f-a014-d847900458a7") then
+				sm.event.sendToInteractable(shape:getInteractable(),"server_toggle",false)
+			end
+		end
+	end
+end
+
 SecureClass(World)

@@ -38,8 +38,8 @@ function Spawner.server_onFixedUpdate( self, timeStep )
 	end
 end
 
-function Spawner:server_toggle()
-	self.interactable.active = not self.interactable.active
+function Spawner:server_toggle(state)
+	self.interactable.active = state or not self.interactable.active
 	print("active?")
 end
 
