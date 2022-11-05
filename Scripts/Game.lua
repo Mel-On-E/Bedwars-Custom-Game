@@ -3,13 +3,12 @@ dofile("$SURVIVAL_DATA/Scripts/game/managers/BeaconManager.lua")
 dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
 dofile("$CONTENT_DATA/Scripts/RespawnManager.lua")
 
-local DEBUG = true
 ---@class Game : GameClass
 Game = class(nil)
-Game.enableLimitedInventory = not DEBUG
-Game.enableRestrictions = not DEBUG
-Game.enableFuelConsumption = not DEBUG
-Game.enableAmmoConsumption = not DEBUG
+Game.enableLimitedInventory = false
+Game.enableRestrictions = false
+Game.enableFuelConsumption = false
+Game.enableAmmoConsumption = false
 Game.enableUpgrade = true
 
 START_AREA_SPAWN_POINT = sm.vec3.new(0, 0, 5)
