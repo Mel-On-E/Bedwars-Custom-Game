@@ -50,6 +50,7 @@ function Game:server_onCreate()
 	end
 
 	self.sv.authorised = { [1] = true } -- Player ids.
+	self.sv.newPlayers = {}
 
 end
 
@@ -107,8 +108,7 @@ function Game:server_onPlayerJoined(player, isNewPlayer)
 	end
 
 	if #sm.player.getAllPlayers() > 1 and not TeamManager.sv_getTeamColor(player) then
-		player.character:setSwimming(true)
-		player.character.publicData.waterMovementSpeedFraction = 5
+		self.sv.newPlayers[#self.sv.newPlayers + 1] = player
 	end
 
 	for _, id in ipairs(self.sv.saved.banned) do
@@ -134,6 +134,14 @@ function Game:server_onFixedUpdate()
 
 			local tumbleMod = math.sin(sm.game.getCurrentTick() / 2) * 420
 			char:applyTumblingImpulse(sm.vec3.new(0, 0, 1) * tumbleMod)
+		end
+	end
+
+	for _, player in ipairs(self.sv.newPlayers) do
+		if player.character then
+			player.character:setSwimming(true)
+			player.character.publicData.waterMovementSpeedFraction = 5
+			self.sv.newPlayers[_] = nil
 		end
 	end
 
