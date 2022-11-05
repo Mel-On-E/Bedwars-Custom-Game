@@ -5,10 +5,10 @@ dofile("$CONTENT_DATA/Scripts/RespawnManager.lua")
 
 ---@class Game : GameClass
 Game = class(nil)
-Game.enableLimitedInventory = false
-Game.enableRestrictions = false
-Game.enableFuelConsumption = false
-Game.enableAmmoConsumption = false
+Game.enableLimitedInventory = true
+Game.enableRestrictions = true
+Game.enableFuelConsumption = true
+Game.enableAmmoConsumption = true
 Game.enableUpgrade = true
 
 START_AREA_SPAWN_POINT = sm.vec3.new(0, 0, 5)
