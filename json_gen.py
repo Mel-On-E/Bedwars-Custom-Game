@@ -5,21 +5,33 @@ shapesetFolders = [
     "C:/Program Files (x86)/Steam/steamapps/common/Scrap Mechanic/Data/Objects/Database/ShapeSets/",
     "C:/Program Files (x86)/Steam/steamapps/common/Scrap Mechanic/Survival/Objects/Database/ShapeSets/"
 ]
-modShapeSet = "C:/Users/claas/AppData/Roaming/Axolot Games/Scrap Mechanic/User/User_76561198207895823/Mods/Bedwars Custom Game/Objects/Database/ShapeSets/generated.shapeset"
+modShapeSet = "/Objects/Database/ShapeSets/generated.shapeset"
 
 recipeUuuids = []
 
-extraItems = "C:/Users/claas/AppData/Roaming/Axolot Games/Scrap Mechanic/User/User_76561198207895823/Mods/Bedwars Custom Game/extra_items.json"
-with open(extraItems) as f:
+extraItems = "/extra_items.json"
+with open(os.getcwd() + extraItems) as f:
     data = json.loads(f.read())
     recipeUuuids = data
     
 
-bedwarsRecipes = "C:/Users/claas/AppData/Roaming/Axolot Games/Scrap Mechanic/User/User_76561198207895823/Mods/Bedwars Custom Game/bedwars.json"
-with open(bedwarsRecipes) as f:
+bedwarsRecipes = "/bedwars.json"
+with open(os.getcwd() + bedwarsRecipes) as f:
     data = json.loads(f.read())
     for recipe in data:
         recipeUuuids.append(recipe["itemId"])
+
+oldCreativeItems = []
+with open(os.getcwd() + "/creative_interactives.json") as f:
+    data = json.loads(f.read())
+    oldCreativeItems = data
+
+upgradeableItems = []
+with open("C:/Program Files (x86)/Steam/steamapps/common/Scrap Mechanic/Survival/Objects/Database/ShapeSets/" + "/interactive_upgradeable.json") as f:
+    data = json.loads(f.read())
+    for item in data["partList"]:
+        upgradeableItems.append(item["uuid"])
+
 
 OldShapesetFolders = [
     "C:/Program Files (x86)/Steam/steamapps/workshop/content/387990/2429097726/Scrap Mechanic/Data/Objects/Database/ShapeSets/",
@@ -58,6 +70,8 @@ for folder in shapesetFolders:
                             block["restrictions"] = {"erasable": False}
                         else: #not "ersable" in part["restrictions"]:
                             block["restrictions"]["erasable"] = False
+                    else:
+                        block["showInInventory"] = False
 
                     newShapeSets["blockList"].append(block)
 
@@ -69,14 +83,30 @@ for folder in shapesetFolders:
                     if part["uuid"] in stackSizes:
                         part["stackSize"] = stackSizes[part["uuid"]]
 
+                    
+                    if part["uuid"] in upgradeableItems:
+                        part["showInInventory"] = False
+
                     if not part["uuid"] in recipeUuuids:
                         if not "restrictions" in part:
                             part["restrictions"] = {"erasable": False}
                         else: #not "ersable" in part["restrictions"]:
                             part["restrictions"]["erasable"] = False
+                    else:
+                        part["showInInventory"] = False
+
+                    if part["uuid"] in oldCreativeItems:
+                        part["showInInventory"] = True
+
+                        if not "restrictions" in part:
+                            part["restrictions"] = {}
+
+                        part["restrictions"]["erasable"] = False
+                        part["restrictions"]["connectable"] = False
+                        part["restrictions"]["destructable"] = False
 
                     newShapeSets["partList"].append(part)
 
-with open(modShapeSet, "w") as f:
+with open(os.getcwd() + modShapeSet, "w") as f:
     f.write(json.dumps(newShapeSets, indent=4))
     print("json generated")
