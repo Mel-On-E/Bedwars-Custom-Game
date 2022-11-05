@@ -590,8 +590,8 @@ function Player:server_onProjectile(hitPos, hitTime, hitVelocity, _, attacker, d
 	BasePlayer.server_onProjectile(self, hitPos, hitTime, hitVelocity, _, attacker, damage, userData, hitNormal,
 		projectileUuid)
 
-		self:sv_takeDamage( damage, "shock", attacker )
 	if type(attacker) == "Player" then
+		self:sv_takeDamage(damage / 2, "shock", attacker)
 	end
 end
 
