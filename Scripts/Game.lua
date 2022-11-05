@@ -367,6 +367,9 @@ function Game:sv_start()
 	for _, plr in ipairs(sm.player.getAllPlayers()) do
 		self:sv_e_respawn({ player = plr })
 	end
+
+	self.network:sendToClients("cl_Alert", { Text = "Game has started!" })
+	self.network:sendToClients("client_showMessage", "Game has started!")
 end
 
 function Game:sv_forceFreecam(params)
