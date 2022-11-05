@@ -87,52 +87,6 @@ function Game:client_onCreate()
 		g_beaconManager = BeaconManager()
 	end
 	g_beaconManager:cl_onCreate()
-
-	if sm.isHost then
-		sm.game.bindChatCommand("/limited", {}, "cl_onChatCommand", "Use the limited inventory")
-		sm.game.bindChatCommand("/unlimited", {}, "cl_onChatCommand", "Use the unlimited inventory")
-		sm.game.bindChatCommand("/encrypt", {}, "cl_onChatCommand", "Restrict interactions in all warehouses")
-		sm.game.bindChatCommand("/decrypt", {}, "cl_onChatCommand", "Unrestrict interactions in all warehouses")
-
-		sm.game.bindChatCommand("/savemap", { { "string", "name", false } }, "cl_onChatCommand", "Exports custom map")
-
-		sm.game.bindChatCommand("/ids", {}, "cl_onChatCommand", "Lists all players with their ID")
-		sm.game.bindChatCommand("/kick", { { "int", "id", false } }, "cl_onChatCommand", "Kick(crash) a player")
-		sm.game.bindChatCommand("/ban", { { "int", "id", false } }, "cl_onChatCommand", "Bans a player from this world")
-
-		sm.game.bindChatCommand("/auth", { { "int", "id", false } }, "cl_onChatCommand", "Authorise a player.")
-		sm.game.bindChatCommand("/unauth", { { "int", "id", false } }, "cl_onChatCommand", "Unauthorise a player.")
-		sm.game.bindChatCommand("/authlist", {}, "cl_onChatCommand", "Get authorised players.")
-	end
-
-	sm.game.bindChatCommand("/fly", {}, "cl_onChatCommand", "Toggle fly mode")
-	sm.game.bindChatCommand("/spectator", {}, "cl_onChatCommand", "Become a spectator")
-	sm.game.bindChatCommand("/tm",
-		{ { "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true }, }, "cl_onChatCommand",
-		"Team message")
-
 end
 
 function Game:server_onPlayerJoined(player, isNewPlayer)
@@ -338,6 +292,31 @@ end
 function Game:cl_onAssignCommands(authorised)
 	sm.game.bindChatCommand("/fly", {}, "cl_onChatCommand", "Toggle fly mode")
 	sm.game.bindChatCommand("/spectator", {}, "cl_onChatCommand", "Become a spectator")
+	sm.game.bindChatCommand("/tm",
+		{ { "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true }, }, "cl_onChatCommand",
+		"Team message")
 
 	if authorised then
 		sm.game.bindChatCommand("/limited", {}, "cl_onChatCommand", "Use the limited inventory")
