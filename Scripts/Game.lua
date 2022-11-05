@@ -3,13 +3,12 @@ dofile("$SURVIVAL_DATA/Scripts/game/managers/BeaconManager.lua")
 dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
 dofile("$CONTENT_DATA/Scripts/RespawnManager.lua")
 
-local DEBUG = true
-
+---@class Game : GameClass
 Game = class(nil)
-Game.enableLimitedInventory = not DEBUG
-Game.enableRestrictions = not DEBUG
-Game.enableFuelConsumption = not DEBUG
-Game.enableAmmoConsumption = not DEBUG
+Game.enableLimitedInventory = true
+Game.enableRestrictions = true
+Game.enableFuelConsumption = true
+Game.enableAmmoConsumption = true
 Game.enableUpgrade = true
 
 START_AREA_SPAWN_POINT = sm.vec3.new(0, 0, 5)
@@ -51,6 +50,7 @@ function Game:server_onCreate()
 	end
 
 	self.sv.authorised = {[1] = true} -- Player ids.
+	self.sv.newPlayers = {}
 	self.sv.gamerunning = false
 end
 
@@ -108,8 +108,7 @@ function Game:server_onPlayerJoined(player, isNewPlayer)
 	end
 
 	if #sm.player.getAllPlayers() > 1 and not TeamManager.sv_getTeamColor(player) then
-		player.character:setSwimming(true)
-		player.character.publicData.waterMovementSpeedFraction = 5
+		self.sv.newPlayers[#self.sv.newPlayers + 1] = player
 	end
 
 	for _, id in ipairs(self.sv.saved.banned) do
@@ -119,7 +118,7 @@ function Game:server_onPlayerJoined(player, isNewPlayer)
 		end
 	end
 
-	self.network:sendToClient(player,"cl_onAssignCommands",self:Authorised(player))
+	self.network:sendToClient(player, "cl_onAssignCommands", self:Authorised(player))
 end
 
 function Game:sv_jankySussySus(params)
@@ -138,11 +137,20 @@ function Game:server_onFixedUpdate()
 		end
 	end
 
+	for _, player in ipairs(self.sv.newPlayers) do
+		if player.character then
+			player.character:setSwimming(true)
+			player.character.publicData.waterMovementSpeedFraction = 5
+			self.sv.newPlayers[_] = nil
+		end
+	end
+
 	g_respawnManager:server_onFixedUpdate()
 end
 
 -- Command Handling --
 
+---@param player Player
 function Game:server_onChatCommand(params, player)
 	if params[1] == "/fly" then
 		self:sv_toggleFly(player)
@@ -150,7 +158,29 @@ function Game:server_onChatCommand(params, player)
 		self:sv_setSpectator(player)
 	elseif params[1] == "/freecam" and not g_teamManager.sv_getTeamColor(player) then
 		if g_teamManager.settings.ForceFreecam and not self:Authorised(player) then return end
-		sm.event.sendToWorld(self.sv.saved.world,"sv_enableFreecam",{state=params[2],players={player}})
+		sm.event.sendToWorld(self.sv.saved.world, "sv_enableFreecam", { state = params[2], players = { player } })
+	elseif params[1] == "/tm" then
+		local team = TeamManager.sv_getTeamColor(player)
+		if not team then
+			self.network:sendToClient(player, "client_showMessage", "#ff0000Not in a team!")
+
+			return
+		end
+		local msg = ""
+
+		table.remove(params, 1)
+
+		for _, v in pairs(params) do
+			msg = msg .. " " .. v
+		end
+		for _, p in pairs(sm.player.getAllPlayers()) do
+			if TeamManager.sv_getTeamColor(p) ~= team then goto continue end
+
+
+			self.network:sendToClient(p, "client_showMessage", team .. player:getName() .. "#ffffff :" .. msg)
+
+			::continue::
+		end
 	end
 
 	if not self:Authorised(player) then return end
@@ -199,7 +229,7 @@ function Game:server_onChatCommand(params, player)
 		if client then
 			self:sv_yeet_player(client)
 			if params[1] == "/ban" then
-				self.sv.saved.banned[#self.sv.saved.banned+1] = client.id
+				self.sv.saved.banned[#self.sv.saved.banned + 1] = client.id
 				self.storage:save(self.sv.saved)
 				self.network:sendToClients("client_showMessage", client.name .. "#ff0000 has been banned!")
 			else
@@ -214,13 +244,13 @@ function Game:server_onChatCommand(params, player)
 
 	if params[1] == "/auth" then
 		local Result = self:Authorise(params[2]) and "Success" or "Already Authed"
-		self:sv_Alert(Result,1)
+		self:sv_Alert(Result, 1)
 	elseif params[1] == "/unauth" then
 		local Result = self:Unauthorise(params[2]) and "Success" or "Not Authed"
-		self:sv_Alert(Result,1)
+		self:sv_Alert(Result, 1)
 	elseif params[1] == "/authlist" then
 		for key, auth in pairs(self.sv.authorised) do
-			self.network:sendToClient(player,"client_showMessage",tostring(key)..":"..tostring(auth))
+			self.network:sendToClient(player, "client_showMessage", tostring(key) .. ":" .. tostring(auth))
 		end
 	end
 end
@@ -243,28 +273,28 @@ function Game:cl_onChatCommand(params) -- just don't handle the command if its a
 		end
 	elseif params[1] == "/forceteam" then
 		local Player
-		for _,plr in ipairs(sm.player.getAllPlayers()) do
+		for _, plr in ipairs(sm.player.getAllPlayers()) do
 			if plr.id == params[2] then
 				Player = plr
 				break
 			end
 		end
-		if not Player then self:cl_Alert({Text="Invaild PlayerId"}) return end
+		if not Player then self:cl_Alert({ Text = "Invaild PlayerId" }) return end
 		local rayCastValid, rayCastResult = sm.localPlayer.getRaycast(100)
 		if rayCastValid and rayCastResult.type == "body" then
 			local Distance = math.huge
 			local Object = nil
-			for _,shape in ipairs(rayCastResult:getBody():getShapes()) do
-				local Dis = (rayCastResult.pointWorld-shape:getWorldPosition()):length()
+			for _, shape in ipairs(rayCastResult:getBody():getShapes()) do
+				local Dis = (rayCastResult.pointWorld - shape:getWorldPosition()):length()
 				if Dis < Distance then
 					Distance = Dis
 					Object = shape
 				end
 			end
 			if Object.uuid == sm.uuid.new("6488a8fa-1187-45e8-8dac-47d13bdaa026") then
-				self.network:sendToServer("server_forceTeam",{bed=Object,player=Player})
+				self.network:sendToServer("server_forceTeam", { bed = Object, player = Player })
 			else
-				self.network:sendToServer("server_forceTeam",{player=Player})
+				self.network:sendToServer("server_forceTeam", { player = Player })
 			end
 		end
 	else
@@ -275,6 +305,31 @@ end
 function Game:cl_onAssignCommands(authorised)
 	sm.game.bindChatCommand("/fly", {}, "cl_onChatCommand", "Toggle fly mode")
 	sm.game.bindChatCommand("/spectator", {}, "cl_onChatCommand", "Become a spectator")
+	sm.game.bindChatCommand("/tm",
+		{ { "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
+			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true }, }, "cl_onChatCommand",
+		"Team message")
 
 	if authorised then
 		sm.game.bindChatCommand("/limited", {}, "cl_onChatCommand", "Use the limited inventory")
@@ -285,9 +340,11 @@ function Game:cl_onAssignCommands(authorised)
 		sm.game.bindChatCommand("/stop", {}, "cl_onChatCommand", "Stop a game!")
 
 		sm.game.bindChatCommand("/freecam", { { "bool", "state", false } }, "cl_onChatCommand", "Toggle Freecam")
-		sm.game.bindChatCommand("/forcefreecam", { { "bool", "state", false } }, "cl_onChatCommand", "Spectators will be stuck in freecam.")
+		sm.game.bindChatCommand("/forcefreecam", { { "bool", "state", false } }, "cl_onChatCommand",
+			"Spectators will be stuck in freecam.")
 		sm.game.bindChatCommand("/lockteams", { { "bool", "state", false } }, "cl_onChatCommand", "Toggles Team Changing.")
-		sm.game.bindChatCommand("/forceteam", { { "int", "id", false } }, "cl_onChatCommand", "Forces Player Into Team. (Stare at a bed)")
+		sm.game.bindChatCommand("/forceteam", { { "int", "id", false } }, "cl_onChatCommand",
+			"Forces Player Into Team. (Stare at a bed)")
 
 		-- Moderation --
 		sm.game.bindChatCommand("/ids", {}, "cl_onChatCommand", "Lists all players with their ID")
@@ -305,7 +362,6 @@ function Game:cl_onAssignCommands(authorised)
 		sm.game.bindChatCommand("/authlist", {}, "cl_onChatCommand", "Get authorised players.")
 	end
 end
-
 
 -- Commands --
 
@@ -326,7 +382,7 @@ function Game:sv_stop()
 end
 
 function Game:sv_forceFreecam(params)
-	sm.event.sendToWorld(self.sv.saved.world,"sv_enableFreecam",{state=params[1],players=params[2]})
+	sm.event.sendToWorld(self.sv.saved.world, "sv_enableFreecam", { state = params[1], players = params[2] })
 end
 
 function Game:server_exportMap(params, player)
@@ -353,7 +409,7 @@ end
 function Game:server_forceTeam(parameters, player)
 	if not self:Authorised(player) or not sm.exists(parameters.player.character) then return end
 	if parameters.bed then
-		sm.event.sendToInteractable(parameters.bed:getInteractable(),"sv_activatedBed",parameters.player)
+		sm.event.sendToInteractable(parameters.bed:getInteractable(), "sv_activatedBed", parameters.player)
 	else
 		TeamManager.sv_setTeam(player, nil)
 	end
@@ -388,7 +444,7 @@ end
 function Game:sv_bedDestroyed(color)
 	local remainingPlayers = TeamManager.sv_getTeamCount(color)
 	self.network:sendToClients("client_bedDestroyed", { color = color, players = remainingPlayers })
-	sm.event.sendToWorld(self.sv.saved.world, "sv_justPlayTheGoddamnSound", {effect = "bed gone"})
+	sm.event.sendToWorld(self.sv.saved.world, "sv_justPlayTheGoddamnSound", { effect = "bed gone" })
 end
 
 function Game:client_bedDestroyed(params)
@@ -457,18 +513,19 @@ function Game:cl_updateMapList(newMap)
 end
 
 function Game:cl_Alert(data)
-	sm.gui.displayAlertText(tostring(data.Text),tonumber(data.Duration) or 4)
+	sm.gui.displayAlertText(tostring(data.Text), tonumber(data.Duration) or 4)
 end
 
 function Game:sv_Alert(T, D, PL)
 	if PL then
-		for _,plr in ipairs(PL) do
-			self.network:sendToClient(plr,"cl_Alert", { Text = T, Duration = D })
+		for _, plr in ipairs(PL) do
+			self.network:sendToClient(plr, "cl_Alert", { Text = T, Duration = D })
 		end
 	else
 		self.network:sendToClients("cl_Alert", { Text = T, Duration = D })
 	end
 end
+
 -- Auth Functions --
 
 function Game:Authorised(player)
@@ -495,7 +552,7 @@ function Game:Unauthorise(id)
 	return false
 end
 
-function Game:cl_shareMap( params)
+function Game:cl_shareMap(params)
 	self.network:sendToServer("sv_shareMap", params) -- ?
 end
 

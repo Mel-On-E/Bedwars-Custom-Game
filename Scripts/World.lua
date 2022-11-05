@@ -56,56 +56,62 @@ end
 
 --local loot = { uuid = sm.uuid.new("c5e56da5-bc3f-4519-91c2-b307d36e15aa"), quantity = amount }
 --SpawnLoot( phrv, loot, phrv.worldPosition)
-function World:makeHarvestables(hitPos, offset, userData)
-    f = true
-    local q = 0
-    local stufs = sm.physics.getSphereContacts(hitPos, 1)
-    for _,st in pairs(stufs.harvestables) do
-        f = false
-        if not sm.exists(st) then return end
-        if st:getPublicData().uuid == userData.lootUid then
-            --[[local lastHrv = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
-            lastHrv:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity, epic = userData.epic  } ) 
-            ]]--
-            q = q + st:getPublicData().quantity
-            if sm.exists(st) then st:destroy() end
-        end
+function World:sv_stack_loot(hitPos, offset, userData)
+    local maxStackSize = 10
+    local quantity = userData.lootQuantity
 
-    end
-    local lastHrv = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
-    lastHrv:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity + q, epic = userData.epic  } ) 
-end
+    local nearbyHarvestables = sm.physics.getSphereContacts(hitPos, 1)
+    for _, harvestable in pairs(nearbyHarvestables.harvestables) do
+        local isLoot = sm.exists(harvestable) and
+            (harvestable:getPublicData() and harvestable:getPublicData().uuid == userData.lootUid)
+        if isLoot then
+            if harvestable:getPublicData().quantity < maxStackSize then
+                quantity = quantity - (maxStackSize - harvestable:getPublicData().quantity)
 
-function World.server_onProjectile( self, hitPos, hitTime, hitVelocity, _, attacker, damage, userData, hitNormal, target, projectileUuid )
-	-- Spawn loot from projectiles with loot user data
-    if true then
-        if userData and userData.lootUid then
-            local normal = -hitVelocity:normalize()
-            local zSignOffset = math.min( sign( normal.z ), 0 ) * 0.5
-            local offset = sm.vec3.new( 0, 0, zSignOffset )
-            --local trg = sm.areaTrigger.createSphere(1 ,hitPos, sm.quat.identity, 512)
-            --trg:bindOnStay("makeHarvestables")
-            self:makeHarvestables(hitPos, offset, userData)
-        end
-    else
-        if userData and userData.lootUid then
-            local normal = -hitVelocity:normalize()
-            local zSignOffset = math.min( sign( normal.z ), 0 ) * 0.5
-            local offset = sm.vec3.new( 0, 0, zSignOffset )
-            local lootHarvestable = sm.harvestable.createHarvestable( hvs_loot, hitPos + offset, sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), sm.vec3.new( 0, 0, 1 ) ) )
-            lootHarvestable:setParams( { uuid = userData.lootUid, quantity = userData.lootQuantity, epic = userData.epic  } )
+                local pos = ((hitPos + offset) + harvestable.worldPosition) / 2
+                local newLoot = sm.harvestable.createHarvestable(hvs_loot, pos,
+                    sm.vec3.getRotation(sm.vec3.new(0, 1, 0), sm.vec3.new(0, 0, 1)))
+
+                newLoot:setParams({ uuid = userData.lootUid,
+                    quantity = maxStackSize + math.max(0, quantity),
+                    epic = userData.epic })
+
+                harvestable:destroy()
+
+                if quantity <= 0 then
+                    break
+                end
+            end
         end
     end
+
+    if quantity > 0 then
+        local newLoot = sm.harvestable.createHarvestable(hvs_loot, hitPos + offset,
+            sm.vec3.getRotation(sm.vec3.new(0, 1, 0), sm.vec3.new(0, 0, 1)))
+        newLoot:setParams({ uuid = userData.lootUid, quantity = quantity, epic = userData.epic })
+    end
 end
-	
+
+function World.server_onProjectile(self, hitPos, hitTime, hitVelocity, _, attacker, damage, userData, hitNormal, target,
+                                   projectileUuid)
+    -- Spawn loot from projectiles with loot user data
+    if userData and userData.lootUid then
+        local normal = -hitVelocity:normalize()
+        local zSignOffset = math.min(sign(normal.z), 0) * 0.5
+        local offset = sm.vec3.new(0, 0, zSignOffset)
+        self:sv_stack_loot(hitPos, offset, userData)
+    end
+end
+
 function World:server_onInteractableCreated(interactable)
     if not self.uuidinteractables[tostring(interactable:getShape().uuid)] then
         self.uuidinteractables[tostring(interactable:getShape().uuid)] = {}
     end
-    table.insert(self.uuidinteractables[tostring(interactable:getShape().uuid)],interactable)
+    table.insert(self.uuidinteractables[tostring(interactable:getShape().uuid)], interactable)
     self.interactables[interactable:getId()] = tostring(interactable:getShape().uuid)
 
-    if interactable:getShape().uuid == sm.uuid.new("5fcd5514-526a-4782-8a79-843827818f55") and #self.uuidinteractables["5fcd5514-526a-4782-8a79-843827818f55"] > 1 then
+    if interactable:getShape().uuid == sm.uuid.new("5fcd5514-526a-4782-8a79-843827818f55") and
+        #self.uuidinteractables["5fcd5514-526a-4782-8a79-843827818f55"] > 1 then
         interactable:getShape():destroyShape(0) -- Limit it to one per world.
     end
 end
@@ -113,7 +119,7 @@ end
 function World:server_onInteractableDestroyed(interactable)
     for key, obj in ipairs(self.uuidinteractables[self.interactables[interactable:getId()]] or {}) do
         if obj == interactable then
-            table.remove(self.uuidinteractables[self.interactables[interactable:getId()]],key)
+            table.remove(self.uuidinteractables[self.interactables[interactable:getId()]], key)
             break
         end
     end
@@ -187,13 +193,16 @@ function World:cl_justPlayTheGoddamnSound(params)
 end
 
 function World:sv_ensureFreecam()
-    if not self.uuidinteractables["5fcd5514-526a-4782-8a79-843827818f55"] or next(self.uuidinteractables["5fcd5514-526a-4782-8a79-843827818f55"]) == nil then
-        sm.shape.createPart( sm.uuid.new("5fcd5514-526a-4782-8a79-843827818f55") , sm.vec3.new(0,0,50), sm.quat.identity(), false, true )
+    if not self.uuidinteractables["5fcd5514-526a-4782-8a79-843827818f55"] or
+        next(self.uuidinteractables["5fcd5514-526a-4782-8a79-843827818f55"]) == nil then
+        sm.shape.createPart(sm.uuid.new("5fcd5514-526a-4782-8a79-843827818f55"), sm.vec3.new(0, 0, 50),
+            sm.quat.identity(), false, true)
     end
 end
 
 function World:sv_enableFreecam(parameters)
-    sm.event.sendToInteractable(self.uuidinteractables["5fcd5514-526a-4782-8a79-843827818f55"][1],parameters.state == false and "sv_disable" or "sv_enable",parameters.players)
+    sm.event.sendToInteractable(self.uuidinteractables["5fcd5514-526a-4782-8a79-843827818f55"][1],
+        parameters.state == false and "sv_disable" or "sv_enable", parameters.players)
 end
 
 function World:sv_start()
