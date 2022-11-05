@@ -159,6 +159,28 @@ function Game:server_onChatCommand(params, player)
 	elseif params[1] == "/freecam" and not g_teamManager.sv_getTeamColor(player) then
 		if g_teamManager.settings.ForceFreecam and not self:Authorised(player) then return end
 		sm.event.sendToWorld(self.sv.saved.world, "sv_enableFreecam", { state = params[2], players = { player } })
+	elseif params[1] == "/tm" then
+		local team = TeamManager.sv_getTeamColor(player)
+		if not team then
+			self.network:sendToClient(player, "client_showMessage", "#ff0000Not in a team!")
+
+			return
+		end
+		local msg = ""
+
+		table.remove(params, 1)
+
+		for _, v in pairs(params) do
+			msg = msg .. " " .. v
+		end
+		for _, p in pairs(sm.player.getAllPlayers()) do
+			if TeamManager.sv_getTeamColor(p) ~= team then goto continue end
+
+
+			self.network:sendToClient(p, "client_showMessage", team .. player:getName() .. "#ffffff :" .. msg)
+
+			::continue::
+		end
 	end
 
 	if not self:Authorised(player) then return end
@@ -187,28 +209,6 @@ function Game:server_onChatCommand(params, player)
 		g_teamManager.settings.ForceFreecam = params[2]
 		self:sv_Alert(params[2] and "Enforced Spectator Freecam Enabled!" or "Enforced Spectator Freecam Disabled!")
 		return
-	elseif params[1] == "/tm" then
-		local team = TeamManager.sv_getTeamColor(player)
-		if not team then
-			self.network:sendToClient(player, "client_showMessage", "#ff0000Not in a team!")
-
-			return
-		end
-		local msg = ""
-
-		table.remove(params, 1)
-
-		for _, v in pairs(params) do
-			msg = msg .. " " .. v
-		end
-		for _, p in pairs(sm.player.getAllPlayers()) do
-			if TeamManager.sv_getTeamColor(p) ~= team then goto continue end
-
-
-			self.network:sendToClient(p, "client_showMessage", team .. player:getName() .. "#ffffff :" .. msg)
-
-			::continue::
-		end
 	end
 
 	if params[1] == "/ban" or params[1] == "/kick" then
