@@ -73,7 +73,7 @@ function World:sv_stack_loot(hitPos, offset, userData)
                     sm.vec3.getRotation(sm.vec3.new(0, 1, 0), sm.vec3.new(0, 0, 1)))
 
                 newLoot:setParams({ uuid = userData.lootUid,
-                    quantity = maxStackSize + math.max(0, quantity),
+                    quantity = maxStackSize + math.min(0, quantity),
                     epic = userData.epic })
 
                 harvestable:destroy()
