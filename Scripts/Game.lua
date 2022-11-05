@@ -3,7 +3,7 @@ dofile("$SURVIVAL_DATA/Scripts/game/managers/BeaconManager.lua")
 dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
 dofile("$CONTENT_DATA/Scripts/RespawnManager.lua")
 
-local DEBUG = true
+local DEBUG = false
 
 Game = class(nil)
 Game.enableLimitedInventory = not DEBUG
@@ -50,10 +50,9 @@ function Game:server_onCreate()
 		sm.storage.save(69, self.sv.teamManager)
 	end
 
-	self.sv.authorised = {[1] = true} -- Player ids.
+	self.sv.authorised = { [1] = true } -- Player ids.
 
 end
-
 
 --cursed stuff to disable chunk unloading
 function Game.sv_loadTerrain(self, data)
@@ -104,9 +103,9 @@ function Game:client_onCreate()
 		sm.game.bindChatCommand("/kick", { { "int", "id", false } }, "cl_onChatCommand", "Kick(crash) a player")
 		sm.game.bindChatCommand("/ban", { { "int", "id", false } }, "cl_onChatCommand", "Bans a player from this world")
 
-		sm.game.bindChatCommand("/auth",{ { "int", "id", false } },"cl_onChatCommand","Authorise a player.")
-		sm.game.bindChatCommand("/unauth",{ { "int", "id", false } },"cl_onChatCommand","Unauthorise a player.")
-		sm.game.bindChatCommand("/authlist",{},"cl_onChatCommand","Get authorised players.")
+		sm.game.bindChatCommand("/auth", { { "int", "id", false } }, "cl_onChatCommand", "Authorise a player.")
+		sm.game.bindChatCommand("/unauth", { { "int", "id", false } }, "cl_onChatCommand", "Unauthorise a player.")
+		sm.game.bindChatCommand("/authlist", {}, "cl_onChatCommand", "Get authorised players.")
 	end
 
 	sm.game.bindChatCommand("/fly", {}, "cl_onChatCommand", "Toggle fly mode")
@@ -151,7 +150,6 @@ end
 function Game:sv_jankySussySus(params)
 	sm.event.sendToWorld(self.sv.saved.world, params.callback, params)
 end
-
 
 function Game:server_onFixedUpdate()
 	for _, player in ipairs(sm.player.getAllPlayers()) do
@@ -209,7 +207,7 @@ function Game:server_onChatCommand(params, player)
 		if client then
 			self:sv_yeet_player(client)
 			if params[1] == "/ban" then
-				self.sv.saved.banned[#self.sv.saved.banned+1] = client.id
+				self.sv.saved.banned[#self.sv.saved.banned + 1] = client.id
 				self.storage:save(self.sv.saved)
 				self.network:sendToClients("client_showMessage", client.name .. "#ff0000 has been banned!")
 			else
@@ -224,13 +222,13 @@ function Game:server_onChatCommand(params, player)
 
 	if params[1] == "/auth" then
 		local Result = self:Authorise(params[2]) and "Success" or "Already Authed"
-		self:sv_Alert(Result,1)
+		self:sv_Alert(Result, 1)
 	elseif params[1] == "/unauth" then
 		local Result = self:Unauthorise(params[2]) and "Success" or "Not Authed"
-		self:sv_Alert(Result,1)
+		self:sv_Alert(Result, 1)
 	elseif params[1] == "/authlist" then
 		for key, auth in pairs(self.sv.authorised) do
-			self.network:sendToClient(player,"client_showMessage",tostring(key)..":"..tostring(auth))
+			self.network:sendToClient(player, "client_showMessage", tostring(key) .. ":" .. tostring(auth))
 		end
 	end
 end
@@ -307,7 +305,7 @@ end
 function Game:sv_bedDestroyed(color)
 	local remainingPlayers = TeamManager.sv_getTeamCount(color)
 	self.network:sendToClients("client_bedDestroyed", { color = color, players = remainingPlayers })
-	sm.event.sendToWorld(self.sv.saved.world, "sv_justPlayTheGoddamnSound", {effect = "bed gone"})
+	sm.event.sendToWorld(self.sv.saved.world, "sv_justPlayTheGoddamnSound", { effect = "bed gone" })
 end
 
 function Game:client_bedDestroyed(params)
@@ -376,18 +374,19 @@ function Game:cl_updateMapList(newMap)
 end
 
 function Game:cl_Alert(data)
-	sm.gui.displayAlertText(tostring(data.Text),tonumber(data.Duration) or 4)
+	sm.gui.displayAlertText(tostring(data.Text), tonumber(data.Duration) or 4)
 end
 
 function Game:sv_Alert(T, D, PL)
 	if PL then
-		for _,plr in ipairs(PL) do
-			self.network:sendToClient(plr,"cl_Alert", { Text = T, Duration = D })
+		for _, plr in ipairs(PL) do
+			self.network:sendToClient(plr, "cl_Alert", { Text = T, Duration = D })
 		end
 	else
 		self.network:sendToClients("cl_Alert", { Text = T, Duration = D })
 	end
 end
+
 -- Auth Functions --
 
 function Game:Authorised(player)
@@ -414,7 +413,7 @@ function Game:Unauthorise(id)
 	return false
 end
 
-function Game:cl_shareMap( params)
+function Game:cl_shareMap(params)
 	self.network:sendToServer("sv_shareMap", params)
 end
 
