@@ -49,9 +49,8 @@ function Game:server_onCreate()
 		sm.storage.save(69, self.sv.teamManager)
 	end
 
-	self.sv.authorised = {[1] = true} -- Player ids.
+	self.sv.authorised = { [1] = true } -- Player ids.
 	self.sv.newPlayers = {}
-	self.sv.gamerunning = false
 end
 
 --cursed stuff to disable chunk unloading
@@ -212,9 +211,6 @@ function Game:server_onChatCommand(params, player)
 	elseif params[1] == "/start" then
 		self:sv_start()
 		return
-	elseif params[1] == "/stop" then
-		self:sv_stop()
-		return
 	end
 
 	if params[1] == "/ban" or params[1] == "/kick" then
@@ -366,19 +362,11 @@ end
 -- Commands --
 
 function Game:sv_start()
-	if self.sv.gamerunning then return end
-	self.sv.gamerunning = true
-	sm.event.sendToWorld(self.sv.saved.world,"sv_start")
+	sm.event.sendToWorld(self.sv.saved.world, "sv_start")
 
-	for _,plr in ipairs(sm.player.getAllPlayers()) do
-		self:sv_e_respawn({player=plr})
+	for _, plr in ipairs(sm.player.getAllPlayers()) do
+		self:sv_e_respawn({ player = plr })
 	end
-end
-
-function Game:sv_stop()
-	if not self.sv.gamerunning then return end
-	self.sv.gamerunning = false
-	sm.event.sendToWorld(self.sv.saved.world,"sv_stop")
 end
 
 function Game:sv_forceFreecam(params)

@@ -211,24 +211,6 @@ end
 
 function World:sv_start()
     self:sv_reset()
-
-    for _, body in ipairs(sm.body.getAllBodies()) do
-        for _, shape in ipairs(body:getShapes()) do
-            if shape.uuid == sm.uuid.new("208d772f-9851-400f-a014-d847900458a7") then
-                sm.event.sendToInteractable(shape:getInteractable(), "server_toggle", true)
-            end
-        end
-    end
-end
-
-function World:sv_stop()
-    for _, body in ipairs(sm.body.getAllBodies()) do
-        for _, shape in ipairs(body:getShapes()) do
-            if shape.uuid == sm.uuid.new("208d772f-9851-400f-a014-d847900458a7") then
-                sm.event.sendToInteractable(shape:getInteractable(), "server_toggle", false)
-            end
-        end
-    end
 end
 
 SecureClass(World)
