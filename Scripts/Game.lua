@@ -198,7 +198,7 @@ function Game:server_onChatCommand(params, player)
 			if TeamManager.sv_getTeamColor(p) ~= team then goto continue end
 
 
-			self.network:sendToClient(p, "client_showMessage", team .. player:getName() .. "#ffffff : " .. msg)
+			self.network:sendToClient(p, "client_showMessage", team .. player:getName() .. "#ffffff :" .. msg)
 
 			::continue::
 		end
