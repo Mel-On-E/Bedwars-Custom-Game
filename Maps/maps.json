@@ -48,6 +48,42 @@
         "blueprint": "Garages"
     },
     {
+        "name": "Jagged",
+        "desc": "Up to 4 Teams map.\n\nBuilt by Monkedude",
+        "image": "Jagged.png",
+        "blueprint": "Jagged" 
+    },
+    {
+        "name": "Chick",
+        "desc": "Up to 4 Teams map.\n\nBuilt by Neon_Birb",
+        "image": "Chick.png",
+        "blueprint": "Chick"
+    },
+    {
+        "name": "Islands 4 Teams",
+        "desc": "Up to 4 Teams map.\n\nBuilt by Neon_Birb",
+        "image": "Islands.png",
+        "blueprint": "Islands4Team"
+    },
+    {
+        "name": "Islands 8 Teams",
+        "desc": "Up to 8 Teams map.\n\nBuilt by Neon_Birb",
+        "image": "Islands.png",
+        "blueprint": "Islands8Team"
+    },
+    {
+        "name": "Amogus",
+        "desc": "Up to 4 Teams map.\n\nBuilt by Columb",
+        "image": "Amogus.png",
+        "blueprint": "amogus"
+    },
+    {
+        "name": "Legacy",
+        "desc": "Up to 4 Teams map.\n\nBuilt by Neon_Birb",
+        "image": "Legacy.png",
+        "blueprint": "Legacy"
+    },
+    {
         "name": "Empty Map",
         "desc": "Empty map. Useful as template for building.",
         "image": "Empty.png",
