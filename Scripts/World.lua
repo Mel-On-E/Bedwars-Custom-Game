@@ -73,7 +73,7 @@ function World:sv_stack_loot(hitPos, offset, userData)
                     sm.vec3.getRotation(sm.vec3.new(0, 1, 0), sm.vec3.new(0, 0, 1)))
 
                 newLoot:setParams({ uuid = userData.lootUid,
-                    quantity = maxStackSize + math.max(0, quantity),
+                    quantity = maxStackSize + math.min(0, quantity),
                     epic = userData.epic })
 
                 harvestable:destroy()
@@ -129,7 +129,7 @@ function World:server_onInteractableDestroyed(interactable)
     self.interactables[interactable:getId()] = nil
 end
 
-function World:sv_changeMap(name)
+function World:sv_reset()
     --reset inventories
     for _, player in ipairs(sm.player.getAllPlayers()) do
         local inventory = player:getInventory()
@@ -155,6 +155,10 @@ function World:sv_changeMap(name)
             end
         end
     end
+end
+
+function World:sv_changeMap(name)
+    self:sv_reset()
 
     --clear bodies
     for _, body in ipairs(sm.body.getAllBodies()) do
@@ -169,6 +173,7 @@ function World:sv_changeMap(name)
 
     --remove helper blocks
     sm.event.sendToWorld(self.world, "sv_remove_helper_blocks")
+    g_gameActive = false
 end
 
 function World:sv_remove_helper_blocks()
@@ -203,6 +208,10 @@ end
 function World:sv_enableFreecam(parameters)
     sm.event.sendToInteractable(self.uuidinteractables["5fcd5514-526a-4782-8a79-843827818f55"][1],
         parameters.state == false and "sv_disable" or "sv_enable", parameters.players)
+end
+
+function World:sv_start()
+    self:sv_reset()
 end
 
 SecureClass(World)

@@ -5,14 +5,15 @@ dofile("$CONTENT_DATA/Scripts/RespawnManager.lua")
 
 ---@class Game : GameClass
 Game = class(nil)
-Game.enableLimitedInventory = false
-Game.enableRestrictions = false
-Game.enableFuelConsumption = false
-Game.enableAmmoConsumption = false
+Game.enableLimitedInventory = true
+Game.enableRestrictions = true
+Game.enableFuelConsumption = true
+Game.enableAmmoConsumption = true
 Game.enableUpgrade = true
 
 START_AREA_SPAWN_POINT = sm.vec3.new(0, 0, 5)
 local deathDepth = -69
+g_gameActive = false
 
 function updateMapTable(t, newMap)
 	local newKey = #t + 1
@@ -50,7 +51,7 @@ function Game:server_onCreate()
 	end
 
 	self.sv.authorised = { [1] = true } -- Player ids.
-
+	self.sv.newPlayers = {}
 end
 
 --cursed stuff to disable chunk unloading
@@ -107,8 +108,7 @@ function Game:server_onPlayerJoined(player, isNewPlayer)
 	end
 
 	if #sm.player.getAllPlayers() > 1 and not TeamManager.sv_getTeamColor(player) then
-		player.character:setSwimming(true)
-		player.character.publicData.waterMovementSpeedFraction = 5
+		self.sv.newPlayers[#self.sv.newPlayers + 1] = player
 	end
 
 	for _, id in ipairs(self.sv.saved.banned) do
@@ -137,6 +137,14 @@ function Game:server_onFixedUpdate()
 		end
 	end
 
+	for _, player in ipairs(self.sv.newPlayers) do
+		if player.character then
+			player.character:setSwimming(true)
+			player.character.publicData.waterMovementSpeedFraction = 5
+			self.sv.newPlayers[_] = nil
+		end
+	end
+
 	g_respawnManager:server_onFixedUpdate()
 end
 
@@ -151,6 +159,28 @@ function Game:server_onChatCommand(params, player)
 	elseif params[1] == "/freecam" and not g_teamManager.sv_getTeamColor(player) then
 		if g_teamManager.settings.ForceFreecam and not self:Authorised(player) then return end
 		sm.event.sendToWorld(self.sv.saved.world, "sv_enableFreecam", { state = params[2], players = { player } })
+	elseif params[1] == "/tm" then
+		local team = TeamManager.sv_getTeamColor(player)
+		if not team then
+			self.network:sendToClient(player, "client_showMessage", "#ff0000Not in a team!")
+
+			return
+		end
+		local msg = ""
+
+		table.remove(params, 1)
+
+		for _, v in pairs(params) do
+			msg = msg .. " " .. v
+		end
+		for _, p in pairs(sm.player.getAllPlayers()) do
+			if TeamManager.sv_getTeamColor(p) ~= team then goto continue end
+
+
+			self.network:sendToClient(p, "client_showMessage", team .. player:getName() .. "#ffffff :" .. msg)
+
+			::continue::
+		end
 	end
 
 	if not self:Authorised(player) then return end
@@ -179,28 +209,12 @@ function Game:server_onChatCommand(params, player)
 		g_teamManager.settings.ForceFreecam = params[2]
 		self:sv_Alert(params[2] and "Enforced Spectator Freecam Enabled!" or "Enforced Spectator Freecam Disabled!")
 		return
-	elseif params[1] == "/tm" then
-		local team = TeamManager.sv_getTeamColor(player)
-		if not team then
-			self.network:sendToClient(player, "client_showMessage", "#ff0000Not in a team!")
-
-			return
-		end
-		local msg = ""
-
-		table.remove(params, 1)
-
-		for _, v in pairs(params) do
-			msg = msg .. " " .. v
-		end
-		for _, p in pairs(sm.player.getAllPlayers()) do
-			if TeamManager.sv_getTeamColor(p) ~= team then goto continue end
-
-
-			self.network:sendToClient(p, "client_showMessage", team .. player:getName() .. "#ffffff :" .. msg)
-
-			::continue::
-		end
+	elseif params[1] == "/start" then
+		self:sv_start()
+		return
+	elseif params[1] == "/stop" then
+		self:sv_stop()
+		return
 	end
 
 	if params[1] == "/ban" or params[1] == "/kick" then
@@ -322,6 +336,8 @@ function Game:cl_onAssignCommands(authorised)
 		sm.game.bindChatCommand("/unlimited", {}, "cl_onChatCommand", "Use the unlimited inventory")
 		sm.game.bindChatCommand("/encrypt", {}, "cl_onChatCommand", "Restrict interactions in all warehouses")
 		sm.game.bindChatCommand("/decrypt", {}, "cl_onChatCommand", "Unrestrict interactions in all warehouses")
+		sm.game.bindChatCommand("/start", {}, "cl_onChatCommand", "Start a game!")
+		sm.game.bindChatCommand("/stop", {}, "cl_onChatCommand", "Stop a game!")
 
 		sm.game.bindChatCommand("/freecam", { { "bool", "state", false } }, "cl_onChatCommand", "Toggle Freecam")
 		sm.game.bindChatCommand("/forcefreecam", { { "bool", "state", false } }, "cl_onChatCommand",
@@ -348,6 +364,22 @@ function Game:cl_onAssignCommands(authorised)
 end
 
 -- Commands --
+
+function Game:sv_start()
+	g_gameActive = true
+	sm.event.sendToWorld(self.sv.saved.world, "sv_start")
+
+	for _, plr in ipairs(sm.player.getAllPlayers()) do
+		self:sv_e_respawn({ player = plr })
+	end
+
+	self.network:sendToClients("cl_Alert", { Text = "Game has started!" })
+	self.network:sendToClients("client_showMessage", "Game has started!")
+end
+
+function Game:sv_stop()
+	g_gameActive = false
+end
 
 function Game:sv_forceFreecam(params)
 	sm.event.sendToWorld(self.sv.saved.world, "sv_enableFreecam", { state = params[1], players = params[2] })
