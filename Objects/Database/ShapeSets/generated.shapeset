@@ -894,7 +894,7 @@
                 "liftable": false,
                 "paintable": false
             },
-            "showInInventory": false
+            "showInInventory": true
         }
     ],
     "partList": [
@@ -6467,7 +6467,12 @@
             },
             "flammable": false,
             "stackSize": 10,
-            "showInInventory": false
+            "showInInventory": true,
+            "restrictions": {
+                "erasable": false,
+                "connectable": false,
+                "destructable": false
+            }
         },
         {
             "uuid": "aa8d89eb-919b-42f4-8b58-af6f0d5856bc",
@@ -7315,12 +7320,12 @@
             },
             "flammable": false,
             "stackSize": 10,
-            "showInInventory": true,
             "restrictions": {
                 "erasable": false,
                 "connectable": false,
                 "destructable": false
-            }
+            },
+            "showInInventory": true
         },
         {
             "uuid": "8f7fd0e7-c46e-4944-a414-7ce2437bb30f",
@@ -7343,12 +7348,12 @@
             },
             "flammable": false,
             "stackSize": 5,
-            "showInInventory": true,
             "restrictions": {
                 "erasable": false,
                 "connectable": false,
                 "destructable": false
-            }
+            },
+            "showInInventory": true
         },
         {
             "uuid": "161786c1-1290-4817-8f8b-7f80de755a06",

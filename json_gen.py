@@ -73,6 +73,10 @@ for folder in shapesetFolders:
                     else:
                         block["showInInventory"] = False
 
+                    if block["uuid"] in oldCreativeItems:
+                        #janky check fo framework block
+                        block["showInInventory"] = True
+
                     newShapeSets["blockList"].append(block)
 
             if "partList" in data:
