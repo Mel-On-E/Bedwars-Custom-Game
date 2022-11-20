@@ -1,6 +1,6 @@
 dofile("$CONTENT_DATA/Scripts/TeamManager.lua")
 dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
-
+---@class BedwarsBed :ShapeClass
 BedwarsBed = class()
 
 local colors = {
@@ -131,7 +131,9 @@ end
 
 function BedwarsBed.client_onInteract(self, character, state)
     if state == true then
-        self.network:sendToServer("server_activateBed", character)
+        if not g_gameActive then
+            self.network:sendToServer("server_activateBed", character)
+        end
         self:cl_seat()
     end
 end
