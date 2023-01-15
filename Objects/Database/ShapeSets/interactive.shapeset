@@ -288,7 +288,8 @@
             "buoyancy": 2
          },
          "flammable": false,
-         "stackSize": 10
+         "stackSize": 10,
+         "showInInventory": false
       },
       {
          "uuid": "69b4ae0b-30c8-4250-8eda-59911da4bf5a",
@@ -310,7 +311,8 @@
             "buoyancy": 4
          },
          "flammable": false,
-         "stackSize": 5
+         "stackSize": 5,
+         "showInInventory": false
       }
    ]
 }
