@@ -26,5 +26,9 @@
   "ea9329c6-48ef-4a1b-b010-b8e0ffc10238": {
     "description": "The Logic Gate is a powerful block that allows you to build basic logical functions. By pressing E on the block, the mechanic can choose between different logic gate types. The logic gate can be connected to other logic gates, triggers, timers and more. Great for making advanced creations.",
     "title": "Logic Gate"
+  },
+  "fada88d2-0b6e-4fdd-9fa6-5fd4c6098fd6": {
+    "description": "Connect all parts of the map together with this block to make it one creation. The block will be automatically deleted whenever you load the map later.",
+    "title": "Map Connection Block"
   }
 }
