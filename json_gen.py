@@ -13,7 +13,7 @@ extraItems = "/extra_items.json"
 with open(os.getcwd() + extraItems) as f:
     data = json.loads(f.read())
     recipeUuuids = data
-    
+
 
 bedwarsRecipes = "/bedwars.json"
 with open(os.getcwd() + bedwarsRecipes) as f:
@@ -41,40 +41,43 @@ destroyTimes = {}
 stackSizes = {}
 for folder in OldShapesetFolders:
     for file in os.listdir(folder):
-        #check if file is dir, but not neccessary
+        # check if file is dir, but not neccessary
         with open(folder + file) as f:
             data = json.loads(f.read())
 
             for part in data["partList"]:
                 if "destroyTime" in part:
                     destroyTimes[part["uuid"]] = part["destroyTime"]
-                
+
                 if "stackSize" in part:
                     stackSizes[part["uuid"]] = part["stackSize"]
 
 
+def restrict_item(obj):
+    if not "restrictions" in obj:
+        obj["restrictions"] = {"erasable": False, "destructable": False}
+    else:
+        obj["restrictions"]["erasable"] = False
+        obj["restrictions"]["destructable"] = False
 
 
-newShapeSets = { "blockList": [], "partList": []}
+newShapeSets = {"blockList": [], "partList": []}
 
 for folder in shapesetFolders:
     for file in os.listdir(folder):
-        #check if file is dir, but not neccessary
+        # check if file is dir, but not neccessary
         with open(folder + file) as f:
             data = json.loads(f.read())
 
             if "blockList" in data:
                 for block in data["blockList"]:
                     if not block["uuid"] in recipeUuuids:
-                        if not "restrictions" in block:
-                            block["restrictions"] = {"erasable": False}
-                        else: #not "ersable" in part["restrictions"]:
-                            block["restrictions"]["erasable"] = False
+                        restrict_item(block)
                     else:
                         block["showInInventory"] = False
 
                     if block["uuid"] in oldCreativeItems:
-                        #janky check fo framework block
+                        # janky check for framework block
                         block["showInInventory"] = True
 
                     newShapeSets["blockList"].append(block)
@@ -87,15 +90,11 @@ for folder in shapesetFolders:
                     if part["uuid"] in stackSizes:
                         part["stackSize"] = stackSizes[part["uuid"]]
 
-                    
                     if part["uuid"] in upgradeableItems:
                         part["showInInventory"] = False
 
                     if not part["uuid"] in recipeUuuids:
-                        if not "restrictions" in part:
-                            part["restrictions"] = {"erasable": False}
-                        else: #not "ersable" in part["restrictions"]:
-                            part["restrictions"]["erasable"] = False
+                        restrict_item(part)
                     else:
                         part["showInInventory"] = False
 
