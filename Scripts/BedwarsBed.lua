@@ -106,7 +106,7 @@ function BedwarsBed.server_activateBed(self, character, player)
 
     TeamManager.sv_setTeam(player, newColor)
     if newColor ~= oldColor then
-        self.network:sendToClients("client_showMessage", newColor .. player.name .. "#ffffff changed team")
+        self.network:sendToClients("cl_changeTeamMsg", newColor .. player.name .. "#ffffff ")
     end
 end
 
@@ -187,6 +187,10 @@ end
 
 function BedwarsBed.client_showMessage(self, msg)
     sm.gui.chatMessage(msg)
+end
+
+function BedwarsBed:cl_changeTeamMsg(msg)
+  sm.gui.chatMessage(msg .. language_tag("teamChange"))
 end
 
 SecureClass(BedwarsBed)
