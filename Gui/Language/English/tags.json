@@ -1,0 +1,15 @@
+{
+  "mapLook": "Look at the map while saving it",
+  "player": "player",
+  "players": "players",
+  "bedDestroyed": "Bed Destroyed!",
+  "playersLeft": "left",
+  "gameStart": "Game has started!",
+  "invalidID": "Invalid PlayerID",
+  "teamChange": "changed team",
+  "mapDelete": "Map deleted",
+  "mapLoading": "The map is loading",
+  "spectator": "is now a spectator",
+  "spectatorCmd": "Become a spectator",
+  "teamMsgCmd": "Send a message to your teammates"
+}

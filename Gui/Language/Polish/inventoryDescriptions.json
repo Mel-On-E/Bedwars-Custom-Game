@@ -1,0 +1,34 @@
+{
+  "5fcb4cb8-7623-11ea-bc55-0242ac130003": {
+    "description": "Użyj przedmiotów które dostajesz z spawnerów żeby kupić itemy u handlarza",
+    "title": "Handlarz Bedwars"
+  },
+  "108d772f-9851-400f-a014-d847900458a7": {
+    "description": "Spawnuje itemki w twojej bazie",
+    "title": "Spawner bazowy"
+  },
+  "208d772f-9851-400f-a014-d847900458a7": {
+    "description": "Spawnuje itemki na środku mapy (Tylko Błyszczaki)",
+    "title": "Środkowy spawner"
+  },
+  "6488a8fa-1187-45e8-8dac-47d13bdaa026": {
+    "description": "Prześpij sie żeby zmienić drużyne. Broń za wszelką cene",
+    "title": "Łóżko Bedwars "
+  },
+  "f2aa1e44-aea8-4431-9b7e-f7e35163dd7c": {
+    "description": "Błyszczący blok służący do ochrony twojego łóżka",
+    "title": "Błyszczący block"
+  },
+  "69b4ae0b-30c8-4250-8eda-59911da4bf5a": {
+    "description": "The Timer allows you delay the interaction between two interactive parts. For example, between a switch and a controller. It goes great with Logic Gates.",
+    "title": "Timer"
+  },
+  "ea9329c6-48ef-4a1b-b010-b8e0ffc10238": {
+    "description": "The Logic Gate is a powerful block that allows you to build basic logical functions. By pressing E on the block, the mechanic can choose between different logic gate types. The logic gate can be connected to other logic gates, triggers, timers and more. Great for making advanced creations.",
+    "title": "Logic Gate"
+  },
+  "fada88d2-0b6e-4fdd-9fa6-5fd4c6098fd6": {
+    "description": "Połącz wszystkie części mapy razem używając tego bloku żeby zrobić je jedną kreacją. Ten blok będzie automatycznie usunięty kiedy załadujesz potem mape",
+    "title": "Blok łączenia mapy"
+  }
+}

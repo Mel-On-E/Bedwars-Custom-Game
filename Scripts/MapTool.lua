@@ -2,15 +2,18 @@ dofile("$GAME_DATA/Scripts/game/AnimationUtil.lua")
 
 dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
 local renderables = { "$SURVIVAL_DATA/Character/Char_Tools/Char_logbook/char_logbook.rend" }
-local renderablesTp = { "$SURVIVAL_DATA/Character/Char_Male/Animations/char_male_tp_logbook.rend",
-	"$SURVIVAL_DATA/Character/Char_Tools/Char_logbook/char_logbook_tp_animlist.rend" }
-local renderablesFp = { "$SURVIVAL_DATA/Character/Char_Male/Animations/char_male_fp_logbook.rend",
-	"$SURVIVAL_DATA/Character/Char_Tools/Char_logbook/char_logbook_fp_animlist.rend" }
+local renderablesTp = {
+	"$SURVIVAL_DATA/Character/Char_Male/Animations/char_male_tp_logbook.rend",
+	"$SURVIVAL_DATA/Character/Char_Tools/Char_logbook/char_logbook_tp_animlist.rend",
+}
+local renderablesFp = {
+	"$SURVIVAL_DATA/Character/Char_Male/Animations/char_male_fp_logbook.rend",
+	"$SURVIVAL_DATA/Character/Char_Tools/Char_logbook/char_logbook_fp_animlist.rend",
+}
 
 sm.tool.preloadRenderables(renderables)
 sm.tool.preloadRenderables(renderablesTp)
 sm.tool.preloadRenderables(renderablesFp)
-
 
 MapTool = class()
 
@@ -18,41 +21,40 @@ function MapTool:client_onCreate()
 	self.cl = {}
 	self:client_onRefresh()
 
-    load_map_data()
-    self.mapIndex = 1
+	load_map_data()
+	self.mapIndex = 1
 end
 
 function load_map_data()
 	g_maps = sm.json.open("$CONTENT_DATA/Maps/maps.json")
 	local custom_maps = sm.json.open("$CONTENT_DATA/Maps/custom.json")
 	if custom_maps then
-		for k,v in ipairs(custom_maps) do
-			g_maps[#g_maps+1] = v
+		for k, v in ipairs(custom_maps) do
+			g_maps[#g_maps + 1] = v
 		end
 	end
 end
 
 function MapTool:cl_openGui()
-    self.gui = sm.gui.createGuiFromLayout("$CONTENT_DATA/Gui/Layouts/MapTool.layout")
+	self.gui = sm.gui.createGuiFromLayout("$CONTENT_DATA/Gui/Layouts/MapTool.layout")
 
-    self.gui:setOnCloseCallback("cl_onGuiClosed")
-    self.gui:setButtonCallback("+1", "cl_change_map")
-    self.gui:setButtonCallback("-1", "cl_change_map")
+	self.gui:setOnCloseCallback("cl_onGuiClosed")
+	self.gui:setButtonCallback("+1", "cl_change_map")
+	self.gui:setButtonCallback("-1", "cl_change_map")
 
 	self.gui:setButtonCallback("DeleteMap", "cl_delete_map_button")
 	self.gui:setButtonCallback("LoadMap", "cl_load_map_button")
 	self.gui:setButtonCallback("ShareMap", "cl_share_map_button")
-	
 
-    self:update_page()
+	self:update_page()
 
 	self.gui:open()
 end
 
 function MapTool:update_page()
-    local map = g_maps[self.mapIndex]
+	local map = g_maps[self.mapIndex]
 
-    self.gui:setText("Title", map.name)
+	self.gui:setText("Title", map.name)
 	self.gui:setVisible("DeleteMap", map.custom)
 	self.gui:setVisible("ShareMap", map.custom)
 
@@ -61,13 +63,13 @@ function MapTool:update_page()
 		self.gui:setImage("Image", "$CONTENT_DATA/Gui/Images/" .. map.image)
 	else
 		local unit = "minutes"
-		local value = math.floor((os.time() - map.time)/60)
+		local value = math.floor((os.time() - map.time) / 60)
 		if value >= 60 then
 			unit = "hours"
-			value = math.floor(value/60)
+			value = math.floor(value / 60)
 			if value >= 24 then
 				unit = "days"
-				value = math.floor(value/24)
+				value = math.floor(value / 24)
 			end
 		end
 
@@ -78,22 +80,22 @@ function MapTool:update_page()
 end
 
 function MapTool:cl_change_map(button)
-    local change = tonumber(button)
-    self.mapIndex = self.mapIndex + change
-    self.mapIndex = math.min(#g_maps, self.mapIndex)
-    self.mapIndex = math.max(1, self.mapIndex)
+	local change = tonumber(button)
+	self.mapIndex = self.mapIndex + change
+	self.mapIndex = math.min(#g_maps, self.mapIndex)
+	self.mapIndex = math.max(1, self.mapIndex)
 
-    self:update_page()
+	self:update_page()
 end
 
 function MapTool:cl_createConfirmGui(callback, description)
 	self.gui:close()
 
-	self.cl.confirmGui = sm.gui.createGuiFromLayout( "$GAME_DATA/Gui/Layouts/PopUp/PopUp_YN.layout" )
-	self.cl.confirmGui:setButtonCallback( "Yes", callback )
-	self.cl.confirmGui:setButtonCallback( "No", callback )
-	self.cl.confirmGui:setText( "Title", "#{MENU_YN_TITLE_ARE_YOU_SURE}" )
-	self.cl.confirmGui:setText( "Message", description )
+	self.cl.confirmGui = sm.gui.createGuiFromLayout("$GAME_DATA/Gui/Layouts/PopUp/PopUp_YN.layout")
+	self.cl.confirmGui:setButtonCallback("Yes", callback)
+	self.cl.confirmGui:setButtonCallback("No", callback)
+	self.cl.confirmGui:setText("Title", "#{MENU_YN_TITLE_ARE_YOU_SURE}")
+	self.cl.confirmGui:setText("Message", description)
 	self.cl.confirmGui:open()
 end
 
@@ -105,8 +107,8 @@ end
 function MapTool:cl_delete_map(name)
 	if name == "Yes" then
 		self.cl.confirmGui:close()
-		
-		sm.json.save({}, "$CONTENT_DATA/Maps/Custom/".. g_maps[self.mapIndex].blueprint ..".blueprint")
+
+		sm.json.save({}, "$CONTENT_DATA/Maps/Custom/" .. g_maps[self.mapIndex].blueprint .. ".blueprint")
 
 		local custom_maps = sm.json.open("$CONTENT_DATA/Maps/custom.json")
 		for k, map in ipairs(custom_maps) do
@@ -118,9 +120,7 @@ function MapTool:cl_delete_map(name)
 		load_map_data()
 		self.mapIndex = math.min(#g_maps, self.mapIndex)
 
-
-		sm.gui.displayAlertText("Map Deleted!")
-
+		sm.gui.displayAlertText(language_tag("mapDelete"))
 	elseif name == "No" then
 		self.cl.confirmGui:close()
 	end
@@ -128,7 +128,9 @@ function MapTool:cl_delete_map(name)
 end
 
 function MapTool:cl_load_map_button()
-	local msg = "#999999Do you want to load #00ff00" .. g_maps[self.mapIndex].name .. "#999999?\nThis will END your current game!"
+	local msg = "#999999Do you want to load #00ff00"
+		.. g_maps[self.mapIndex].name
+		.. "#999999?\nThis will END your current game!"
 	self:cl_createConfirmGui("cl_load_map", msg)
 end
 
@@ -136,11 +138,10 @@ function MapTool:cl_share_map_button()
 	sm.event.sendToGame("cl_shareMap", g_maps[self.mapIndex])
 end
 
-
 function MapTool:cl_load_map(name)
 	if name == "Yes" then
 		self.cl.confirmGui:close()
-		
+
 		local map = g_maps[self.mapIndex]
 		name = map.blueprint
 		if map.custom then
@@ -148,8 +149,7 @@ function MapTool:cl_load_map(name)
 		end
 		self.network:sendToServer("server_load_map", name)
 
-		sm.gui.displayAlertText("Map Loading...")
-
+		sm.gui.displayAlertText(language_tag("mapLoading"))
 	elseif name == "No" then
 		self.cl.confirmGui:close()
 	end
@@ -164,19 +164,20 @@ function MapTool:server_load_map(file)
 		local team = TeamManager.sv_getTeamColor(player)
 		if team then
 			TeamManager.sv_setTeam(player, nil)
-			self.network:sendToClients("client_showMessage", player.name .. " is now a spectator")
+			self.network:sendToClients("cl_specatorMsg", player.name)
 		end
 	end
 end
 
-
+function MapTool:cl_specatorMsg(msg)
+	sm.gui.chatMessage(msg .. " " ..language_tag("spectator"))
+end
 
 function MapTool.client_onEquip(self)
-    if not sm.isHost then
-        sm.tool.forceTool(nil)
-        return
-    end
-
+	if not sm.isHost then
+		sm.tool.forceTool(nil)
+		return
+	end
 
 	if self.tool:isLocal() then
 		self:cl_openGui()
@@ -198,12 +199,7 @@ function MapTool.cl_onGuiClosed(self)
 	self.cl.seatedEquiped = false
 end
 
-function MapTool.client_onUnequip( self ) end
-
-
-
-
-
+function MapTool.client_onUnequip(self) end
 
 --ANIMATION STUFF BELOW
 function MapTool:client_onEquipAnimations()
@@ -269,7 +265,7 @@ function MapTool.client_onUpdate(self, dt)
 				end
 			end
 			if animation.time >= animation.info.duration - self.cl.blendTime and not animation.looping then
-				if (name == "putdown") then
+				if name == "putdown" then
 					self.cl.equipped = false
 				elseif animation.nextAnimation ~= "" then
 					setTpAnimation(self.tpAnimations, animation.nextAnimation, 0.001)
@@ -284,7 +280,6 @@ function MapTool.client_onUpdate(self, dt)
 
 	totalWeight = totalWeight == 0 and 1.0 or totalWeight
 	for name, animation in pairs(self.tpAnimations.animations) do
-
 		local weight = animation.weight / totalWeight
 		if name == "idle" then
 			self.tool:updateMovementAnimation(animation.time, weight)
@@ -302,8 +297,11 @@ function MapTool.client_onUnequip(self)
 	self.cl.seatedEquiped = false
 	if sm.exists(self.tool) then
 		setTpAnimation(self.tpAnimations, "useExit")
-		if self.tool:isLocal() and self.fpAnimations.currentAnimation ~= "unequip" and
-			self.fpAnimations.currentAnimation ~= "useExit" then
+		if
+			self.tool:isLocal()
+			and self.fpAnimations.currentAnimation ~= "unequip"
+			and self.fpAnimations.currentAnimation ~= "useExit"
+		then
 			swapFpAnimation(self.fpAnimations, "equip", "useExit", 0.2)
 		end
 	end
@@ -311,17 +309,14 @@ end
 
 function MapTool.cl_loadAnimations(self)
 	-- TP
-	self.tpAnimations = createTpAnimations(
-		self.tool,
-		{
-			idle = { "logbook_use_idle", { looping = true } },
-			sprint = { "logbook_sprint" },
-			pickup = { "logbook_pickup", { nextAnimation = "useInto" } },
-			putdown = { "logbook_putdown" },
-			useInto = { "logbook_use_into", { nextAnimation = "idle" } },
-			useExit = { "logbook_use_exit", { nextAnimation = "putdown" } }
-		}
-	)
+	self.tpAnimations = createTpAnimations(self.tool, {
+		idle = { "logbook_use_idle", { looping = true } },
+		sprint = { "logbook_sprint" },
+		pickup = { "logbook_pickup", { nextAnimation = "useInto" } },
+		putdown = { "logbook_putdown" },
+		useInto = { "logbook_use_into", { nextAnimation = "idle" } },
+		useExit = { "logbook_use_exit", { nextAnimation = "putdown" } },
+	})
 
 	local movementAnimations = {
 		idle = "logbook_use_idle",
@@ -341,7 +336,7 @@ function MapTool.cl_loadAnimations(self)
 
 		crouchIdle = "logbook_crouch_idle",
 		crouchFwd = "logbook_crouch_fwd",
-		crouchBwd = "logbook_crouch_bwd"
+		crouchBwd = "logbook_crouch_bwd",
 	}
 
 	for name, animation in pairs(movementAnimations) do
@@ -350,16 +345,13 @@ function MapTool.cl_loadAnimations(self)
 
 	if self.tool:isLocal() then
 		-- FP
-		self.fpAnimations = createFpAnimations(
-			self.tool,
-			{
-				idle = { "logbook_use_idle", { looping = true } },
-				equip = { "logbook_pickup", { nextAnimation = "useInto" } },
-				unequip = { "logbook_putdown" },
-				useInto = { "logbook_use_into", { nextAnimation = "idle" } },
-				useExit = { "logbook_use_exit", { nextAnimation = "unequip" } }
-			}
-		)
+		self.fpAnimations = createFpAnimations(self.tool, {
+			idle = { "logbook_use_idle", { looping = true } },
+			equip = { "logbook_pickup", { nextAnimation = "useInto" } },
+			unequip = { "logbook_putdown" },
+			useInto = { "logbook_use_into", { nextAnimation = "idle" } },
+			useExit = { "logbook_use_exit", { nextAnimation = "unequip" } },
+		})
 	end
 
 	setTpAnimation(self.tpAnimations, "idle", 5.0)

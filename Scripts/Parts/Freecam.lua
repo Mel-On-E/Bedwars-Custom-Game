@@ -22,7 +22,6 @@ function Freecam:client_onUpdate(dt)
     sm.camera.setDirection(sm.localPlayer.getPlayer().character.direction)
     sm.camera.setFov(sm.camera.getDefaultFov())
 end
-
 function Freecam:client_onAction(action, state)
     if not self.cl.enabled then return end
     local val = state and 1 or -1

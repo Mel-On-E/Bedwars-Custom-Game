@@ -1,5 +1,5 @@
 dofile("$SURVIVAL_DATA/Scripts/game/managers/BeaconManager.lua")
-
+dofile("$CONTENT_DATA/Scripts/LanguageManager.lua")
 dofile("$CONTENT_DATA/Scripts/Utils/Network.lua")
 dofile("$CONTENT_DATA/Scripts/RespawnManager.lua")
 
@@ -46,7 +46,8 @@ function Game:server_onCreate()
 
 	self.sv.teamManager = sm.storage.load(69)
 	if not self.sv.teamManager then
-		self.sv.teamManager = sm.scriptableObject.createScriptableObject(sm.uuid.new("cb5871ae-c677-4480-94e9-31d16899d093"))
+		self.sv.teamManager =
+			sm.scriptableObject.createScriptableObject(sm.uuid.new("cb5871ae-c677-4480-94e9-31d16899d093"))
 		sm.storage.save(69, self.sv.teamManager)
 	end
 
@@ -87,6 +88,8 @@ function Game:client_onCreate()
 		g_beaconManager = BeaconManager()
 	end
 	g_beaconManager:cl_onCreate()
+
+	g_languageManager = LanguageManager()
 end
 
 function Game:server_onPlayerJoined(player, isNewPlayer)
@@ -157,7 +160,9 @@ function Game:server_onChatCommand(params, player)
 	elseif params[1] == "/spectator" then
 		self:sv_setSpectator(player)
 	elseif params[1] == "/freecam" and not g_teamManager.sv_getTeamColor(player) then
-		if g_teamManager.settings.ForceFreecam and not self:Authorised(player) then return end
+		if g_teamManager.settings.ForceFreecam and not self:Authorised(player) then
+			return
+		end
 		sm.event.sendToWorld(self.sv.saved.world, "sv_enableFreecam", { state = params[2], players = { player } })
 	elseif params[1] == "/tm" then
 		local team = TeamManager.sv_getTeamColor(player)
@@ -174,8 +179,9 @@ function Game:server_onChatCommand(params, player)
 			msg = msg .. " " .. v
 		end
 		for _, p in pairs(sm.player.getAllPlayers()) do
-			if TeamManager.sv_getTeamColor(p) ~= team then goto continue end
-
+			if TeamManager.sv_getTeamColor(p) ~= team then
+				goto continue
+			end
 
 			self.network:sendToClient(p, "client_showMessage", team .. player:getName() .. "#ffffff :" .. msg)
 
@@ -183,7 +189,9 @@ function Game:server_onChatCommand(params, player)
 		end
 	end
 
-	if not self:Authorised(player) then return end
+	if not self:Authorised(player) then
+		return
+	end
 
 	if params[1] == "/encrypt" then
 		sm.game.setEnableRestrictions(true)
@@ -236,11 +244,17 @@ function Game:server_onChatCommand(params, player)
 				self.network:sendToClients("client_showMessage", client.name .. "#ff0000 has been kicked!")
 			end
 		else
-			self.network:sendToClient(player, "client_showMessage", "Couldn't find player with id: " .. tostring(params[2]))
+			self.network:sendToClient(
+				player,
+				"client_showMessage",
+				"Couldn't find player with id: " .. tostring(params[2])
+			)
 		end
 	end
 
-	if player.id ~= 1 then return end
+	if player.id ~= 1 then
+		return
+	end
 
 	if params[1] == "/auth" then
 		local Result = self:Authorise(params[2]) and "Success" or "Already Authed"
@@ -261,11 +275,11 @@ function Game:cl_onChatCommand(params) -- just don't handle the command if its a
 		if rayCastValid and rayCastResult.type == "body" then
 			local importParams = {
 				name = params[2],
-				body = rayCastResult:getBody()
+				body = rayCastResult:getBody(),
 			}
 			self.network:sendToServer("server_exportMap", importParams)
 		else
-			sm.gui.chatMessage("#ff0000Look at the map while saving it")
+			sm.gui.chatMessage("#ff0000" .. language_tag("mapLook"))
 		end
 	elseif params[1] == "/ids" then
 		for _, player in ipairs(sm.player.getAllPlayers()) do
@@ -279,7 +293,10 @@ function Game:cl_onChatCommand(params) -- just don't handle the command if its a
 				break
 			end
 		end
-		if not Player then self:cl_Alert({ Text = "Invaild PlayerId" }) return end
+		if not Player then
+			self:cl_Alert({ Text = language_tag("invalidID") })
+			return
+		end
 		local rayCastValid, rayCastResult = sm.localPlayer.getRaycast(100)
 		if rayCastValid and rayCastResult.type == "body" then
 			local Distance = math.huge
@@ -304,32 +321,78 @@ end
 
 function Game:cl_onAssignCommands(authorised)
 	sm.game.bindChatCommand("/fly", {}, "cl_onChatCommand", "Toggle fly mode")
-	sm.game.bindChatCommand("/spectator", {}, "cl_onChatCommand", "Become a spectator")
-	sm.game.bindChatCommand("/tm",
-		{ { "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true },
-			{ "string", "message", true }, { "string", "message", true }, { "string", "message", true }, }, "cl_onChatCommand",
-		"Team message")
+	sm.game.bindChatCommand("/spectator", {}, "cl_onChatCommand", language_tag("spectatorCmd"))
+	sm.game.bindChatCommand("/tm", {
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+		{ "string", "message", true },
+	}, "cl_onChatCommand", language_tag("teamMsgCmd"))
 
 	if authorised then
 		sm.game.bindChatCommand("/limited", {}, "cl_onChatCommand", "Use the limited inventory")
@@ -340,11 +403,24 @@ function Game:cl_onAssignCommands(authorised)
 		sm.game.bindChatCommand("/stop", {}, "cl_onChatCommand", "Stop a game!")
 
 		sm.game.bindChatCommand("/freecam", { { "bool", "state", false } }, "cl_onChatCommand", "Toggle Freecam")
-		sm.game.bindChatCommand("/forcefreecam", { { "bool", "state", false } }, "cl_onChatCommand",
-			"Spectators will be stuck in freecam.")
-		sm.game.bindChatCommand("/lockteams", { { "bool", "state", false } }, "cl_onChatCommand", "Toggles Team Changing.")
-		sm.game.bindChatCommand("/forceteam", { { "int", "id", false } }, "cl_onChatCommand",
-			"Forces Player Into Team. (Stare at a bed)")
+		sm.game.bindChatCommand(
+			"/forcefreecam",
+			{ { "bool", "state", false } },
+			"cl_onChatCommand",
+			"Spectators will be stuck in freecam."
+		)
+		sm.game.bindChatCommand(
+			"/lockteams",
+			{ { "bool", "state", false } },
+			"cl_onChatCommand",
+			"Toggles Team Changing."
+		)
+		sm.game.bindChatCommand(
+			"/forceteam",
+			{ { "int", "id", false } },
+			"cl_onChatCommand",
+			"Forces Player Into Team. (Stare at a bed)"
+		)
 
 		-- Moderation --
 		sm.game.bindChatCommand("/ids", {}, "cl_onChatCommand", "Lists all players with their ID")
@@ -373,8 +449,7 @@ function Game:sv_start()
 		self:sv_e_respawn({ player = plr })
 	end
 
-	self.network:sendToClients("cl_Alert", { Text = "Game has started!" })
-	self.network:sendToClients("client_showMessage", "Game has started!")
+	self.network:sendToClients("cl_gameStartMsg")
 end
 
 function Game:sv_stop()
@@ -386,7 +461,9 @@ function Game:sv_forceFreecam(params)
 end
 
 function Game:server_exportMap(params, player)
-	if not player.id == 1 then return end
+	if not player.id == 1 then
+		return
+	end
 	local obj = sm.json.parseJsonString(sm.creation.exportToString(params.body))
 	sm.json.save(obj, "$CONTENT_DATA/Maps/Custom/" .. params.name .. ".blueprint")
 
@@ -407,7 +484,9 @@ function Game:server_exportMap(params, player)
 end
 
 function Game:server_forceTeam(parameters, player)
-	if not self:Authorised(player) or not sm.exists(parameters.player.character) then return end
+	if not self:Authorised(player) or not sm.exists(parameters.player.character) then
+		return
+	end
 	if parameters.bed then
 		sm.event.sendToInteractable(parameters.bed:getInteractable(), "sv_activatedBed", parameters.player)
 	else
@@ -428,10 +507,12 @@ function Game:sv_toggleFly(player)
 end
 
 function Game:sv_setSpectator(player)
-	if not g_teamManager.settings.CanChangeTeam and not self:Authorised(player) then return end
+	if not g_teamManager.settings.CanChangeTeam and not self:Authorised(player) then
+		return
+	end
 	TeamManager.sv_setTeam(player, nil)
 
-	self.network:sendToClients("client_showMessage", player.name .. " is now a spectator")
+	self.network:sendToClients("cl_specatorMsg", player.name )
 end
 
 -- Callbacks --
@@ -448,17 +529,31 @@ function Game:sv_bedDestroyed(color)
 end
 
 function Game:client_bedDestroyed(params)
-	local stopComplainingAboutGrammar = "players"
+	local stopComplainingAboutGrammar = language_tag("players")
 	if params.players == 1 then
-		stopComplainingAboutGrammar = "player"
+		stopComplainingAboutGrammar = language_tag("player")
 	end
 
-	sm.gui.chatMessage(params.color .. "Bed destroyed! (" ..
-		"#ffffff" .. params.players .. " " .. stopComplainingAboutGrammar .. " left" .. params.color .. ")"
+	sm.gui.chatMessage(
+		params.color
+			.. language_tag("bedDestroyed")
+			.. "("
+			.. "#ffffff"
+			.. params.players
+			.. " "
+			.. stopComplainingAboutGrammar
+			.. " "
+			.. language_tag("playersLeft")
+			.. params.color
+			.. ")"
 	)
 
-	sm.gui.displayAlertText(params.color .. "Bed destroyed!")
+	sm.gui.displayAlertText(params.color .. language_tag("bedDestroyed"))
+end
 
+function Game:cl_gameStartMsg()
+	sm.gui.displayAlertText(language_tag("gameStart"))
+	sm.gui.chatMessage(language_tag("gameStart"))
 end
 
 function Game:sv_e_respawn(params)
@@ -469,8 +564,12 @@ function Game:sv_e_respawn(params)
 		if not sm.exists(self.sv.saved.world) then
 			sm.world.loadWorld(self.sv.saved.world)
 		end
-		self.sv.saved.world:loadCell(math.floor(spawnPoint.x / 64), math.floor(spawnPoint.y / 64), params.player,
-			"sv_createPlayerCharacter")
+		self.sv.saved.world:loadCell(
+			math.floor(spawnPoint.x / 64),
+			math.floor(spawnPoint.y / 64),
+			params.player,
+			"sv_createPlayerCharacter"
+		)
 	end
 end
 
@@ -498,8 +597,13 @@ end
 function Game:sv_yeet_player(player)
 	local char = player:getCharacter()
 	if char then
-		local newChar = sm.character.createCharacter(player, player:getCharacter():getWorld(), sm.vec3.new(69420, 69420, 69420)
-			, 0, 0)
+		local newChar = sm.character.createCharacter(
+			player,
+			player:getCharacter():getWorld(),
+			sm.vec3.new(69420, 69420, 69420),
+			0,
+			0
+		)
 		player:setCharacter(newChar)
 		player:setCharacter(nil)
 	end
@@ -510,6 +614,10 @@ function Game:cl_updateMapList(newMap)
 	if sm.isHost then
 		updateMapTable(g_maps, newMap)
 	end
+end
+
+function Game:cl_specatorMsg(msg)
+	sm.gui.chatMessage(msg .. " " .. language_tag("spectator"))
 end
 
 function Game:cl_Alert(data)
@@ -544,7 +652,9 @@ function Game:Authorise(id)
 end
 
 function Game:Unauthorise(id)
-	if id == 1 then return false end
+	if id == 1 then
+		return false
+	end
 	if self.sv.authorised[id] then
 		self.sv.authorised[id] = nil
 		return true

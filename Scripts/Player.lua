@@ -378,7 +378,7 @@ end
 function Player:sv_removePlayer(player)
 	local team = TeamManager.sv_getTeamColor(player) or ""
 	TeamManager.sv_setTeam(player, nil)
-	self.network:sendToClients("cl_msg", player.name .. " is now a spectator")
+	self.network:sendToClients("cl_specatorMsg", player.name)
 
 	local remainingPlayers = TeamManager.sv_getTeamCount(team)
 	local stopComplainingAboutGrammar = "players"
@@ -622,6 +622,9 @@ function Player.server_onInventoryChanges(self, container, changes)
 	end
 end
 
+function Player:cl_specatorMsg(msg)
+  sm.gui.chatMessage(msg .. " " .. language_tag("spectator"))
+end
 function Player:sv_msg(msg)
 	self.network:sendToClients("cl_msg", msg)
 end

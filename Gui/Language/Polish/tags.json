@@ -1,0 +1,15 @@
+{
+  "mapLook": "Patrz na mape podczas zapisywania",
+  "player": "gracz",
+  "players": "graczy",
+  "playersLeft": "pozostało",
+  "bedDestroyed": "Łóżko zostało zniszczone!",
+  "gameStart": "Gra sie zaczeła!", 
+  "invalidID": "Nieprawidłowe id gracza",
+  "teamChange": "zmienił drużyne",
+  "mapDelete": "Mapa została usunięta",
+  "mapLoading": "Mapa ładuje się...",
+  "spectator": "jest teraz obserwującym",
+  "spectatorCmd": "Stań się obserwującym",
+  "teamMsgCmd": "Wyślij wiadomość do członków swojej drużyny"
+}
